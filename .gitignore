@@ -1,0 +1,24 @@
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.bcf
+*.blg
+*.run.xml
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.lof
+*.lot
+
+# Tectonic
+*.pdf
+
+# Editor
+.vscode/*
+!.vscode/settings.json
+
+# Build 
+build/
