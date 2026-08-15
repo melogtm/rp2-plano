@@ -2,159 +2,338 @@
 
 \usepackage{sbc-template}
 \usepackage{graphicx,url}
+\usepackage{float}
 \usepackage[utf8]{inputenc}
 \usepackage[brazil]{babel}
 
-     
 \sloppy
 
-\title{Instructions for Authors of SBC Conferences\\ Papers and Abstracts}
+\raggedbottom
 
-\author{Luciana P. Nedel\inst{1}, Rafael H. Bordini\inst{2}, Flávio Rech
-  Wagner\inst{1}, Jomi F. Hübner\inst{3} }
+\setlength{\parskip}{3pt}
 
+\renewcommand{\inst}[1]{}
 
-\address{Instituto de Informática -- Universidade Federal do Rio Grande do Sul
-  (UFRGS)\\
-  Caixa Postal 15.064 -- 91.501-970 -- Porto Alegre -- RS -- Brazil
-\nextinstitute
-  Department of Computer Science -- University of Durham\\
-  Durham, U.K.
-\nextinstitute
-  Departamento de Sistemas e Computação\\
-  Universidade Regional de Blumenal (FURB) -- Blumenau, SC -- Brazil
-  \email{\{nedel,flavio\}@inf.ufrgs.br, R.Bordini@durham.ac.uk,
-  jomi@inf.furb.br}
+\AtBeginEnvironment{thebibliography}{%
+  \setlength{\itemsep}{0pt plus 1pt minus 0pt}%
+  \setlength{\parsep}{0pt}%
 }
 
-\begin{document} 
+\title{Fatores associados \`a gravidade de acidentes em rodovias federais
+  brasileiras: relev\^ancia preditiva e estabilidade entre macrorregi\~oes}
+
+\author{Diogo Leonel dos Santos (15580980)\\ Gabriel Trigueiro de Melo
+  (15511832)\\ Dhener Alves Bento da Silva (15526067)}
+
+
+\address{Universidade de S\~ao Paulo (USP), S\~ao Paulo, SP, Brasil}
+
+\begin{document}
 
 \maketitle
 
-\begin{abstract}
-  This meta-paper describes the style to be used in articles and short papers
-  for SBC conferences. For papers in English, you should add just an abstract
-  while for the papers in Portuguese, we also ask for an abstract in
-  Portuguese (``resumo''). In both cases, abstracts should not have more than
-  10 lines and must be in the first page of the paper.
-\end{abstract}
-     
-\begin{resumo} 
-  Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
-  resumos de artigos para publicação nos anais das conferências organizadas
-  pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
-  escritos em português. Artigos em inglês deverão apresentar apenas abstract.
-  Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-  não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-  página do artigo.
+\begin{resumo}
+Modelos de aprendizado de m\'aquina treinados sobre dados abertos da
+Pol\'icia Rodovi\'aria Federal (PRF) s\~ao empregados para identificar
+fatores de risco associados \`a gravidade de acidentes. Um estudo recente
+\cite{gabardo2025} treinou kNN, MLP e Random Forest sobre registros da
+regi\~ao Sul (2021--2024), reportando AUC-ROC de 0,99 para a classe fatal
+em dois dos tr\^es modelos, e derivou fatores de risco via SHAP. A leitura
+do c\'odigo publicado revelou falhas de protocolo que comprometem a
+independ\^encia do conjunto de teste. Este trabalho quantifica, sob
+protocolo corrigido, a relev\^ancia preditiva dos fatores em base nacional
+de 608.921 registros, e avalia a estabilidade do desempenho e do
+ordenamento de fatores entre as cinco macrorregi\~oes por uma matriz de
+transfer\^encia $5\times 5$, com concord\^ancia medida pelo tau de Kendall
+e pela sobreposi\c{c}\~ao top-$k$.
 \end{resumo}
 
 
-\section{General Information}
+\section{Introdu\c{c}\~ao}
 
-All full papers and posters (short papers) submitted to some SBC conference,
-including any supporting documents, should be written in English or in
-Portuguese. The format paper should be A4 with single column, 3.5 cm for upper
-margin, 2.5 cm for bottom margin and 3.0 cm for lateral margins, without
-headers or footers. The main font must be Times, 12 point nominal size, with 6
-points of space before each paragraph. Page numbers must be suppressed.
+O tr\^ansito \'e uma das principais causas de morte evit\'avel no Brasil.
+Segundo o Anu\'ario Estat\'istico de Sinistros de Tr\^ansito 2024 da PRF
+\cite{prf2024}, as rodovias federais registraram 6.160 mortes em 2024, o
+maior n\'umero em cinco anos, das quais 4.291 em ocorr\^encias em pista
+simples. O Brasil \'e signat\'ario da Agenda 2030 da ONU, cuja meta ODS
+3.6 prev\^e reduzir pela metade as mortes e les\~oes no tr\^ansito at\'e
+2030, tema tamb\'em alinhado ao ODS 11. Nesse contexto, os microdados
+abertos da PRF tornaram-se insumo frequente para modelos preditivos que
+prometem orientar a aloca\c{c}\~ao de recursos de fiscaliza\c{c}\~ao e de
+engenharia vi\'aria.
 
-Full papers must respect the page limits defined by the conference.
-Conferences that publish just abstracts ask for \textbf{one}-page texts.
+Esse uso traz um risco pouco examinado. Quando um fator \'e apontado como
+determinante da letalidade e essa conclus\~ao orienta investimento
+p\'ublico, a validade da recomenda\c{c}\~ao depende inteiramente da
+validade do protocolo que a produziu. O estudo de \cite{gabardo2025} \'e,
+a um s\'o tempo, caso ilustrativo e exemplar em transpar\^encia: os
+autores publicaram o c\'odigo-fonte,\footnote{Dispon\'ivel em
+\url{https://github.com/arthur-miguel/Highway-to-Classifying-Accidents}.
+Acesso em 15 de agosto de 2026.} e \'e precisamente por isso que esta
+an\'alise foi poss\'ivel --- m\'erito que deve ser explicitamente
+reconhecido. A leitura desse c\'odigo revelou tr\^es defeitos que fazem o
+conjunto de teste deixar de ser independente do conjunto de treino: (D1)
+um erro de particionamento que faz o conjunto de teste ficar contido no de
+treino; (D2) codifica\c{c}\~ao por alvo ajustada sobre a base completa
+antes da separa\c{c}\~ao treino/teste; e (D3) SMOTE aplicado antes da
+separa\c{c}\~ao, espalhando inst\^ancias derivadas do mesmo registro pelos
+dois lados. O pr\'oprio resultado publicado \'e ind\'icio: dois modelos de
+fam\'ilias distintas --- um baseado em dist\^ancia e outro em
+\emph{ensemble} de \'arvores --- empatam em AUC-ROC de 0,99 sobre uma
+classe que representa menos de 5\% dos registros, desempenho dif\'icil de
+justificar por modelagem e inteiramente coerente com contamina\c{c}\~ao do
+conjunto de avalia\c{c}\~ao. O artigo n\~ao apresenta se\c{c}\~ao de
+limita\c{c}\~oes. Cabe registrar, em nome da justi\c{c}a, que os autores
+citam a refer\^encia correta sobre codifica\c{c}\~ao regularizada e
+tentaram implementar a vers\~ao adequada: trata-se de defeito de
+implementa\c{c}\~ao, n\~ao de desconhecimento conceitual.
 
-\section{First Page} \label{sec:firstpage}
+A consequ\^encia \'e direta e \'e o que motiva este trabalho: o estudo
+restringe-se \`a regi\~ao Sul, ao passo
+que as recomenda\c{c}\~oes derivadas dele s\~ao formuladas em termos
+gerais. Frota, malha vi\'aria, clima e padr\~ao de tr\'afego diferem
+substancialmente entre as macrorregi\~oes brasileiras, e a base nacional
+confirma assimetria de volume relevante --- a regi\~ao Norte concentra
+5,7\% dos registros contra 30,9\% do Sudeste. N\~ao h\'a evid\^encia de
+que um conjunto de fatores estimado no Sul descreva o Nordeste ou o Norte.
 
-The first page must display the paper title, the name and address of the
-authors, the abstract in English and ``resumo'' in Portuguese (``resumos'' are
-required only for papers written in Portuguese). The title must be centered
-over the whole page, in 16 point boldface font and with 12 points of space
-before itself. Author names must be centered in 12 point font, bold, all of
-them disposed in the same line, separated by commas and with 12 points of
-space after the title. Addresses must be centered in 12 point font, also with
-12 points of space after the authors' names. E-mail addresses should be
-written using font Courier New, 10 point nominal size, with 6 points of space
-before and 6 points of space after.
+\textbf{Objetivo.} Quantificar, sob protocolo de valida\c{c}\~ao
+corrigido, a relev\^ancia preditiva dos fatores associados \`a gravidade
+de acidentes em rodovias federais brasileiras, e avaliar a estabilidade
+desses fatores e do desempenho preditivo entre as cinco macrorregi\~oes do
+IBGE. O objetivo \'e verific\'avel ao final do trabalho segundo o
+crit\'erio de \cite{wazlawick2009}: a relev\^ancia \'e medida por valores
+SHAP sob delineamento fatorial, o desempenho por F1 da classe positiva, e
+a estabilidade pelo tau de Kendall e pela sobreposi\c{c}\~ao top-$k$
+entre ordenamentos. Nenhuma configura\c{c}\~ao de resultados torna o
+objetivo trivialmente satisfeito: tanto a confirma\c{c}\~ao quanto a
+refuta\c{c}\~ao da hip\'otese de robustez constituem resposta. Das tr\^es
+medidas decorrem, respectivamente, uma estimativa do desempenho sob
+avalia\c{c}\~ao n\~ao contaminada, evid\^encia sobre a adequa\c{c}\~ao de
+um modelo nacional \'unico frente a modelos regionais, e um veredito sobre
+a base emp\'irica das recomenda\c{c}\~oes derivadas do estudo de
+refer\^encia.
 
-The abstract and ``resumo'' (if is the case) must be in 12 point Times font,
-indented 0.8cm on both sides. The word \textbf{Abstract} and \textbf{Resumo},
-should be written in boldface and must precede the text.
+\section{Fundamentos Te\'oricos}
 
-\section{CD-ROMs and Printed Proceedings}
+\textbf{Vazamento de dados.} Vazamento \'e a introdu\c{c}\~ao, no
+processo de modelagem, de informa\c{c}\~ao sobre o alvo que n\~ao estaria
+legitimamente dispon\'ivel no momento da predi\c{c}\~ao.
+\cite{kaufman2012} formalizaram o conceito e o classificaram entre os
+erros mais comuns em minera\c{c}\~ao de dados. \cite{kapoor2023}
+mostraram que o vazamento \'e a principal causa de irreprodutibilidade em
+ci\^encia baseada em aprendizado de m\'aquina, identificando 17 campos
+afetados, 294 artigos comprometidos e propondo uma taxonomia de oito
+tipos. O sintoma \'e o desempenho otimista que n\~ao se sustenta fora da
+configura\c{c}\~ao contaminada.
 
-In some conferences, the papers are published on CD-ROM while only the
-abstract is published in the printed Proceedings. In this case, authors are
-invited to prepare two final versions of the paper. One, complete, to be
-published on the CD and the other, containing only the first page, with
-abstract and ``resumo'' (for papers in Portuguese).
+\textbf{Protocolo de valida\c{c}\~ao.} A valida\c{c}\~ao cruzada
+estratificada $k$-fold particiona os dados em $k$ dobras preservando a
+propor\c{c}\~ao de classes; sua validade exige que todo processamento
+dependente do alvo ocorra dentro de cada dobra de treino. A
+codifica\c{c}\~ao por alvo, proposta por \cite{micci2001} para
+vari\'aveis categ\'oricas de alta cardinalidade, substitui cada categoria
+por uma estat\'istica da vari\'avel resposta e, quando ajustada fora da
+valida\c{c}\~ao cruzada, injeta informa\c{c}\~ao do alvo do conjunto de
+teste nas vari\'aveis preditoras. O SMOTE \cite{chawla2002} gera exemplos
+sint\'eticos da classe minorit\'aria por interpola\c{c}\~ao entre
+vizinhos; aplic\'a-lo antes de particionar faz com que amostras derivadas
+de um registro de teste apare\c{c}am no treino. \cite{demircioglu2024}
+demonstrou empiricamente que essa ordem produz vi\'es positivo de at\'e
+0,34 em AUC.
 
-\section{Sections and Paragraphs}
+\textbf{M\'etricas sob desbalanceamento.} A acur\'acia \'e enganosa
+quando uma classe \'e rara, pois pode ser alta simplesmente ignorando a
+classe minorit\'aria. \cite{saito2015} mostraram que a curva
+precis\~ao-revoca\c{c}\~ao \'e mais informativa que a curva ROC nesses
+cen\'arios, raz\~ao pela qual se adotam o F1 da classe positiva e a
+\'area sob a curva precis\~ao-revoca\c{c}\~ao.
 
-Section titles must be in boldface, 13pt, flush left. There should be an extra
-12 pt of space before each title. Section numbering is optional. The first
-paragraph of each section should not be indented, while the first lines of
-subsequent paragraphs should be indented by 1.27 cm.
+\textbf{Interpretabilidade.} O SHAP \cite{lundberg2017} atribui a cada
+atributo uma contribui\c{c}\~ao aditiva para cada predi\c{c}\~ao. Duas
+limita\c{c}\~oes s\~ao centrais aqui: o m\'etodo mede associa\c{c}\~ao
+com a predi\c{c}\~ao do modelo e n\~ao causalidade, e as
+explica\c{c}\~oes herdam a validade do modelo explicado --- ordenamentos
+derivados de modelo contaminado descrevem a contamina\c{c}\~ao, n\~ao o
+fen\^omeno.
 
-\subsection{Subsections}
+\section{Trabalhos Relacionados}
 
-The subsection titles must be in boldface, 12pt, flush left.
+\textbf{Predi\c{c}\~ao de gravidade no Brasil.} Diversos trabalhos
+aplicam aprendizado de m\'aquina a microdados da PRF, em geral com recorte
+geogr\'afico restrito. \cite{mafort2025} modelaram a gravidade de
+acidentes em rodovias federais do Rio de Janeiro (2020--2023) comparando
+sete classificadores, com regress\~ao log\'istica alcan\c{c}ando 73,85\%
+de acur\'acia e interpreta\c{c}\~ao via LIME. \cite{andrade2019}
+analisaram a tend\^encia do n\'umero de v\'itimas nas rodovias federais
+por macrorregi\~ao antes e depois da D\'ecada de A\c{c}\~ao pela
+Seguran\c{c}a no Tr\^ansito, evidenciando heterogeneidade regional
+consistente ao longo do tempo. O estudo de \cite{gabardo2025} insere-se
+nessa linha, restringindo-se \`a regi\~ao Sul e sinalizando como
+dire\c{c}\~ao futura a extens\~ao a outras regi\~oes do pa\'is.
 
-\section{Figures and Captions}\label{sec:figs}
+\textbf{Generaliza\c{c}\~ao geogr\'afica.} A transferibilidade espacial de
+modelos de seguran\c{c}a vi\'aria \'e tema estabelecido
+internacionalmente. \cite{man2022} avaliam explicitamente a portabilidade
+espacial e temporal de modelos de previs\~ao de sinistros, recorrendo a
+aprendizado por transfer\^encia para conter a degrada\c{c}\~ao observada.
+A raiz do problema \'e a heterogeneidade n\~ao observada:
+\cite{mannering2016} argumentam que fatores contribuintes variam de forma
+sistem\'atica e n\~ao capturada entre contextos, gerando estimativas
+viesadas quando um modelo ajustado em uma regi\~ao \'e aplicado a outra.
 
+\textbf{Posicionamento.} Nenhum desses trabalhos mede a relev\^ancia dos
+fatores de gravidade sob protocolo corrigido, nem avalia a estabilidade
+desse ordenamento entre as cinco macrorregi\~oes com controle de tamanho
+amostral. \'E essa a lacuna que este trabalho ocupa.
 
-Figure and table captions should be centered if less than one line
-(Figure~\ref{fig:exampleFig1}), otherwise justified and indented by 0.8cm on
-both margins, as shown in Figure~\ref{fig:exampleFig2}. The caption font must
-be Helvetica, 10 point, boldface, with 6 points of space before and after each
-caption.
+\section{M\'etodo}
 
-\begin{figure}[ht]
+\textbf{Dados.} Utilizam-se os microdados abertos da PRF na vers\~ao
+agrupada por pessoa, variante que inclui todas as causas e tipos de
+acidente, referentes aos anos de 2021 a 2024 --- mesmo intervalo temporal
+adotado pelo estudo de refer\^encia. Os arquivos CSV (ISO-8859-1)
+apresentam esquema id\^entico nos quatro anos, com 37 atributos.
+A base bruta re\'une 2.117.994 registros de envolvidos, correspondentes a
+270.097 acidentes distintos e 652.411 pessoas distintas. Cada registro
+\'e atribu\'ido a uma das cinco macrorregi\~oes do IBGE pela unidade
+federativa da ocorr\^encia. Na base anal\'itica, ap\'os as redu\c{c}\~oes
+descritas adiante, a distribui\c{c}\~ao \'e: Sudeste, 30,9\%; Sul, 29,7\%;
+Nordeste, 21,4\%; Centro-Oeste, 12,3\%; e Norte, 5,7\% --- assimetria de
+mais de cinco vezes entre a maior e a menor macrorregi\~ao. A vari\'avel
+resposta \'e bin\'aria e deriva do atributo de estado f\'isico do
+envolvido, assumindo valor positivo quando o desfecho \'e \'obito. Na
+base anal\'itica, que re\'une 608.921 registros, a classe positiva
+corresponde a 3,72\%, raz\~ao de desbalanceamento de aproximadamente 1
+para 26.
+
+\textbf{Prepara\c{c}\~ao e decis\~oes de escopo.} Tr\^es decis\~oes
+definem a base anal\'itica. Primeiro, a variante replica cada envolvido por
+causa e por tipo: a base bruta tem 2.117.994 linhas para 652.411 pessoas;
+a restri\c{c}\~ao \`a causa principal reduz a 1.228.893, e a
+restri\c{c}\~ao ao tipo prim\'ario resulta em 716.779 registros, uma linha
+por envolvido por ocorr\^encia. A multiplicidade n\~ao compromete a
+independ\^encia entre parti\c{c}\~oes --- todas as linhas de um mesmo
+envolvido compartilham o identificador do acidente ---, mas distorce a
+pondera\c{c}\~ao, pois ocorr\^encias mais detalhadas contribuem
+desproporcionalmente para o ajuste. Segundo, 15,95\% n\~ao possuem
+r\'otulo utiliz\'avel (valores ausentes e ``n\~ao informado'') e s\~ao
+exclu\'idos, pois atribu\'i-los \`a classe negativa inflaria a maioria; a
+base anal\'itica re\'une 608.921 registros. Terceiro, atributos de
+contagem de ilesos, feridos leves, feridos graves e \'obitos s\~ao
+codifica\c{c}\~oes determin\'isticas do estado f\'isico ---
+coincid\^encia total com o r\'otulo ---, constituindo o alvo sob outra
+forma; s\~ao removidos, assim como os identificadores de registro, pessoa
+e ve\'iculo. A presen\c{c}a desses atributos entre os preditores do estudo
+de refer\^encia integra a replica\c{c}\~ao. Em raz\~ao da estrutura de
+agrupamento, adota-se particionamento por grupo pelo identificador do
+acidente em todas as oito configura\c{c}\~oes como decis\~ao de protocolo;
+a verifica\c{c}\~ao de integridade confirmou aus\^encia de colis\~ao de
+identificadores entre os anos.
+
+\textbf{Replica\c{c}\~ao.} A an\'alise \'e reimplementada em Python, com
+scikit-learn e imbalanced-learn, ao passo que a implementa\c{c}\~ao
+original est\'a em R. Antes de qualquer corre\c{c}\~ao, a
+configura\c{c}\~ao original \'e reproduzida integralmente, incluindo seus
+defeitos, e comparada aos valores publicados; sem essa equival\^encia,
+qualquer diferen\c{c}a posterior seria amb\'igua entre efeito da
+corre\c{c}\~ao e efeito da reimplementa\c{c}\~ao. Considera-se a
+replica\c{c}\~ao bem-sucedida quando o F1 da classe positiva difere em no
+m\'aximo 0,02 do valor publicado. Registra-se que o \emph{script}
+publicado n\~ao executa sem corre\c{c}\~ao de um erro de digita\c{c}\~ao
+em uma chamada de fun\c{c}\~ao. A etapa de replica\c{c}\~ao \'e
+conduzida sobre a variante padr\~ao utilizada pelos autores, restringindo
+a diverg\^encia de base \`as an\'alises subsequentes.
+
+\textbf{Decomposi\c{c}\~ao fatorial.} Delineamento fatorial completo
+$2^3$, em que cada defeito (D1, particionamento; D2, codifica\c{c}\~ao por
+alvo; D3, balanceamento) assume o n\'ivel original ou corrigido,
+totalizando oito configura\c{c}\~oes. Adota-se o fatorial completo em vez
+da corre\c{c}\~ao de um defeito por vez porque os defeitos n\~ao s\~ao
+independentes: o efeito de D2 \'e condicionado por D1, j\'a que sob
+particionamento sobreposto o vazamento adicional da codifica\c{c}\~ao \'e
+redundante e s\'o se torna mensur\'avel uma vez corrigido o
+particionamento. Um delineamento aditivo produziria uma decomposi\c{c}\~ao
+cuja soma n\~ao corresponde ao efeito total. A relev\^ancia de D2 \'e
+ampliada pela cardinalidade elevada de marca do ve\'iculo e de
+munic\'ipio na base, cen\'ario em que o vazamento da codifica\c{c}\~ao por
+alvo \'e mais severo.
+
+\textbf{Hiperpar\^ametros e m\'etricas.} Fixados os hiperpar\^ametros nos
+valores do trabalho original, sem reotimiza\c{c}\~ao entre
+configura\c{c}\~oes --- pois o objeto de compara\c{c}\~ao \'e o protocolo,
+n\~ao o modelo ---, a m\'etrica prim\'aria \'e o F1 da classe positiva,
+com precis\~ao, revoca\c{c}\~ao e \'area sob a curva
+precis\~ao-revoca\c{c}\~ao reportadas separadamente, expressas como
+m\'edia e desvio-padr\~ao entre as dobras de valida\c{c}\~ao cruzada
+estratificada de cinco dobras. A dispers\~ao entre dobras \'e informativa
+por si s\'o: configura\c{c}\~oes contaminadas devem apresentar vari\^ancia
+anormalmente baixa, evid\^encia de vazamento independente do valor
+absoluto da m\'etrica.
+
+\textbf{Generaliza\c{c}\~ao regional.} Constr\'oi-se uma matriz de
+transfer\^encia $5\times 5$: para cada macrorregi\~ao $i$, treina-se um
+modelo exclusivamente com seus registros e avalia-se sobre cada
+macrorregi\~ao $j$, incluindo a pr\'opria. O elemento $M_{ij}$ \'e o F1
+da classe positiva; a diagonal representa o desempenho intrarregional
+sobre parti\c{c}\~ao retida e os elementos fora da diagonal representam a
+transfer\^encia, com degrada\c{c}\~ao relativa definida como
+$(M_{ii}-M_{ij})/M_{ii}$. A matriz completa \'e prefer\'ivel \`a
+avalia\c{c}\~ao de uma \'unica origem porque permite distinguir a
+hip\'otese de que uma regi\~ao espec\'ifica n\~ao exporta seu modelo da
+hip\'otese de que nenhuma regi\~ao exporta; apenas a segunda sustenta a
+afirma\c{c}\~ao de que um modelo nacional \'unico \'e inadequado. Como o
+volume de registros difere em fator superior a cinco entre a maior e a
+menor macrorregi\~ao, todos os conjuntos de treino s\~ao subamostrados
+para o $n$ da regi\~ao Norte, preservando a propor\c{c}\~ao de classes,
+com repeti\c{c}\~ao em amostragens independentes e agrega\c{c}\~ao dos
+resultados --- sem esse controle, diferen\c{c}a de tamanho amostral seria
+interpretada como heterogeneidade regional.
+
+\textbf{Estabilidade dos fatores.} Os valores SHAP s\~ao calculados sobre
+as parti\c{c}\~oes de valida\c{c}\~ao e convertidos em ordenamento de
+import\^ancia. Realizam-se duas compara\c{c}\~oes: o ordenamento sob
+protocolo original \emph{versus} corrigido, na mesma regi\~ao; e os
+ordenamentos entre macrorregi\~oes sob protocolo corrigido. A
+concord\^ancia \'e quantificada pelo tau de Kendall entre ordenamentos
+completos e pela sobreposi\c{c}\~ao relativa entre os dez atributos mais
+influentes, com $k = 5$ como verifica\c{c}\~ao de robustez. A
+concord\^ancia observada determina se os fatores s\~ao robustos ou se
+constituem artefato de protocolo ou especificidade regional.
+
+\textbf{Reprodutibilidade.} Sementes aleat\'orias s\~ao fixadas e
+reportadas; c\'odigo e vers\~oes de bibliotecas s\~ao depositados em
+reposit\'orio p\'ublico. Os resultados s\~ao consolidados em tabelas de
+replica\c{c}\~ao, de decomposi\c{c}\~ao por configura\c{c}\~ao e de
+desempenho por modelo, al\'em da matriz de transfer\^encia regional e do
+gr\'afico comparativo de estabilidade dos fatores.
+
+\section{Cronograma}
+
+Os marcos, amarrados \`as datas da disciplina em 2026, s\~ao apresentados
+a seguir.
+
+\begin{table}[H]
 \centering
-\includegraphics[width=.5\textwidth]{fig1.jpg}
-\caption{A typical figure}
-\label{fig:exampleFig1}
-\end{figure}
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=.3\textwidth]{fig2.jpg}
-\caption{This figure is an example of a figure caption taking more than one
-  line and justified considering margins mentioned in Section~\ref{sec:figs}.}
-\label{fig:exampleFig2}
-\end{figure}
-
-In tables, try to avoid the use of colored or shaded backgrounds, and avoid
-thick, doubled, or unnecessary framing lines. When reporting empirical data,
-do not use more decimal digits than warranted by their precision and
-reproducibility. Table caption must be placed before the table (see Table 1)
-and the font used must also be Helvetica, 10 point, boldface, with 6 points of
-space before and after each caption.
-
-\begin{table}[ht]
-\centering
-\caption{Variables to be considered on the evaluation of interaction
-  techniques}
-\label{tab:exTable1}
-\includegraphics[width=.7\textwidth]{table.jpg}
+\caption{Cronograma de marcos e entregas}
+\label{tab:cronograma}
+\begin{tabular}{|p{3.2cm}|p{9.6cm}|}
+\hline
+\textbf{Prazo} & \textbf{Marco / Atividade} \\ \hline
+At\'e 26/08/2026 & Entrega do plano de trabalho. \\ \hline
+At\'e 16/09/2026 & Replica\c{c}\~ao da configura\c{c}\~ao original,
+primeira medida sob protocolo corrigido e auditoria do conjunto de
+preditores do estudo de refer\^encia. \\ \hline
+At\'e 21/10/2026 & Relat\'orio parcial e v\'ideo de 8 a 10 minutos:
+decomposi\c{c}\~ao fatorial completa e primeiras macrorregi\~oes da
+matriz de transfer\^encia. \\ \hline
+At\'e 18/11/2026 & Relat\'orio final: matriz de transfer\^encia completa,
+compara\c{c}\~ao de estabilidade dos fatores e desempenho consolidado dos
+modelos. \\ \hline
+19/11/2026 & Entrega dos slides e apresenta\c{c}\~ao presencial de 12
+minutos, seguida de 3 minutos de perguntas. \\ \hline
+\end{tabular}
 \end{table}
-
-\section{Images}
-
-All images and illustrations should be in black-and-white, or gray tones,
-excepting for the papers that will be electronically available (on CD-ROMs,
-internet, etc.). The image resolution on paper should be about 600 dpi for
-black-and-white images, and 150-300 dpi for grayscale images.  Do not include
-images with excessive resolution, as they may take hours to print, without any
-visible difference in the result. 
-
-\section{References}
-
-Bibliographic references must be unambiguous and uniform.  We recommend giving
-the author names references in brackets, e.g. \cite{knuth:84},
-\cite{boulic:91}, and \cite{smith:99}.
-
-The references must be listed using 12 point font size, with 6 points of space
-before each reference. The first line of each reference should not be
-indented, while the subsequent should be indented by 0.5 cm.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
