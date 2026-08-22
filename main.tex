@@ -189,6 +189,13 @@ amostral. \'E essa a lacuna que este trabalho ocupa.
 
 \section{M\'etodo}
 
+\textbf{Modelos.} Os algoritmos a serem utilizados e estudados neste trabalho serão o Random Forest, 
+o Support Vector Machine (SVM) e o Multi-Layer Perceptron (MLP). Para o modelo MLP, 
+a quantidade de camadas e de neurônios será definida ao longo do desenvolvimento, considerando a complexidade 
+do problema e os resultados obtidos durante a etapa de experimentação. A seleção e o ajuste dos hiperparâmetros 
+dos modelos também serão realizados de forma experimental, 
+buscando identificar as configurações que proporcionem o melhor desempenho para a tarefa proposta.
+
 \textbf{Dados.} Utilizam-se os microdados abertos da PRF na vers\~ao
 agrupada por pessoa, variante que inclui todas as causas e tipos de
 acidente, referentes aos anos de 2021 a 2024 --- mesmo intervalo temporal
@@ -231,9 +238,8 @@ acidente em todas as oito configura\c{c}\~oes como decis\~ao de protocolo;
 a verifica\c{c}\~ao de integridade confirmou aus\^encia de colis\~ao de
 identificadores entre os anos.
 
-\textbf{Replica\c{c}\~ao.} A an\'alise \'e reimplementada em Python, com
-scikit-learn e imbalanced-learn, ao passo que a implementa\c{c}\~ao
-original est\'a em R. Antes de qualquer corre\c{c}\~ao, a
+\textbf{Implementa\c{c}\~ao.} A an\'alise \'e reimplementada em Python, com
+scikit-learn e imbalanced-learn. Antes de qualquer corre\c{c}\~ao, a
 configura\c{c}\~ao original \'e reproduzida integralmente, incluindo seus
 defeitos, e comparada aos valores publicados; sem essa equival\^encia,
 qualquer diferen\c{c}a posterior seria amb\'igua entre efeito da
@@ -245,19 +251,6 @@ em uma chamada de fun\c{c}\~ao. A etapa de replica\c{c}\~ao \'e
 conduzida sobre a variante padr\~ao utilizada pelos autores, restringindo
 a diverg\^encia de base \`as an\'alises subsequentes.
 
-\textbf{Decomposi\c{c}\~ao fatorial.} Delineamento fatorial completo
-$2^3$, em que cada defeito (D1, particionamento; D2, codifica\c{c}\~ao por
-alvo; D3, balanceamento) assume o n\'ivel original ou corrigido,
-totalizando oito configura\c{c}\~oes. Adota-se o fatorial completo em vez
-da corre\c{c}\~ao de um defeito por vez porque os defeitos n\~ao s\~ao
-independentes: o efeito de D2 \'e condicionado por D1, j\'a que sob
-particionamento sobreposto o vazamento adicional da codifica\c{c}\~ao \'e
-redundante e s\'o se torna mensur\'avel uma vez corrigido o
-particionamento. Um delineamento aditivo produziria uma decomposi\c{c}\~ao
-cuja soma n\~ao corresponde ao efeito total. A relev\^ancia de D2 \'e
-ampliada pela cardinalidade elevada de marca do ve\'iculo e de
-munic\'ipio na base, cen\'ario em que o vazamento da codifica\c{c}\~ao por
-alvo \'e mais severo.
 
 \textbf{Hiperpar\^ametros e m\'etricas.} Fixados os hiperpar\^ametros nos
 valores do trabalho original, sem reotimiza\c{c}\~ao entre
