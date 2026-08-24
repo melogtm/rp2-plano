@@ -123,7 +123,17 @@ A raiz do problema \'e a heterogeneidade n\~ao observada:
 sistem\'atica e n\~ao capturada entre contextos, gerando estimativas
 viesadas quando um modelo ajustado em uma regi\~ao \'e aplicado a outra.
 
-\textbf{Transferibilidade de modelos}
+\textbf{Transferibilidade de modelos.} A avaliação de quanto um modelo ajustado em um contexto 
+preserva desempenho em outro constitui linha metodológica própria. [Xu et al. 2014] tratam o
+problema por atualização bayesiana, mostrando que o grau de consistência entre as 
+distribuições de origem e destino condiciona a transferibilidade e que a recalibração com 
+amostra reduzida da região-alvo recupera parte do desempenho perdido. [Man et al. 2022] recorrem a 
+aprendizado por transferência para o mesmo fim, reportando degradação sistemática sob aplicação direta e 
+ganhos sob adaptação. O que distingue este trabalho dessa linha é o propósito da medição: enquanto tais 
+estudos tratam a degradação como problema a ser mitigado, aqui ela é o objeto de interesse, pois a 
+magnitude da queda entre macrorregiões é o que determina se recomendações derivadas de um recorte 
+regional podem ser generalizadas ao país. A matriz de transferência completa 
+cumpre essa função diagnóstica, e não corretiva.
 
 \textbf{Posicionamento.} Nenhum desses trabalhos mede a relev\^ancia dos
 fatores de gravidade sob protocolo corrigido, nem avalia a estabilidade
@@ -156,7 +166,23 @@ envolvido, assumindo valor positivo quando o desfecho \'e \'obito. Na
 base anal\'itica, que re\'une 608.921 registros, a classe positiva
 corresponde a 3,72\%, raz\~ao de desbalanceamento de aproximadamente 1
 para 26.
-\textbf{Algoritmos de aprendizado de máquina.} MLP, SVM, RandomForest(XGBoost)
+
+\textbf{Algoritmos de aprendizado de máquina.} A etapa de replicação emprega os três algoritmos do estudo de referência — 
+k-vizinhos mais próximos, perceptron multicamadas e florestas aleatórias —, condição necessária para que a 
+comparação com os valores publicados seja legítima. As análises subsequentes acrescentam gradient boosting sobre 
+árvores, na implementação XGBoost, e uma máquina de vetores de suporte com kernel linear. A escolha não visa 
+maximizar desempenho, e sim cobrir famílias com capacidades de memorização distintas: modelos baseados em 
+distância e em margem linear ajustam-se a fronteiras globais, ao passo que ensembles de árvores particionam 
+o espaço de atributos com granularidade suficiente para isolar observações individuais. Essa diferença é 
+diagnóstica, pois o ganho espúrio produzido por contaminação do conjunto de avaliação cresce com a 
+capacidade de memorização; a comparação entre famílias sob as oito configurações do delineamento permite, 
+portanto, separar efeito de protocolo de efeito de modelo. Os hiperparâmetros dos três algoritmos 
+replicados são fixados nos valores reportados pelos autores; para os dois algoritmos acrescentados, 
+são fixados por busca conduzida uma única vez sobre a configuração integralmente corrigida e mantidos 
+constantes nas demais, de modo que nenhuma diferença observada entre configurações decorra de reotimização. 
+Adota-se o kernel linear na máquina de vetores de suporte porque o custo de treino dos kernels não lineares 
+é superquadrático no número de amostras, incompatível com as 33 execuções previstas entre delineamento 
+fatorial e matriz de transferência.
 
 \textbf{Prepara\c{c}\~ao e decis\~oes de escopo.} Tr\^es decis\~oes
 definem a base anal\'itica. Primeiro, a variante replica cada envolvido por
