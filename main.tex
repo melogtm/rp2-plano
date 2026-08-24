@@ -38,13 +38,13 @@ Pol\'icia Rodovi\'aria Federal (PRF) s\~ao empregados para identificar
 fatores de risco associados \`a gravidade de acidentes. Um estudo recente
 \cite{gabardo2025} treinou kNN, MLP e Random Forest sobre registros da
 regi\~ao Sul (2021--2024), reportando AUC-ROC de 0,99 para a classe fatal
-em dois dos tr\^es modelos, e derivou fatores de risco via SHAP. A leitura
-do c\'odigo publicado revelou falhas de protocolo que comprometem a
-independ\^encia do conjunto de teste. Este trabalho quantifica, sob
-protocolo corrigido, a relev\^ancia preditiva dos fatores em base nacional
-de 608.921 registros, e avalia a estabilidade do desempenho e do
+em dois dos tr\^es modelos, e derivou fatores de risco via SHAP. % A leitura
+%do c\'odigo publicado revelou falhas de protocolo que comprometem a
+%independ\^encia do conjunto de teste.
+Este trabalho quantifica a relev\^ancia preditiva dos fatores de uma base nacional
+de registros, e avalia a estabilidade do desempenho e do
 ordenamento de fatores entre as cinco macrorregi\~oes por uma matriz de
-transfer\^encia $5\times 5$, com concord\^ancia medida pelo tau de Kendall
+transfer\^encia $5\times 5$, com concord\^ancia dos valores SHAP medida pelo tau de Kendall
 e pela sobreposi\c{c}\~ao top-$k$.
 \end{resumo}
 
@@ -65,97 +65,38 @@ engenharia vi\'aria.
 Esse uso traz um risco pouco examinado. Quando um fator \'e apontado como
 determinante da letalidade e essa conclus\~ao orienta investimento
 p\'ublico, a validade da recomenda\c{c}\~ao depende inteiramente da
-validade do protocolo que a produziu. O estudo de \cite{gabardo2025} \'e,
-a um s\'o tempo, caso ilustrativo e exemplar em transpar\^encia: os
-autores publicaram o c\'odigo-fonte,\footnote{Dispon\'ivel em
-\url{https://github.com/arthur-miguel/Highway-to-Classifying-Accidents}.
-Acesso em 15 de agosto de 2026.} e \'e precisamente por isso que esta
-an\'alise foi poss\'ivel --- m\'erito que deve ser explicitamente
-reconhecido. A leitura desse c\'odigo revelou tr\^es defeitos que fazem o
-conjunto de teste deixar de ser independente do conjunto de treino: (D1)
-um erro de particionamento que faz o conjunto de teste ficar contido no de
-treino; (D2) codifica\c{c}\~ao por alvo ajustada sobre a base completa
-antes da separa\c{c}\~ao treino/teste; e (D3) SMOTE aplicado antes da
-separa\c{c}\~ao, espalhando inst\^ancias derivadas do mesmo registro pelos
-dois lados. O pr\'oprio resultado publicado \'e ind\'icio: dois modelos de
-fam\'ilias distintas --- um baseado em dist\^ancia e outro em
-\emph{ensemble} de \'arvores --- empatam em AUC-ROC de 0,99 sobre uma
-classe que representa menos de 5\% dos registros, desempenho dif\'icil de
-justificar por modelagem e inteiramente coerente com contamina\c{c}\~ao do
-conjunto de avalia\c{c}\~ao. O artigo n\~ao apresenta se\c{c}\~ao de
-limita\c{c}\~oes. Cabe registrar, em nome da justi\c{c}a, que os autores
-citam a refer\^encia correta sobre codifica\c{c}\~ao regularizada e
-tentaram implementar a vers\~ao adequada: trata-se de defeito de
-implementa\c{c}\~ao, n\~ao de desconhecimento conceitual.
-
-A consequ\^encia \'e direta e \'e o que motiva este trabalho: o estudo
+validade do protocolo que a produziu. Tal protocolo pode estar restrito ou
+enviesado pelo desbalanceamentos dos dados utilizados, orientando uma predição
+da severidade dos acidentes que podem não condizer em um outro contexto.
+O estudo de \cite{gabardo2025} \'e,
+a um s\'o tempo, caso ilustrativo e exemplar em transpar\^encia: o estudo
 restringe-se \`a regi\~ao Sul, ao passo
 que as recomenda\c{c}\~oes derivadas dele s\~ao formuladas em termos
-gerais. Frota, malha vi\'aria, clima e padr\~ao de tr\'afego diferem
-substancialmente entre as macrorregi\~oes brasileiras, e a base nacional
-confirma assimetria de volume relevante --- a regi\~ao Norte concentra
-5,7\% dos registros contra 30,9\% do Sudeste. N\~ao h\'a evid\^encia de
-que um conjunto de fatores estimado no Sul descreva o Nordeste ou o Norte.
+gerais.
 
-\textbf{Objetivo.} Quantificar, sob protocolo de valida\c{c}\~ao
-corrigido, a relev\^ancia preditiva dos fatores associados \`a gravidade
+Portanto, quando analisamos esta problemática sob o prisma macrorregional brasileiro,
+a consequ\^encia \'e direta na formulação de políticas públicas e \'e o que motiva este trabalho.
+Frota, malha vi\'aria, clima e padr\~ao de tr\'afego diferem
+substancialmente entre as macrorregi\~oes brasileiras, e não há evidência estatística que um
+conjunto de fatores estimado no Sul descreva o que acontece Nordeste ou o Norte.
+
+\textbf{Objetivo.} Quantificar, %sob protocolo de valida\c{c}\~ao
+% corrigido,
+a relev\^ancia preditiva dos fatores associados \`a gravidade
 de acidentes em rodovias federais brasileiras, e avaliar a estabilidade
 desses fatores e do desempenho preditivo entre as cinco macrorregi\~oes do
 IBGE. O objetivo \'e verific\'avel ao final do trabalho segundo o
 crit\'erio de \cite{wazlawick2009}: a relev\^ancia \'e medida por valores
 SHAP sob delineamento fatorial, o desempenho por F1 da classe positiva, e
 a estabilidade pelo tau de Kendall e pela sobreposi\c{c}\~ao top-$k$
-entre ordenamentos. Nenhuma configura\c{c}\~ao de resultados torna o
-objetivo trivialmente satisfeito: tanto a confirma\c{c}\~ao quanto a
-refuta\c{c}\~ao da hip\'otese de robustez constituem resposta. Das tr\^es
-medidas decorrem, respectivamente, uma estimativa do desempenho sob
+entre ordenamentos. %Nenhuma configura\c{c}\~ao de resultados torna o
+%objetivo trivialmente satisfeito: tanto a confirma\c{c}\~ao quanto a
+%refuta\c{c}\~ao da hip\'otese de robustez constituem resposta.
+ Das tr\^es medidas decorrem, respectivamente, uma estimativa do desempenho sob
 avalia\c{c}\~ao n\~ao contaminada, evid\^encia sobre a adequa\c{c}\~ao de
 um modelo nacional \'unico frente a modelos regionais, e um veredito sobre
-a base emp\'irica das recomenda\c{c}\~oes derivadas do estudo de
-refer\^encia.
-
-\section{Fundamentos Te\'oricos}
-
-\textbf{Vazamento de dados.} Vazamento \'e a introdu\c{c}\~ao, no
-processo de modelagem, de informa\c{c}\~ao sobre o alvo que n\~ao estaria
-legitimamente dispon\'ivel no momento da predi\c{c}\~ao.
-\cite{kaufman2012} formalizaram o conceito e o classificaram entre os
-erros mais comuns em minera\c{c}\~ao de dados. \cite{kapoor2023}
-mostraram que o vazamento \'e a principal causa de irreprodutibilidade em
-ci\^encia baseada em aprendizado de m\'aquina, identificando 17 campos
-afetados, 294 artigos comprometidos e propondo uma taxonomia de oito
-tipos. O sintoma \'e o desempenho otimista que n\~ao se sustenta fora da
-configura\c{c}\~ao contaminada.
-
-\textbf{Protocolo de valida\c{c}\~ao.} A valida\c{c}\~ao cruzada
-estratificada $k$-fold particiona os dados em $k$ dobras preservando a
-propor\c{c}\~ao de classes; sua validade exige que todo processamento
-dependente do alvo ocorra dentro de cada dobra de treino. A
-codifica\c{c}\~ao por alvo, proposta por \cite{micci2001} para
-vari\'aveis categ\'oricas de alta cardinalidade, substitui cada categoria
-por uma estat\'istica da vari\'avel resposta e, quando ajustada fora da
-valida\c{c}\~ao cruzada, injeta informa\c{c}\~ao do alvo do conjunto de
-teste nas vari\'aveis preditoras. O SMOTE \cite{chawla2002} gera exemplos
-sint\'eticos da classe minorit\'aria por interpola\c{c}\~ao entre
-vizinhos; aplic\'a-lo antes de particionar faz com que amostras derivadas
-de um registro de teste apare\c{c}am no treino. \cite{demircioglu2024}
-demonstrou empiricamente que essa ordem produz vi\'es positivo de at\'e
-0,34 em AUC.
-
-\textbf{M\'etricas sob desbalanceamento.} A acur\'acia \'e enganosa
-quando uma classe \'e rara, pois pode ser alta simplesmente ignorando a
-classe minorit\'aria. \cite{saito2015} mostraram que a curva
-precis\~ao-revoca\c{c}\~ao \'e mais informativa que a curva ROC nesses
-cen\'arios, raz\~ao pela qual se adotam o F1 da classe positiva e a
-\'area sob a curva precis\~ao-revoca\c{c}\~ao.
-
-\textbf{Interpretabilidade.} O SHAP \cite{lundberg2017} atribui a cada
-atributo uma contribui\c{c}\~ao aditiva para cada predi\c{c}\~ao. Duas
-limita\c{c}\~oes s\~ao centrais aqui: o m\'etodo mede associa\c{c}\~ao
-com a predi\c{c}\~ao do modelo e n\~ao causalidade, e as
-explica\c{c}\~oes herdam a validade do modelo explicado --- ordenamentos
-derivados de modelo contaminado descrevem a contamina\c{c}\~ao, n\~ao o
-fen\^omeno.
+a base emp\'irica das recomenda\c{c}\~oes derivadas de estudos que utilizam
+o aprendizado de máquina como metodologia de investigação.
 
 \section{Trabalhos Relacionados}
 
@@ -181,6 +122,8 @@ A raiz do problema \'e a heterogeneidade n\~ao observada:
 \cite{mannering2016} argumentam que fatores contribuintes variam de forma
 sistem\'atica e n\~ao capturada entre contextos, gerando estimativas
 viesadas quando um modelo ajustado em uma regi\~ao \'e aplicado a outra.
+
+\textbf{Transferibilidade de modelos}
 
 \textbf{Posicionamento.} Nenhum desses trabalhos mede a relev\^ancia dos
 fatores de gravidade sob protocolo corrigido, nem avalia a estabilidade
@@ -213,6 +156,7 @@ envolvido, assumindo valor positivo quando o desfecho \'e \'obito. Na
 base anal\'itica, que re\'une 608.921 registros, a classe positiva
 corresponde a 3,72\%, raz\~ao de desbalanceamento de aproximadamente 1
 para 26.
+\textbf{Algoritmos de aprendizado de máquina.} MLP, SVM, RandomForest(XGBoost)
 
 \textbf{Prepara\c{c}\~ao e decis\~oes de escopo.} Tr\^es decis\~oes
 definem a base anal\'itica. Primeiro, a variante replica cada envolvido por
@@ -332,3 +276,7 @@ minutos, seguida de 3 minutos de perguntas. \\ \hline
 \bibliography{referencias}
 
 \end{document}
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: t
+%%% End:
