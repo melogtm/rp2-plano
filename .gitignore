@@ -19,6 +19,7 @@
 # Editor
 .vscode/*
 !.vscode/settings.json
+auto/
 
 # Build 
 build/
