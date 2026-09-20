@@ -100,3 +100,15 @@ P1 e P2 valem só 10% somados, mas entram na fórmula como multiplicador: não e
 ## Pendências
 
 - [ ] Substituir o template placeholder pelo oficial do e-Disciplinas
+## Código (replicação e análises)
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+# colocar os nove CSVs "todas_causas_tipos" (2017–2025) em data/
+.venv/bin/python src/caracterizacao.py            # funil, alvo, regiões, derivas -> results/caracterizacao.json
+.venv/bin/python src/replicacao.py publicado      # configuração como publicada (D1+D2+D3)
+.venv/bin/python src/replicacao.py corrigido      # configuração totalmente corrigida
+.venv/bin/python src/tabela_replicacao.py         # média ± dp por modelo -> results/replicacao_resumo.csv
+```
+
+`src/dados.py` concentra carregamento, filtros e mapeamento de macrorregião; a primeira leitura grava um cache em `data/base_bruta.parquet`.
