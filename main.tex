@@ -127,7 +127,8 @@ codifica\c{c}\~ao por alvo \cite{micci2001} \'e inst\^ancia, e o
 balanceamento sint\'etico \cite{chawla2002} aplicado antes da
 valida\c{c}\~ao cruzada, cujo efeito sobre a estimativa de desempenho
 \cite{demircioglu2024} quantificam. Iniciativas como o programa de
-reprodutibilidade do NeurIPS consolidaram listas de verifica\c{c}\~ao e
+reprodutibilidade do NeurIPS \cite{pineau2021} consolidaram listas de
+verifica\c{c}\~ao e
 pol\'iticas de submiss\~ao de c\'odigo, legitimando a verifica\c{c}\~ao de
 protocolo como contribui\c{c}\~ao cient\'ifica de pleno direito; \'e sob
 esse enquadramento que este trabalho se coloca, e \'e a publica\c{c}\~ao
@@ -167,30 +168,24 @@ amostral. \'E essa a lacuna que este trabalho ocupa.
 
 \section{M\'etodo}
 
-\textbf{Modelos.} Os algoritmos a serem utilizados e estudados neste trabalho serão o Random Forest, 
-o Support Vector Machine (SVM) e o Multi-Layer Perceptron (MLP). Para o modelo MLP, 
-a quantidade de camadas e de neurônios será definida ao longo do desenvolvimento, considerando a complexidade 
-do problema e os resultados obtidos durante a etapa de experimentação. A seleção e o ajuste dos hiperparâmetros 
-dos modelos também serão realizados de forma experimental, 
-buscando identificar as configurações que proporcionem o melhor desempenho para a tarefa proposta.
-
 \textbf{Dados.} Utilizam-se os microdados abertos da PRF na vers\~ao
 agrupada por pessoa, variante que inclui todas as causas e tipos de
-acidente, referentes aos anos de 2021 a 2024 --- mesmo intervalo temporal
-adotado pelo estudo de refer\^encia. Os arquivos CSV (ISO-8859-1)
-apresentam esquema id\^entico nos quatro anos, com 37 atributos.
-A base bruta re\'une 2.117.994 registros de envolvidos, correspondentes a
-270.097 acidentes distintos e 652.411 pessoas distintas. Cada registro
+acidente, nos nove arquivos anuais de 2017 a 2025; o intervalo do estudo
+de refer\^encia (2021--2024) \'e usado apenas na etapa de replica\c{c}\~ao.
+Os arquivos CSV (ISO-8859-1) apresentam esquema id\^entico nos nove anos,
+com 37 atributos. A base bruta re\'une 4.069.971 registros de envolvidos,
+correspondentes a 632.670 acidentes distintos e 1.509.447 pessoas
+distintas. Cada registro
 \'e atribu\'ido a uma das cinco macrorregi\~oes do IBGE pela unidade
 federativa da ocorr\^encia. Na base anal\'itica, ap\'os as redu\c{c}\~oes
-descritas adiante, a distribui\c{c}\~ao \'e: Sudeste, 30,9\%; Sul, 29,7\%;
-Nordeste, 21,4\%; Centro-Oeste, 12,3\%; e Norte, 5,7\% --- assimetria de
+descritas adiante, a distribui\c{c}\~ao \'e: Sudeste, 30,8\%; Sul, 29,7\%;
+Nordeste, 21,4\%; Centro-Oeste, 12,2\%; e Norte, 5,9\% --- assimetria de
 mais de cinco vezes entre a maior e a menor macrorregi\~ao. A vari\'avel
 resposta \'e bin\'aria e deriva do atributo de estado f\'isico do
 envolvido, assumindo valor positivo quando o desfecho \'e \'obito. Na
-base anal\'itica, que re\'une 608.921 registros, a classe positiva
-corresponde a 3,72\%, raz\~ao de desbalanceamento de aproximadamente 1
-para 26.
+base anal\'itica, que re\'une 1.415.582 registros, a classe positiva
+corresponde a 3,59\%, raz\~ao de desbalanceamento de aproximadamente 1
+para 27.
 
 \textbf{Algoritmos de aprendizado de máquina.} A etapa de replicação emprega os três algoritmos do estudo de referência — 
 k-vizinhos mais próximos, perceptron multicamadas e florestas aleatórias —, condição necessária para que a 
@@ -211,23 +206,23 @@ fatorial e matriz de transferência.
 
 \textbf{Prepara\c{c}\~ao e decis\~oes de escopo.} Tr\^es decis\~oes
 definem a base anal\'itica. Primeiro, a variante replica cada envolvido por
-causa e por tipo: a base bruta tem 2.117.994 linhas para 652.411 pessoas;
-a restri\c{c}\~ao \`a causa principal reduz a 1.228.893, e a
-restri\c{c}\~ao ao tipo prim\'ario resulta em 716.779 registros, uma linha
-por envolvido por ocorr\^encia. A multiplicidade n\~ao compromete a
+causa e por tipo: a base bruta tem 4.069.971 linhas para 1.509.447
+pessoas; a restri\c{c}\~ao \`a causa principal reduz a 2.626.579, e a
+restri\c{c}\~ao ao tipo prim\'ario resulta em 1.654.055 registros, uma
+linha por envolvido por ocorr\^encia. A multiplicidade n\~ao compromete a
 independ\^encia entre parti\c{c}\~oes --- todas as linhas de um mesmo
 envolvido compartilham o identificador do acidente ---, mas distorce a
 pondera\c{c}\~ao, pois ocorr\^encias mais detalhadas contribuem
-desproporcionalmente para o ajuste. Segundo, 15,95\% n\~ao possuem
+desproporcionalmente para o ajuste. Segundo, 14,42\% n\~ao possuem
 r\'otulo utiliz\'avel (valores ausentes e ``n\~ao informado'') e s\~ao
 exclu\'idos, pois atribu\'i-los \`a classe negativa inflaria a maioria; a
-base anal\'itica re\'une 608.921 registros. Terceiro, atributos de
+base anal\'itica re\'une 1.415.582 registros. Terceiro, atributos de
 contagem de ilesos, feridos leves, feridos graves e \'obitos s\~ao
 codifica\c{c}\~oes determin\'isticas do estado f\'isico ---
 coincid\^encia total com o r\'otulo ---, constituindo o alvo sob outra
 forma; s\~ao removidos, assim como os identificadores de registro, pessoa
-e ve\'iculo. A presen\c{c}a desses atributos entre os preditores do estudo
-de refer\^encia integra a replica\c{c}\~ao. Em raz\~ao da estrutura de
+e ve\'iculo. A aus\^encia desses atributos entre os preditores do estudo
+de refer\^encia foi verificada na auditoria do c\'odigo. Em raz\~ao da estrutura de
 agrupamento, adota-se particionamento por grupo pelo identificador do
 acidente em todas as oito configura\c{c}\~oes como decis\~ao de protocolo;
 a verifica\c{c}\~ao de integridade confirmou aus\^encia de colis\~ao de
@@ -240,11 +235,10 @@ defeitos, e comparada aos valores publicados; sem essa equival\^encia,
 qualquer diferen\c{c}a posterior seria amb\'igua entre efeito da
 corre\c{c}\~ao e efeito da reimplementa\c{c}\~ao. Considera-se a
 replica\c{c}\~ao bem-sucedida quando o F1 da classe positiva difere em no
-m\'aximo 0,02 do valor publicado. Registra-se que o \emph{script}
-publicado n\~ao executa sem corre\c{c}\~ao de um erro de digita\c{c}\~ao
-em uma chamada de fun\c{c}\~ao. A etapa de replica\c{c}\~ao \'e
-conduzida sobre a variante padr\~ao utilizada pelos autores, restringindo
-a diverg\^encia de base \`as an\'alises subsequentes.
+m\'aximo 0,02 do valor publicado. A etapa de replica\c{c}\~ao \'e
+conduzida sobre o recorte 2021--2024 da mesma variante deduplicada, e
+n\~ao sobre a variante padr\~ao utilizada pelos autores; a diverg\^encia
+\'e registrada como limita\c{c}\~ao.
 
 
 \textbf{Hiperpar\^ametros e m\'etricas.} Fixados os hiperpar\^ametros nos
@@ -292,9 +286,8 @@ constituem artefato de protocolo ou especificidade regional.
 \textbf{Reprodutibilidade.} Sementes aleat\'orias s\~ao fixadas e
 reportadas; c\'odigo e vers\~oes de bibliotecas s\~ao depositados em
 reposit\'orio p\'ublico. Os resultados s\~ao consolidados em tabelas de
-replica\c{c}\~ao, de decomposi\c{c}\~ao por configura\c{c}\~ao e de
-desempenho por modelo, al\'em da matriz de transfer\^encia regional e do
-gr\'afico comparativo de estabilidade dos fatores.
+replica\c{c}\~ao, de decomposi\c{c}\~ao e de desempenho por modelo, na
+matriz de transfer\^encia e no gr\'afico de estabilidade dos fatores.
 
 \section{Resultados Preliminares}
 
@@ -555,33 +548,6 @@ por tau de Kendall e sobreposi\c{c}\~ao top-$k$, com o desempenho
 consolidado de todos os modelos, incluindo XGBoost e SVM linear. C\'odigo,
 sementes e vers\~oes de bibliotecas est\~ao no reposit\'orio p\'ublico do
 trabalho.
-
-\section{Cronograma}
-
-Os marcos, amarrados \`as datas da disciplina em 2026, s\~ao apresentados
-a seguir.
-
-\begin{table}[H]
-\centering
-\caption{Cronograma de marcos e entregas}
-\label{tab:cronograma}
-\begin{tabular}{|p{3.2cm}|p{9.6cm}|}
-\hline
-\textbf{Prazo} & \textbf{Marco / Atividade} \\ \hline
-At\'e 26/08/2026 & Entrega do plano de trabalho. \\ \hline
-At\'e 16/09/2026 & Replica\c{c}\~ao da configura\c{c}\~ao original,
-primeira medida sob protocolo corrigido e auditoria do conjunto de
-preditores do estudo de refer\^encia. \\ \hline
-At\'e 21/10/2026 & Relat\'orio parcial e v\'ideo de 8 a 10 minutos:
-decomposi\c{c}\~ao fatorial completa e primeiras macrorregi\~oes da
-matriz de transfer\^encia. \\ \hline
-At\'e 18/11/2026 & Relat\'orio final: matriz de transfer\^encia completa,
-compara\c{c}\~ao de estabilidade dos fatores e desempenho consolidado dos
-modelos. \\ \hline
-19/11/2026 & Entrega dos slides e apresenta\c{c}\~ao presencial de 12
-minutos, seguida de 3 minutos de perguntas. \\ \hline
-\end{tabular}
-\end{table}
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
