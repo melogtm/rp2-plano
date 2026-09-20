@@ -8,7 +8,7 @@ METRICAS = ["f1", "precisao", "revocacao", "auc_pr", "auc_roc"]
 
 
 def agregar() -> pd.DataFrame:
-    df = pd.concat([pd.read_csv(f) for f in sorted(RESULTS.glob("replicacao_*.csv"))])
+    df = pd.concat([pd.read_csv(RESULTS / f"replicacao_{c}.csv") for c in ("publicado", "corrigido")])
     g = df.groupby(["config", "modelo"])[METRICAS]
     return g.agg(["mean", "std"]).round(4), df
 

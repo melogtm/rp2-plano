@@ -22,12 +22,14 @@ import imblearn
 from imblearn.over_sampling import SMOTE
 from imblearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (average_precision_score, f1_score,
                              precision_score, recall_score, roc_auc_score)
 from sklearn.model_selection import StratifiedGroupKFold, StratifiedKFold
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler, TargetEncoder
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, str(Path(__file__).parent))
 import dados  # noqa: E402
@@ -37,6 +39,7 @@ SEED = 420          # mesma semente do script original (set.seed(420))
 N_REP = 5
 SMOTE_K = 3         # SMOTE(..., K = 3, dup_size = 12)
 SMOTE_DUP = 12
+TE_M = 10          # suavização (m-estimate) da codificação por alvo corrigida
 CATEGORICAS = ["dia_semana", "tipo_acidente", "fase_dia", "sentido_via",
                "condicao_metereologica", "tipo_pista", "uso_solo",
                "tipo_veiculo", "sexo", "br_km"]
@@ -55,6 +58,8 @@ HIPER = {
 
 
 def modelo(nome, seed):
+    if nome == "LR":     # diagnóstico: linear, sem balanceamento; não integra a replicação
+        return LogisticRegression(max_iter=1000)
     if nome == "kNN":
         return KNeighborsClassifier(**HIPER["kNN"], n_jobs=-1)
     if nome == "RF":
@@ -140,13 +145,57 @@ def rodar_publicado(df, seed):
 
 
 # ------------------------------------------------------- config corrigido
+class GroupTargetEncoder(BaseEstimator, TransformerMixin):
+    """Codificação por alvo com suavização (m-estimate) e ajuste fora-da-dobra
+    por grupo. No treino, cada linha é codificada com dobras que excluem todo
+    o seu acidente (GroupKFold por `id`); sem isso, pessoas do mesmo acidente
+    — mesmo br_km, mesmo rótulo — vazam o rótulo umas para as outras. No
+    teste, usa-se o mapa ajustado sobre todo o treino. `id` é consumido e
+    não sai como atributo."""
+
+    def __init__(self, cols, grupo="id", m=10, n_splits=5):
+        self.cols, self.grupo, self.m, self.n_splits = cols, grupo, m, n_splits
+
+    def _mapa(self, X, y):
+        prior = y.mean()
+        return {c: (y.groupby(X[c]).agg(["sum", "count"]).pipe(lambda t: (t["sum"] + self.m * prior) / (t["count"] + self.m)))
+                for c in self.cols}, prior
+
+    def fit(self, X, y):
+        self.mapa_, self.prior_ = self._mapa(X, pd.Series(np.asarray(y), index=X.index))
+        return self
+
+    def _aplicar(self, X, mapa, prior):
+        out = X.drop(columns=[self.grupo]).copy()
+        for c in self.cols:
+            out[c] = X[c].map(mapa[c]).astype(float).fillna(prior)
+        return out
+
+    def transform(self, X):
+        return self._aplicar(X, self.mapa_, self.prior_)
+
+    def fit_transform(self, X, y):
+        from sklearn.model_selection import GroupKFold
+        self.fit(X, y)
+        y = pd.Series(np.asarray(y), index=X.index)
+        out = X.drop(columns=[self.grupo]).copy()
+        for c in self.cols:
+            out[c] = np.nan
+        for tr, te in GroupKFold(self.n_splits).split(X, y, X[self.grupo]):
+            mapa, prior = self._mapa(X.iloc[tr], y.iloc[tr])
+            enc = self._aplicar(X.iloc[te], mapa, prior)
+            out.iloc[te, [out.columns.get_loc(c) for c in self.cols]] = enc[self.cols].values
+        return out
+
+
 def pipeline_corrigido(nome, seed, razao):
-    return Pipeline([
-        ("te", TargetEncoder(target_type="binary", smooth="auto", random_state=seed)),
-        ("scale", StandardScaler()),
-        ("smote", SMOTE(k_neighbors=SMOTE_K, sampling_strategy=razao, random_state=seed)),
-        ("clf", modelo(nome, seed)),
-    ])
+    etapas = [("te", GroupTargetEncoder(CATEGORICAS, grupo="id", m=TE_M)),
+              ("scale", StandardScaler()),
+              ("smote", SMOTE(k_neighbors=SMOTE_K, sampling_strategy=razao, random_state=seed)),
+              ("clf", modelo(nome, seed))]
+    if nome == "LR":
+        etapas = [e for e in etapas if e[0] != "smote"]
+    return Pipeline(etapas)
 
 
 def metricas(y_true, prob, pred):
@@ -172,11 +221,11 @@ def main(config):
                                    **metricas(y_te, prob, (prob >= 0.5).astype(int)), tempo_s=time.time() - t))
                 print(linhas[-1], flush=True)
     else:
-        X, y, g = df[CATEGORICAS + NUMERICAS], df["y"], df["id"]
+        X, y, g = df[["id"] + CATEGORICAS + NUMERICAS], df["y"], df["id"]
         cv = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=SEED)
         for k, (tr, te) in enumerate(cv.split(X, y, g)):
             assert not set(g.iloc[tr]) & set(g.iloc[te])
-            for nome in HIPER:
+            for nome in list(HIPER) + ["LR"]:
                 t = time.time()
                 p = pipeline_corrigido(nome, SEED + k, razao).fit(X.iloc[tr], y.iloc[tr])
                 prob = p.predict_proba(X.iloc[te])[:, 1]
@@ -186,7 +235,7 @@ def main(config):
                 print(linhas[-1], flush=True)
     RESULTS.mkdir(exist_ok=True)
     pd.DataFrame(linhas).to_csv(RESULTS / f"replicacao_{config}.csv", index=False)
-    cfg = dict(seed=SEED, n_rep=N_REP, smote=dict(k_neighbors=SMOTE_K, dup_size=SMOTE_DUP, razao_efetiva=razao),
+    cfg = dict(seed=SEED, n_rep=N_REP, smote=dict(k_neighbors=SMOTE_K, dup_size=SMOTE_DUP, razao_efetiva=razao), target_encoding_m=TE_M,
                hiperparametros=HIPER, recorte=dict(n=len(df), positivos=int(df["y"].sum()),
                prevalencia=float(df["y"].mean()), acidentes=int(df["id"].nunique()), regiao="Sul", anos="2021-2024",
                alvo="classificacao_acidente == 'Com Vítimas Fatais'"),
