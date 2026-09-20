@@ -35,13 +35,13 @@
 \begin{resumo}
 Modelos de aprendizado de m\'aquina sobre dados abertos da PRF s\~ao usados
 para identificar fatores de risco de gravidade de acidentes. Um estudo
-recente \cite{gabardo2025} treinou kNN, MLP e Random Forest sobre a
-regi\~ao Sul (2021--2024), reportando AUC-ROC de 0,99 para a classe fatal,
-e derivou fatores via SHAP. Este trabalho quantifica, sob protocolo de
+recente \cite{gabardo2025} reportou AUC-ROC de 0,99 para a classe fatal
+na regi\~ao Sul (2021--2024) e derivou fatores via SHAP. Este trabalho quantifica, sob protocolo de
 valida\c{c}\~ao corrigido, a relev\^ancia preditiva desses fatores em base
 nacional de 1,4 milh\~ao de registros (2017--2025) e avalia sua
 estabilidade entre as cinco macrorregi\~oes por matriz de transfer\^encia
-$5\times 5$. Resultados preliminares reproduzem o desempenho publicado a
+$5\times 5$. Resultados preliminares, obtidos sobre o recorte de
+replica\c{c}\~ao (Sul, 2021--2024), reproduzem o desempenho publicado a
 partir do c\'odigo dos autores e mostram que, sob protocolo corrigido, a
 AUC-ROC cai para 0,62--0,71.
 \end{resumo}
@@ -64,23 +64,34 @@ Esse uso traz um risco pouco examinado. Quando um fator \'e apontado como
 determinante da letalidade e essa conclus\~ao orienta investimento
 p\'ublico, a validade da recomenda\c{c}\~ao depende inteiramente da
 validade do protocolo que a produziu. Tal protocolo pode estar restrito ou
-enviesado pelo desbalanceamentos dos dados utilizados, orientando uma predição
-da severidade dos acidentes que podem não condizer em um outro contexto.
-O estudo de \cite{gabardo2025} \'e,
-a um s\'o tempo, caso ilustrativo e exemplar em transpar\^encia: o estudo
-restringe-se \`a regi\~ao Sul, ao passo
-que as recomenda\c{c}\~oes derivadas dele s\~ao formuladas em termos
-gerais.
+enviesado pelo desbalanceamento dos dados utilizados, orientando uma
+predi\c{c}\~ao da severidade dos acidentes que pode n\~ao condizer com
+outro contexto.
+O estudo de \cite{gabardo2025} \'e, a um s\'o tempo, caso ilustrativo e
+exemplar em transpar\^encia: os autores publicaram o
+c\'odigo-fonte\footnote{\url{https://github.com/arthur-miguel/Highway-to-Classifying-Accidents}},
+e \'e precisamente por isso que esta an\'alise foi poss\'ivel --- m\'erito
+que deve ser explicitamente reconhecido. A leitura desse c\'odigo revelou
+tr\^es defeitos que fazem o conjunto de teste deixar de ser independente
+do conjunto de treino: (D1) um erro de particionamento que faz o conjunto
+de teste ficar contido no de treino; (D2) codifica\c{c}\~ao por alvo
+ajustada sobre a base completa antes da separa\c{c}\~ao treino/teste; e
+(D3) balanceamento sint\'etico contaminando a valida\c{c}\~ao interna.
+Cabe registrar que os autores citam a refer\^encia correta sobre
+codifica\c{c}\~ao regularizada e tentaram implementar a vers\~ao adequada:
+trata-se de defeito de implementa\c{c}\~ao, n\~ao de desconhecimento
+conceitual. O estudo restringe-se \`a regi\~ao Sul, ao passo que as
+recomenda\c{c}\~oes derivadas dele s\~ao formuladas em termos gerais.
 
-Portanto, quando analisamos esta problemática sob o prisma macrorregional brasileiro,
-a consequ\^encia \'e direta na formulação de políticas públicas e \'e o que motiva este trabalho.
-Frota, malha vi\'aria, clima e padr\~ao de tr\'afego diferem
-substancialmente entre as macrorregi\~oes brasileiras, e não há evidência estatística que um
-conjunto de fatores estimado no Sul descreva o que acontece Nordeste ou o Norte.
+Sob o prisma macrorregional brasileiro, a consequ\^encia \'e direta na
+formula\c{c}\~ao de pol\'iticas p\'ublicas, e \'e o que motiva este
+trabalho. Frota, malha vi\'aria, clima e padr\~ao de tr\'afego diferem
+substancialmente entre as macrorregi\~oes brasileiras, e n\~ao h\'a
+evid\^encia estat\'istica de que um conjunto de fatores estimado no Sul
+descreva o que acontece no Nordeste ou no Norte.
 
-\textbf{Objetivo.} Quantificar, %sob protocolo de valida\c{c}\~ao
-% corrigido,
-a relev\^ancia preditiva dos fatores associados \`a gravidade
+\textbf{Objetivo.} Quantificar, sob protocolo de valida\c{c}\~ao
+corrigido, a relev\^ancia preditiva dos fatores associados \`a gravidade
 de acidentes em rodovias federais brasileiras, e avaliar a estabilidade
 desses fatores e do desempenho preditivo entre as cinco macrorregi\~oes do
 IBGE. O objetivo \'e verific\'avel ao final do trabalho segundo o
@@ -94,7 +105,11 @@ entre ordenamentos. %Nenhuma configura\c{c}\~ao de resultados torna o
 avalia\c{c}\~ao n\~ao contaminada, evid\^encia sobre a adequa\c{c}\~ao de
 um modelo nacional \'unico frente a modelos regionais, e um veredito sobre
 a base emp\'irica das recomenda\c{c}\~oes derivadas de estudos que utilizam
-o aprendizado de máquina como metodologia de investigação.
+o aprendizado de m\'aquina como metodologia de investiga\c{c}\~ao. Os
+resultados preliminares reproduzem o desempenho publicado a partir do
+c\'odigo dos autores e mostram que, sob protocolo corrigido, a AUC-ROC cai
+de 0,99--1,00 para 0,62--0,71, com magnitude de queda proporcional \`a
+capacidade de memoriza\c{c}\~ao de cada modelo.
 
 \section{Trabalhos Relacionados}
 
@@ -185,24 +200,34 @@ resposta \'e bin\'aria e deriva do atributo de estado f\'isico do
 envolvido, assumindo valor positivo quando o desfecho \'e \'obito. Na
 base anal\'itica, que re\'une 1.415.582 registros, a classe positiva
 corresponde a 3,59\%, raz\~ao de desbalanceamento de aproximadamente 1
-para 27.
+para 27. A auditoria do c\'odigo do estudo de refer\^encia revelou,
+contudo, que sua vari\'avel resposta n\~ao \'e o estado f\'isico do
+envolvido, mas a classifica\c{c}\~ao do acidente, de n\'ivel ocorr\^encia,
+replicada para todas as pessoas envolvidas. Para que a compara\c{c}\~ao
+com os valores publicados seja leg\'itima, adota-se esse mesmo r\'otulo na
+replica\c{c}\~ao, no delineamento fatorial, na matriz de transfer\^encia
+e na an\'alise de estabilidade. Trata-se de alvo herdado do estudo
+auditado, e n\~ao de escolha metodol\'ogica deste trabalho; a an\'alise
+sobre o estado f\'isico do envolvido, de n\'ivel pessoa, fica registrada
+como complementar. Os dois diferem em preval\^encia --- 7,1\% contra
+3,59\% no mesmo recorte --- e em unidade de atribui\c{c}\~ao, o que \'e
+discutido na Se\c{c}\~ao~5. Por isso, a classifica\c{c}\~ao do acidente
+\'e exclu\'ida do conjunto de preditores quando o alvo \'e o estado
+f\'isico, e passa a ser o pr\'oprio alvo na replica\c{c}\~ao do estudo de
+refer\^encia.
 
 \textbf{Algoritmos de aprendizado de máquina.} A etapa de replicação emprega os três algoritmos do estudo de referência — 
 k-vizinhos mais próximos, perceptron multicamadas e florestas aleatórias —, condição necessária para que a 
 comparação com os valores publicados seja legítima. As análises subsequentes acrescentam gradient boosting sobre 
 árvores, na implementação XGBoost, e uma máquina de vetores de suporte com kernel linear. A escolha não visa 
-maximizar desempenho, e sim cobrir famílias com capacidades de memorização distintas: modelos baseados em 
-distância e em margem linear ajustam-se a fronteiras globais, ao passo que ensembles de árvores particionam 
-o espaço de atributos com granularidade suficiente para isolar observações individuais. Essa diferença é 
-diagnóstica, pois o ganho espúrio produzido por contaminação do conjunto de avaliação cresce com a 
-capacidade de memorização; a comparação entre famílias sob as oito configurações do delineamento permite, 
-portanto, separar efeito de protocolo de efeito de modelo. Os hiperparâmetros dos três algoritmos 
-replicados são fixados nos valores reportados pelos autores; para os dois algoritmos acrescentados, 
-são fixados por busca conduzida uma única vez sobre a configuração integralmente corrigida e mantidos 
-constantes nas demais, de modo que nenhuma diferença observada entre configurações decorra de reotimização. 
-Adota-se o kernel linear na máquina de vetores de suporte porque o custo de treino dos kernels não lineares 
-é superquadrático no número de amostras, incompatível com as 33 execuções previstas entre delineamento 
-fatorial e matriz de transferência.
+maximizar desempenho, e sim cobrir famílias com capacidades de memorização distintas, pois o ganho 
+espúrio produzido por contaminação do conjunto de avaliação cresce com essa capacidade: a comparação 
+entre famílias sob as oito configurações separa efeito de protocolo de efeito de modelo. Os 
+hiperparâmetros dos três algoritmos replicados são fixados nos valores reportados pelos autores ou, na 
+ausência de valores reportados, em padrões documentados dentro das grades originais; para os dois 
+acrescentados, por busca conduzida uma única vez sobre a configuração integralmente corrigida. Nenhum é 
+reotimizado entre configurações. O kernel linear decorre do custo superquadrático dos kernels não lineares, 
+incompatível com as 33 execuções previstas.
 
 \textbf{Prepara\c{c}\~ao e decis\~oes de escopo.} Tr\^es decis\~oes
 definem a base anal\'itica. Primeiro, a variante replica cada envolvido por
@@ -241,10 +266,8 @@ n\~ao sobre a variante padr\~ao utilizada pelos autores; a diverg\^encia
 \'e registrada como limita\c{c}\~ao.
 
 
-\textbf{Hiperpar\^ametros e m\'etricas.} Fixados os hiperpar\^ametros nos
-valores do trabalho original, sem reotimiza\c{c}\~ao entre
-configura\c{c}\~oes --- pois o objeto de compara\c{c}\~ao \'e o protocolo,
-n\~ao o modelo ---, a m\'etrica prim\'aria \'e o F1 da classe positiva,
+\textbf{M\'etricas.} O objeto de compara\c{c}\~ao \'e o protocolo, n\~ao
+o modelo. A m\'etrica prim\'aria \'e o F1 da classe positiva,
 com precis\~ao, revoca\c{c}\~ao e \'area sob a curva
 precis\~ao-revoca\c{c}\~ao reportadas separadamente, expressas como
 m\'edia e desvio-padr\~ao entre as dobras de valida\c{c}\~ao cruzada
@@ -265,12 +288,11 @@ avalia\c{c}\~ao de uma \'unica origem porque permite distinguir a
 hip\'otese de que uma regi\~ao espec\'ifica n\~ao exporta seu modelo da
 hip\'otese de que nenhuma regi\~ao exporta; apenas a segunda sustenta a
 afirma\c{c}\~ao de que um modelo nacional \'unico \'e inadequado. Como o
-volume de registros difere em fator superior a cinco entre a maior e a
-menor macrorregi\~ao, todos os conjuntos de treino s\~ao subamostrados
-para o $n$ da regi\~ao Norte, preservando a propor\c{c}\~ao de classes,
-com repeti\c{c}\~ao em amostragens independentes e agrega\c{c}\~ao dos
-resultados --- sem esse controle, diferen\c{c}a de tamanho amostral seria
-interpretada como heterogeneidade regional.
+volume difere em fator superior a cinco entre regi\~oes, os conjuntos de
+treino s\~ao subamostrados ao $n$ do Norte, com propor\c{c}\~ao de classes
+preservada e repeti\c{c}\~ao em amostragens independentes; sem isso,
+diferen\c{c}a de tamanho amostral seria lida como heterogeneidade
+regional.
 
 \textbf{Estabilidade dos fatores.} Os valores SHAP s\~ao calculados sobre
 as parti\c{c}\~oes de valida\c{c}\~ao e convertidos em ordenamento de
@@ -279,15 +301,11 @@ protocolo original \emph{versus} corrigido, na mesma regi\~ao; e os
 ordenamentos entre macrorregi\~oes sob protocolo corrigido. A
 concord\^ancia \'e quantificada pelo tau de Kendall entre ordenamentos
 completos e pela sobreposi\c{c}\~ao relativa entre os dez atributos mais
-influentes, com $k = 5$ como verifica\c{c}\~ao de robustez. A
-concord\^ancia observada determina se os fatores s\~ao robustos ou se
-constituem artefato de protocolo ou especificidade regional.
+influentes, com $k = 5$ como verifica\c{c}\~ao de robustez.
 
 \textbf{Reprodutibilidade.} Sementes aleat\'orias s\~ao fixadas e
 reportadas; c\'odigo e vers\~oes de bibliotecas s\~ao depositados em
-reposit\'orio p\'ublico. Os resultados s\~ao consolidados em tabelas de
-replica\c{c}\~ao, de decomposi\c{c}\~ao e de desempenho por modelo, na
-matriz de transfer\^encia e no gr\'afico de estabilidade dos fatores.
+reposit\'orio p\'ublico.
 
 \section{Resultados Preliminares}
 
@@ -295,17 +313,14 @@ matriz de transfer\^encia e no gr\'afico de estabilidade dos fatores.
 abertos da PRF na variante agrupada por pessoa com todas as causas e tipos
 de acidente, nos nove arquivos anuais de 2017 a 2025, de esquema id\^entico
 com 37 atributos. A unidade de an\'alise \'e o envolvido em uma
-ocorr\^encia. Como a variante replica cada envolvido por causa e por tipo
-registrados, ocorr\^encias de registro mais detalhado contribuiriam
-desproporcionalmente para o ajuste e para as m\'etricas; a
-Tabela~\ref{tab:funil} apresenta o funil de redu\c{c}\~ao. A restri\c{c}\~ao
-\`a causa principal e ao tipo prim\'ario elimina a multiplicidade sem
-comprometer a independ\^encia entre parti\c{c}\~oes, pois todas as c\'opias
-compartilham o identificador do acidente; a exclus\~ao dos registros sem
-r\'otulo utiliz\'avel evita atribuir \`a classe negativa o que \'e
-aus\^encia de informa\c{c}\~ao. A base anal\'itica re\'une 1.415.582
+ocorr\^encia. A Tabela~\ref{tab:funil} apresenta o funil de redu\c{c}\~ao,
+cujas raz\~oes est\~ao na Se\c{c}\~ao~3: os dois primeiros filtros
+eliminam a multiplicidade por causa e por tipo sem comprometer a
+independ\^encia entre parti\c{c}\~oes, e o terceiro evita atribuir \`a
+classe negativa o que \'e aus\^encia de informa\c{c}\~ao. A base anal\'itica re\'une 1.415.582
 registros de 620.799 acidentes, com 50.822 \'obitos (3,590\%), raz\~ao de
-desbalanceamento de aproximadamente 1 para 27.
+desbalanceamento de aproximadamente 1 para 27 para o alvo de n\'ivel
+pessoa (\'obito do envolvido), que \'e o desta caracteriza\c{c}\~ao.
 
 \begin{table}[H]
 \centering
@@ -324,9 +339,7 @@ Exclus\~ao de registros sem r\'otulo (base anal\'itica) & 1.415.582 & 34,8 \\ \h
 A distribui\c{c}\~ao regional \'e assim\'etrica: Sudeste, 30,8\%
 (435.386 registros); Sul, 29,7\% (420.755); Nordeste, 21,4\% (302.635);
 Centro-Oeste, 12,2\% (173.294); e Norte, 5,9\% (83.512), raz\~ao de 5,2
-vezes entre a maior e a menor. Sem subamostrar os conjuntos de treino ao
-$n$ do Norte, uma diferen\c{c}a de desempenho entre regi\~oes seria
-indistingu\'ivel de uma diferen\c{c}a de volume. Os valores ausentes
+vezes entre a maior e a menor. Os valores ausentes
 concentram-se em poucos atributos: idade, 3,6\%; ano de fabrica\c{c}\~ao e
 tipo do ve\'iculo, 2,2\%; rodovia e quil\^ometro, 0,2\%; os demais abaixo
 de 0,1\%.
@@ -338,17 +351,17 @@ deriva na distribui\c{c}\~ao do alvo, independente da deriva regional, que
 motiva considerar o ano como vari\'avel de controle. O segundo \'e a
 deriva de categorias: a causa do acidente tem 77 valores distintos no
 recorte 2021--2024 (76 ap\'os a restri\c{c}\~ao \`a causa principal) e 91
-na s\'erie completa; o tipo de acidente passa de 18 para 21. Parte s\~ao
-categorias novas, parte \'e prov\'avel renomea\c{c}\~ao. Sem
+na s\'erie completa; o tipo de acidente passa de 18 para 21. Sem
 harmoniza\c{c}\~ao, a codifica\c{c}\~ao por alvo fragmenta o mesmo fator
 em dois, o que afeta diretamente a an\'alise de estabilidade; a
 harmoniza\c{c}\~ao est\'a em andamento. Registra-se ainda a decis\~ao
 sobre a classifica\c{c}\~ao do acidente (sem v\'itimas, com feridos, com
 fatais), atributo de n\'ivel ocorr\^encia: a probabilidade de \'obito \'e
 39,9\% entre envolvidos em acidentes classificados como fatais e nula
-entre os demais (uma \'unica linha discordante em 1,4 milh\~ao), com $V$
-de Cram\'er de 0,61 em rela\c{c}\~ao ao alvo. Por ser filtro
-determin\'istico da classe negativa, \'e exclu\'ida dos preditores.
+entre os demais, com $V$
+de Cram\'er de 0,61 em rela\c{c}\~ao ao alvo de n\'ivel pessoa. Por ser
+filtro determin\'istico da classe negativa, \'e exclu\'ida dos preditores
+quando esse \'e o alvo; na replica\c{c}\~ao, \'e o pr\'oprio alvo.
 
 \textbf{Auditoria do c\'odigo do estudo de refer\^encia.} A leitura do
 reposit\'orio p\'ublico de \cite{gabardo2025} respondeu \`as quatro
@@ -420,19 +433,15 @@ implementa\c{c}\~ao, n\~ao de concep\c{c}\~ao.
 com os filtros e o alvo do estudo de refer\^encia aplicados \`a variante
 deduplicada) re\'une 168.213 registros de 75.396 acidentes, com 11.936
 positivos (7,10\%), preval\^encia id\^entica \`a reportada pelos autores.
-A Tabela~\ref{tab:replicacao} compara as duas configura\c{c}\~oes
-executadas nesta etapa: a publicada, que reproduz D1, D2 e D3 conforme
-transcritos, e a integralmente corrigida, com valida\c{c}\~ao cruzada
-estratificada por grupo em cinco dobras, codifica\c{c}\~ao por alvo com
-suaviza\c{c}\~ao ajustada fora-da-dobra e por grupo dentro de cada
-parti\c{c}\~ao de treino, e SMOTE apenas sobre o treino, tudo encadeado em
-\emph{pipeline}. Na configura\c{c}\~ao publicada n\~ao h\'a dobras, e a
-dispers\~ao \'e medida sobre cinco repeti\c{c}\~oes com sementes
-distintas. Os hiperpar\^ametros ($k=5$; 500 \'arvores, $\sqrt{p}$
-atributos por divis\~ao, folha m\'inima 1; camada oculta de 100
-neur\^onios, decaimento $10^{-4}$, 100 \'epocas) s\~ao id\^enticos nas
-duas configura\c{c}\~oes; a semente base \'e 420, a do \emph{script}
-original.
+A Tabela~\ref{tab:replicacao} compara a configura\c{c}\~ao publicada,
+que reproduz D1, D2 e D3 conforme transcritos, com a integralmente
+corrigida: valida\c{c}\~ao cruzada estratificada por grupo em cinco
+dobras, codifica\c{c}\~ao por alvo suavizada e ajustada fora-da-dobra e
+por grupo dentro do treino, e SMOTE apenas sobre o treino, tudo em
+\emph{pipeline}. Na publicada n\~ao h\'a dobras: a dispers\~ao \'e medida
+sobre cinco repeti\c{c}\~oes com sementes distintas. Os hiperpar\^ametros ($k=5$; 500 \'arvores; camada
+oculta de 100 neur\^onios) s\~ao id\^enticos nas duas configura\c{c}\~oes
+e est\~ao registrados no reposit\'orio; a semente base \'e 420.
 
 \begin{table}[tb]
 \centering
@@ -459,12 +468,15 @@ A configura\c{c}\~ao publicada recupera os valores de refer\^encia: a
 floresta aleat\'oria atinge F1 de 0,999 e AUC-ROC de 1,000 contra 0,99 e
 0,99 publicados, dentro da toler\^ancia de 0,02; o kNN reproduz a
 sensibilidade de 1,00 e a AUC-ROC de 0,99, com F1 de 0,57 contra 0,50; o
-MLP reproduz AUC-ROC de 0,84 contra 0,82 e F1 de 0,32 contra 0,29. As
-diferen\c{c}as residuais de F1 no kNN e no MLP s\~ao compat\'iveis com os
-hiperpar\^ametros selecionados n\~ao recuperados ($k$ e tamanho da camada)
-e com a diverg\^encia de variante dos dados; o padr\~ao qualitativo ---
-RF e kNN empatados no teto, MLP muito abaixo --- \'e integralmente
-reproduzido. Sob protocolo corrigido, o desempenho cai a uma fra\c{c}\~ao:
+MLP reproduz AUC-ROC de 0,84 contra 0,82 e F1 de 0,32 contra 0,29. O
+crit\'erio de toler\^ancia de 0,02 no F1, declarado na Se\c{c}\~ao~3, \'e
+atendido pela floresta aleat\'oria. O kNN e o MLP divergem al\'em dele ---
+0,07 e 0,03, respectivamente ---, embora reproduzam a AUC-ROC dentro ou no
+limite da toler\^ancia (0,008 e 0,021) e o padr\~ao qualitativo
+integralmente: RF e kNN empatados no teto, MLP muito abaixo. A
+diverg\^encia \'e compat\'ivel com os hiperpar\^ametros selecionados n\~ao
+recuperados e com a variante de dados utilizada; registra-se, contudo,
+que o crit\'erio declarado foi atendido para um dos tr\^es modelos. Sob protocolo corrigido, o desempenho cai a uma fra\c{c}\~ao:
 a AUC-ROC da floresta vai de 1,000 a 0,658, a do kNN de 0,998 a 0,620 e a
 do MLP de 0,841 a 0,709; o F1 da classe fatal fica entre 0,14 e 0,23.
 A queda \'e ordenada pela capacidade de memoriza\c{c}\~ao: os dois modelos
@@ -474,19 +486,24 @@ o padr\~ao esperado se o ganho da configura\c{c}\~ao publicada \'e
 contamina\c{c}\~ao, e n\~ao capacidade preditiva. A dispers\~ao entre
 dobras corrobora: na configura\c{c}\~ao publicada o desvio-padr\~ao da
 AUC-ROC \'e de 0,000 a 0,001, uma ordem de grandeza abaixo dos 0,007 a
-0,016 da corrigida, como se espera quando o teste est\'a contido no
-treino. Dois detalhes merecem registro. A floresta corrigida atribui classe
-positiva a quase todos os registros (revoca\c{c}\~ao de 0,985 com
-precis\~ao igual \`a preval\^encia): sobre atributos codificados por
-alvo, as sint\'eticas do SMOTE ocupam posi\c{c}\~oes que nenhum registro
-real ocupa, e \'arvores plenamente crescidas as separam dos negativos
-sem aprender a fronteira \'util; a AUC-PR de 0,135, m\'etrica mais
-informativa sob desbalanceamento \cite{saito2015}, confirma o baixo poder
-discriminativo. E a regress\~ao log\'istica sem balanceamento, com
-AUC-ROC de 0,748, supera os tr\^es modelos sob protocolo corrigido, o que
-sugere sinal limitado nos doze atributos e uma intera\c{c}\~ao adversa
-entre balanceamento sint\'etico e codifica\c{c}\~ao por alvo, a ser
-separada pelo delineamento fatorial completo.
+0,016 da corrigida. A floresta corrigida atribui classe positiva a quase todos os registros
+(revoca\c{c}\~ao de 0,985 com precis\~ao igual \`a preval\^encia): sobre
+atributos codificados por alvo, as sint\'eticas do SMOTE ocupam
+posi\c{c}\~oes que nenhum registro real ocupa, e \'arvores plenamente
+crescidas as separam dos negativos sem aprender a fronteira \'util; a
+AUC-PR de 0,135 \cite{saito2015} confirma o baixo poder discriminativo.
+
+Registra-se um resultado adicional de natureza diagn\'ostica. A
+regress\~ao log\'istica sem qualquer balanceamento, inclu\'ida apenas como
+refer\^encia, atinge AUC-ROC de 0,748 sob protocolo corrigido, acima dos
+tr\^es modelos do estudo de refer\^encia. O padr\~ao reproduz, de forma
+independente e em outro dom\'inio, o que \cite{kapoor2023} documentam em
+seu estudo de caso: corrigido o protocolo, modelos cl\'assicos voltam a
+igualar ou superar aprendizado de m\'aquina complexo. Duas leituras s\~ao
+poss\'iveis e ser\~ao separadas pelo delineamento fatorial completo: sinal
+limitado nos doze atributos dispon\'iveis, ou intera\c{c}\~ao adversa
+entre balanceamento sint\'etico e codifica\c{c}\~ao por alvo, que
+degradaria o desempenho em rela\c{c}\~ao a n\~ao aplicar nenhum dos dois.
 
 \section{Discuss\~ao e Conclus\~ao}
 
@@ -505,8 +522,7 @@ dispers\~ao entre dobras uma ordem de grandeza maior. A explica\c{c}\~ao
 alternativa --- um atributo que codifica o alvo --- foi verificada e
 exclu\'ida. Terceiro, a auditoria revelou que o alvo do estudo \'e de
 n\'ivel ocorr\^encia, o que torna o particionamento por grupo condi\c{c}\~ao
-necess\'aria de qualquer estimativa honesta sobre esses dados, inclusive
-para trabalhos futuros que n\~ao cometam D1, D2 ou D3.
+necess\'aria de qualquer estimativa honesta sobre esses dados.
 
 O que ainda n\~ao se pode afirmar \'e a contribui\c{c}\~ao de cada defeito.
 As duas configura\c{c}\~oes executadas s\~ao os extremos do delineamento
@@ -520,11 +536,18 @@ ainda n\~ao realizado.
 Vale reiterar que n\~ao h\'a configura\c{c}\~ao de resultados sem
 conclus\~ao: se o ordenamento se mantiver, o desfecho \'e que as
 m\'etricas estavam infladas mas os fatores identificados s\~ao robustos
---- resposta afirmativa \`a pergunta de pesquisa, que valida o estudo de
-refer\^encia no que importa para pol\'itica p\'ublica. O indicativo de
+--- resposta afirmativa \`a pergunta de pesquisa. O indicativo de
 que o atributo l\'ider do ordenamento publicado \'e justamente aquele em
 que a codifica\c{c}\~ao vazada equivale ao r\'otulo torna a pergunta
 aberta, n\~ao respondida.
+
+Um desdobramento poss\'ivel merece registro. Se o delineamento completo
+confirmar que a combina\c{c}\~ao de balanceamento sint\'etico e
+codifica\c{c}\~ao por alvo degrada o desempenho em rela\c{c}\~ao \`a
+aus\^encia de ambos, a conclus\~ao deste trabalho ser\'a mais forte que a
+infla\c{c}\~ao de m\'etricas: o \emph{pipeline} de pr\'e-processamento
+seria, ele pr\'oprio, contraproducente. A hip\'otese n\~ao est\'a
+estabelecida e depende das seis configura\c{c}\~oes intermedi\'arias.
 
 As limita\c{c}\~oes reconhecidas s\~ao tr\^es. A replica\c{c}\~ao usa a
 variante de dados com todas as causas e tipos, deduplicada, e n\~ao a
@@ -534,8 +557,7 @@ pode ser atribu\'ida com seguran\c{c}a a hiperpar\^ametros ou \`a
 variante. As categorias de causa e tipo de acidente ainda n\~ao foram
 harmonizadas entre 2017 e 2025, o que afeta a an\'alise de estabilidade
 na s\'erie completa. E os hiperpar\^ametros selecionados pelos autores
-n\~ao foram recuperados, tendo sido substitu\'idos por padr\~oes
-documentados dentro das grades originais.
+n\~ao foram recuperados.
 
 Os pr\'oximos passos seguem o calend\'ario da disciplina. At\'e 21/10,
 executam-se as seis configura\c{c}\~oes intermedi\'arias do fatorial, com
@@ -545,9 +567,7 @@ harmoniza\c{c}\~ao de categorias precede ambas. At\'e 18/11, completam-se
 a matriz $5\times 5$, o c\'alculo de SHAP nas duas configura\c{c}\~oes
 extremas e entre macrorregi\~oes, e a compara\c{c}\~ao de ordenamentos
 por tau de Kendall e sobreposi\c{c}\~ao top-$k$, com o desempenho
-consolidado de todos os modelos, incluindo XGBoost e SVM linear. C\'odigo,
-sementes e vers\~oes de bibliotecas est\~ao no reposit\'orio p\'ublico do
-trabalho.
+consolidado de todos os modelos, incluindo XGBoost e SVM linear.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
