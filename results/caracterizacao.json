@@ -1,0 +1,83 @@
+{
+  "funil": {
+    "base bruta": 4069971,
+    "causa_principal == Sim": 2626579,
+    "ordem_tipo_acidente == 1": 1654055,
+    "com rótulo": 1415582
+  },
+  "positivos": 50822,
+  "prevalencia": 0.03590184108020588,
+  "acidentes": 620799,
+  "regioes": {
+    "Sudeste": {
+      "n": 435386,
+      "pct": 0.3075667817194624
+    },
+    "Sul": {
+      "n": 420755,
+      "pct": 0.29723110353197485
+    },
+    "Nordeste": {
+      "n": 302635,
+      "pct": 0.21378839233615574
+    },
+    "Centro-Oeste": {
+      "n": 173294,
+      "pct": 0.12241890614602333
+    },
+    "Norte": {
+      "n": 83512,
+      "pct": 0.05899481626638372
+    }
+  },
+  "razao_maior_menor": 5.213454353865313,
+  "nulos_pct": {
+    "idade": 0.03564682229641236,
+    "ano_fabricacao_veiculo": 0.021965523720985432,
+    "tipo_veiculo": 0.021965523720985432,
+    "km": 0.0023545086049412893,
+    "br": 0.0023545086049412893,
+    "uop": 0.0007700013139471962,
+    "delegacia": 0.00041325758592578884,
+    "regional": 6.993589915667196e-05,
+    "tipo_acidente": 5.227531856155278e-05,
+    "classificacao_acidente": 1.9073427042728716e-05
+  },
+  "letalidade_ano": {
+    "2017": 0.032227116580872114,
+    "2018": 0.0338356718055315,
+    "2019": 0.034849799972590044,
+    "2020": 0.03843472198012899,
+    "2021": 0.038376210589188955,
+    "2022": 0.03758401315198696,
+    "2023": 0.03603424758416209,
+    "2024": 0.03680666344010851,
+    "2025": 0.03640383375803469
+  },
+  "recorte_2021_2024": {
+    "n": 608921,
+    "prevalencia": 0.03715588721689677
+  },
+  "causa_acidente_distintos": {
+    "2021_2024": 76,
+    "2017_2025": 91
+  },
+  "tipo_acidente_distintos": {
+    "2021_2024": 18,
+    "2017_2025": 21
+  },
+  "ids_em_mais_de_um_ano": 0,
+  "constantes": {
+    "causa_principal": 1,
+    "ordem_tipo_acidente": 1
+  },
+  "mortos_vs_obito": 1.0,
+  "soma_onehot_igual_1": 1.0,
+  "classificacao_acidente": {
+    "P(obito | acidente fatal)": 0.3992850408548083,
+    "P(obito | acidente nao fatal)": 7.762155146852213e-07,
+    "P(acidente fatal)": 0.08991354792587078,
+    "cramer_v": 0.6139208820052502,
+    "pessoas_por_acidente_fatal_mediana": 2.0
+  }
+}
