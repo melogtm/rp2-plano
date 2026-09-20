@@ -69,7 +69,9 @@ predi\c{c}\~ao da severidade dos acidentes que pode n\~ao condizer com
 outro contexto.
 O estudo de \cite{gabardo2025} \'e, a um s\'o tempo, caso ilustrativo e
 exemplar em transpar\^encia: os autores publicaram o
-c\'odigo-fonte\footnote{\url{https://github.com/arthur-miguel/Highway-to-Classifying-Accidents}},
+c\'odigo-fonte\footnote{Reposit\'orio do artigo original:
+\url{https://github.com/arthur-miguel/Highway-to-Classifying-Accidents}.
+Acesso em 20 set. 2026.},
 e \'e precisamente por isso que esta an\'alise foi poss\'ivel --- m\'erito
 que deve ser explicitamente reconhecido. A leitura desse c\'odigo revelou
 tr\^es defeitos que fazem o conjunto de teste deixar de ser independente
@@ -515,25 +517,28 @@ floresta aleat\'oria dentro da toler\^ancia e reproduz o padr\~ao dos
 outros dois modelos. Segundo, esse desempenho \'e artefato de protocolo:
 com o teste contido no treino, a codifica\c{c}\~ao ajustada antes da
 separa\c{c}\~ao e o balanceamento contaminando a valida\c{c}\~ao interna,
-o mesmo c\'odigo, os mesmos atributos e os mesmos hiperpar\^ametros
-produzem AUC-ROC de 0,62 a 0,71 sob protocolo corrigido, e a queda \'e
-proporcional \`a capacidade de memoriza\c{c}\~ao do modelo, com
-dispers\~ao entre dobras uma ordem de grandeza maior. A explica\c{c}\~ao
-alternativa --- um atributo que codifica o alvo --- foi verificada e
-exclu\'ida. Terceiro, a auditoria revelou que o alvo do estudo \'e de
+os mesmos atributos e hiperpar\^ametros produzem AUC-ROC de 0,62 a 0,71
+sob protocolo corrigido, com queda proporcional \`a capacidade de
+memoriza\c{c}\~ao e dispers\~ao entre dobras uma ordem de grandeza maior. Terceiro, a auditoria revelou que o alvo do estudo \'e de
 n\'ivel ocorr\^encia, o que torna o particionamento por grupo condi\c{c}\~ao
 necess\'aria de qualquer estimativa honesta sobre esses dados.
 
-O que ainda n\~ao se pode afirmar \'e a contribui\c{c}\~ao de cada defeito.
-As duas configura\c{c}\~oes executadas s\~ao os extremos do delineamento
-$2^3$; a decomposi\c{c}\~ao exige as seis intermedi\'arias, e o
-comportamento da floresta corrigida sugere que a intera\c{c}\~ao entre
-SMOTE e codifica\c{c}\~ao por alvo ser\'a parte relevante da resposta.
-Tampouco se pode afirmar, ainda, se o ordenamento de fatores sobrevive
-\`a corre\c{c}\~ao: essa \'e a pergunta central e depende do c\'alculo de
-SHAP \cite{lundberg2017} sobre as parti\c{c}\~oes de valida\c{c}\~ao,
-ainda n\~ao realizado.
-Vale reiterar que n\~ao h\'a configura\c{c}\~ao de resultados sem
+A unidade de atribui\c{c}\~ao do r\'otulo herdado merece registro. Ao
+classificar como positiva toda pessoa envolvida em acidente com v\'itima
+fatal, inclusive ilesos e feridos leves, o alvo de n\'ivel ocorr\^encia
+mede a gravidade do sinistro, e n\~ao o desfecho do indiv\'iduo. Os
+fatores que o SHAP identificar sob esse r\'otulo descrevem, portanto, o
+que torna um acidente grave, e n\~ao o que torna uma pessoa vulner\'avel
+nele. A distin\c{c}\~ao importa para o uso em pol\'itica p\'ublica:
+investimento em infraestrutura responde \`a primeira pergunta, campanhas
+de uso de equipamento de seguran\c{c}a \`a segunda.
+
+O que ainda n\~ao se pode afirmar \'e a contribui\c{c}\~ao de cada defeito:
+as duas configura\c{c}\~oes executadas s\~ao os extremos do delineamento
+$2^3$, e a decomposi\c{c}\~ao exige as seis intermedi\'arias. Tampouco se
+sabe se o ordenamento de fatores sobrevive \`a corre\c{c}\~ao --- a
+pergunta central, que depende do SHAP \cite{lundberg2017} sobre as
+parti\c{c}\~oes de valida\c{c}\~ao, ainda n\~ao calculado. Vale reiterar que n\~ao h\'a configura\c{c}\~ao de resultados sem
 conclus\~ao: se o ordenamento se mantiver, o desfecho \'e que as
 m\'etricas estavam infladas mas os fatores identificados s\~ao robustos
 --- resposta afirmativa \`a pergunta de pesquisa. O indicativo de
@@ -541,7 +546,7 @@ que o atributo l\'ider do ordenamento publicado \'e justamente aquele em
 que a codifica\c{c}\~ao vazada equivale ao r\'otulo torna a pergunta
 aberta, n\~ao respondida.
 
-Um desdobramento poss\'ivel merece registro. Se o delineamento completo
+Se o delineamento completo
 confirmar que a combina\c{c}\~ao de balanceamento sint\'etico e
 codifica\c{c}\~ao por alvo degrada o desempenho em rela\c{c}\~ao \`a
 aus\^encia de ambos, a conclus\~ao deste trabalho ser\'a mais forte que a
@@ -552,22 +557,20 @@ estabelecida e depende das seis configura\c{c}\~oes intermedi\'arias.
 As limita\c{c}\~oes reconhecidas s\~ao tr\^es. A replica\c{c}\~ao usa a
 variante de dados com todas as causas e tipos, deduplicada, e n\~ao a
 variante padr\~ao dos autores; a preval\^encia id\^entica (7,1\%) sugere
-equival\^encia, mas a diferen\c{c}a residual de F1 no kNN e no MLP n\~ao
-pode ser atribu\'ida com seguran\c{c}a a hiperpar\^ametros ou \`a
-variante. As categorias de causa e tipo de acidente ainda n\~ao foram
-harmonizadas entre 2017 e 2025, o que afeta a an\'alise de estabilidade
-na s\'erie completa. E os hiperpar\^ametros selecionados pelos autores
+equival\^encia, mas a diverg\^encia de F1 no kNN e no MLP n\~ao pode ser
+atribu\'ida com seguran\c{c}a a hiperpar\^ametros ou \`a variante. As categorias de causa e tipo de acidente ainda n\~ao foram
+harmonizadas entre 2017 e 2025. E os hiperpar\^ametros selecionados pelos autores
 n\~ao foram recuperados.
 
-Os pr\'oximos passos seguem o calend\'ario da disciplina. At\'e 21/10,
+Quanto aos pr\'oximos passos, at\'e 21/10
 executam-se as seis configura\c{c}\~oes intermedi\'arias do fatorial, com
-a tabela de decomposi\c{c}\~ao completa, e as primeiras linhas da matriz
-de transfer\^encia, j\'a com subamostragem ao $n$ do Norte; a
-harmoniza\c{c}\~ao de categorias precede ambas. At\'e 18/11, completam-se
-a matriz $5\times 5$, o c\'alculo de SHAP nas duas configura\c{c}\~oes
-extremas e entre macrorregi\~oes, e a compara\c{c}\~ao de ordenamentos
-por tau de Kendall e sobreposi\c{c}\~ao top-$k$, com o desempenho
-consolidado de todos os modelos, incluindo XGBoost e SVM linear.
+a tabela de decomposi\c{c}\~ao, e as primeiras linhas da matriz de
+transfer\^encia, precedidas da harmoniza\c{c}\~ao de categorias. At\'e
+18/11, completam-se a matriz $5\times 5$, o SHAP nas configura\c{c}\~oes
+extremas e entre macrorregi\~oes, a compara\c{c}\~ao de ordenamentos e o
+desempenho consolidado, incluindo XGBoost e SVM linear. C\'odigo,
+sementes e vers\~oes de bibliotecas est\~ao no reposit\'orio p\'ublico do
+trabalho.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
