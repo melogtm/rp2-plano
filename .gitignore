@@ -23,12 +23,3 @@ auto/
 
 # Build 
 build/
-
-# Markdown
-*.md
-
-# Dados - confirmar depois com a professora se ela vai querer ou não no repositório 
-data/
-# Python
-.venv/
-__pycache__/
