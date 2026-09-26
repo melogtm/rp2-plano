@@ -34,18 +34,17 @@
 
 \begin{resumo}
 Modelos de aprendizado de m\'aquina treinados sobre dados abertos da
-Pol\'icia Rodovi\'aria Federal (PRF) s\~ao empregados para identificar
-fatores de risco associados \`a gravidade de acidentes. Um estudo recente
-\cite{gabardo2025} treinou kNN, MLP e Random Forest sobre registros da
-regi\~ao Sul (2021--2024), reportando AUC-ROC de 0,99 para a classe fatal
-em dois dos tr\^es modelos, e derivou fatores de risco via SHAP. % A leitura
-%do c\'odigo publicado revelou falhas de protocolo que comprometem a
-%independ\^encia do conjunto de teste.
-Este trabalho quantifica a relev\^ancia preditiva dos fatores de uma base nacional
-de registros, e avalia a estabilidade do desempenho e do
-ordenamento de fatores entre as cinco macrorregi\~oes por uma matriz de
-transfer\^encia $5\times 5$, com concord\^ancia dos valores SHAP medida pelo tau de Kendall
-e pela sobreposi\c{c}\~ao top-$k$.
+Pol\'icia Rodovi\'aria Federal (PRF) \cite{prfdados} s\~ao empregados para
+identificar fatores de risco associados \`a gravidade de acidentes. Um
+estudo recente \cite{gabardo2025} treinou kNN, MLP e Random Forest sobre
+registros da regi\~ao Sul (2021--2024), reportou AUC-ROC de 0,99 para a
+classe fatal em dois dos tr\^es modelos e derivou fatores de risco via
+SHAP \cite{lundberg2017}. Este trabalho quantifica a relev\^ancia
+preditiva dos fatores em uma base nacional de registros e avalia a
+estabilidade do desempenho e do ordenamento de fatores entre as cinco
+macrorregi\~oes por meio de uma matriz de transfer\^encia $5\times 5$. A
+concord\^ancia entre os valores SHAP \'e medida pelo tau de Kendall
+\cite{kendall1938} e pela sobreposi\c{c}\~ao top-$k$.
 \end{resumo}
 
 
@@ -55,48 +54,41 @@ O tr\^ansito \'e uma das principais causas de morte evit\'avel no Brasil.
 Segundo o Anu\'ario Estat\'istico de Sinistros de Tr\^ansito 2024 da PRF
 \cite{prf2024}, as rodovias federais registraram 6.160 mortes em 2024, o
 maior n\'umero em cinco anos, das quais 4.291 em ocorr\^encias em pista
-simples. O Brasil \'e signat\'ario da Agenda 2030 da ONU, cuja meta ODS
-3.6 prev\^e reduzir pela metade as mortes e les\~oes no tr\^ansito at\'e
-2030, tema tamb\'em alinhado ao ODS 11. Nesse contexto, os microdados
-abertos da PRF tornaram-se insumo frequente para modelos preditivos que
-prometem orientar a aloca\c{c}\~ao de recursos de fiscaliza\c{c}\~ao e de
-engenharia vi\'aria.
+simples. O Brasil \'e signat\'ario da Agenda 2030 da ONU \cite{onu2015},
+cuja meta ODS 3.6 prev\^e reduzir pela metade as mortes e les\~oes no
+tr\^ansito at\'e 2030, tema tamb\'em alinhado ao ODS 11. Nesse contexto,
+os microdados abertos da PRF \cite{prfdados} tornaram-se insumo frequente
+para modelos preditivos que buscam orientar a aloca\c{c}\~ao de recursos
+de fiscaliza\c{c}\~ao e de engenharia vi\'aria.
 
-Esse uso traz um risco pouco examinado. Quando um fator \'e apontado como
-determinante da letalidade e essa conclus\~ao orienta investimento
-p\'ublico, a validade da recomenda\c{c}\~ao depende inteiramente da
-validade do protocolo que a produziu. Tal protocolo pode estar restrito ou
-enviesado pelo desbalanceamentos dos dados utilizados, orientando uma predição
-da severidade dos acidentes que podem não condizer em um outro contexto.
-O estudo de \cite{gabardo2025} \'e,
-a um s\'o tempo, caso ilustrativo e exemplar em transpar\^encia: o estudo
-restringe-se \`a regi\~ao Sul, ao passo
-que as recomenda\c{c}\~oes derivadas dele s\~ao formuladas em termos
-gerais.
+Quando um fator \'e apontado como determinante da letalidade e essa
+conclus\~ao orienta investimento p\'ublico, a validade da
+recomenda\c{c}\~ao depende da validade do protocolo que a produziu. Esse
+protocolo pode estar restrito a um recorte ou enviesado pelo
+desbalanceamento dos dados utilizados, levando a predi\c{c}\~oes da
+gravidade dos acidentes que podem n\~ao se sustentar em outro contexto.
+O estudo de \cite{gabardo2025} ilustra essa situa\c{c}\~ao e,
+ao mesmo tempo, \'e exemplar em transpar\^encia, pois os autores
+disponibilizaram publicamente o c\'odigo-fonte \cite{gabardo2025codigo}.
+O estudo restringe-se \`a regi\~ao Sul, enquanto as recomenda\c{c}\~oes
+derivadas dele s\~ao formuladas em termos gerais.
 
-Portanto, quando analisamos esta problemática sob o prisma macrorregional brasileiro,
-a consequ\^encia \'e direta na formulação de políticas públicas e \'e o que motiva este trabalho.
-Frota, malha vi\'aria, clima e padr\~ao de tr\'afego diferem
-substancialmente entre as macrorregi\~oes brasileiras, e não há evidência estatística que um
-conjunto de fatores estimado no Sul descreva o que acontece Nordeste ou o Norte.
+Sob o prisma macrorregional brasileiro, essa limita\c{c}\~ao tem
+consequ\^encia direta na formula\c{c}\~ao de pol\'iticas p\'ublicas, e
+\'e isso que motiva este trabalho. Frota, malha vi\'aria, clima e
+padr\~ao de tr\'afego diferem substancialmente entre as macrorregi\~oes
+brasileiras, e n\~ao h\'a evid\^encia estat\'istica de que um conjunto de
+fatores estimado no Sul descreva o que acontece no Nordeste ou no Norte.
 
-\textbf{Objetivo.} Quantificar, %sob protocolo de valida\c{c}\~ao
-% corrigido,
-a relev\^ancia preditiva dos fatores associados \`a gravidade
-de acidentes em rodovias federais brasileiras, e avaliar a estabilidade
-desses fatores e do desempenho preditivo entre as cinco macrorregi\~oes do
-IBGE. O objetivo \'e verific\'avel ao final do trabalho segundo o
-crit\'erio de \cite{wazlawick2009}: a relev\^ancia \'e medida por valores
-SHAP sob delineamento fatorial, o desempenho por F1 da classe positiva, e
-a estabilidade pelo tau de Kendall e pela sobreposi\c{c}\~ao top-$k$
-entre ordenamentos. %Nenhuma configura\c{c}\~ao de resultados torna o
-%objetivo trivialmente satisfeito: tanto a confirma\c{c}\~ao quanto a
-%refuta\c{c}\~ao da hip\'otese de robustez constituem resposta.
- Das tr\^es medidas decorrem, respectivamente, uma estimativa do desempenho sob
-avalia\c{c}\~ao n\~ao contaminada, evid\^encia sobre a adequa\c{c}\~ao de
-um modelo nacional \'unico frente a modelos regionais, e um veredito sobre
-a base emp\'irica das recomenda\c{c}\~oes derivadas de estudos que utilizam
-o aprendizado de máquina como metodologia de investigação.
+\textbf{Objetivo.} Identificar, por meio de algoritmos de aprendizado de
+m\'aquina, os principais fatores associados \`a gravidade de acidentes em
+rodovias federais brasileiras, comparando sua relev\^ancia e capacidade de
+predi\c{c}\~ao entre as cinco macrorregi\~oes do IBGE \cite{ibge2017}.
+Segundo o crit\'erio de \cite{wazlawick2009}, o objetivo \'e
+verific\'avel ao final do trabalho: a relev\^ancia \'e medida por valores
+SHAP, a capacidade de predi\c{c}\~ao pelo F1 da classe positiva e a
+compara\c{c}\~ao entre regi\~oes pelo tau de Kendall e pela
+sobreposi\c{c}\~ao top-$k$ entre ordenamentos.
 
 \section{Trabalhos Relacionados}
 
@@ -108,139 +100,152 @@ sete classificadores, com regress\~ao log\'istica alcan\c{c}ando 73,85\%
 de acur\'acia e interpreta\c{c}\~ao via LIME. \cite{andrade2019}
 analisaram a tend\^encia do n\'umero de v\'itimas nas rodovias federais
 por macrorregi\~ao antes e depois da D\'ecada de A\c{c}\~ao pela
-Seguran\c{c}a no Tr\^ansito, evidenciando heterogeneidade regional
-consistente ao longo do tempo. O estudo de \cite{gabardo2025} insere-se
-nessa linha, restringindo-se \`a regi\~ao Sul e sinalizando como
+Seguran\c{c}a no Tr\^ansito e encontraram heterogeneidade regional
+consistente ao longo do tempo. O estudo de \cite{gabardo2025}
+insere-se nessa linha, restringe-se \`a regi\~ao Sul e aponta como
 dire\c{c}\~ao futura a extens\~ao a outras regi\~oes do pa\'is.
 
 \textbf{Generaliza\c{c}\~ao geogr\'afica.} A transferibilidade espacial de
 modelos de seguran\c{c}a vi\'aria \'e tema estabelecido
-internacionalmente. \cite{man2022} avaliam explicitamente a portabilidade
-espacial e temporal de modelos de previs\~ao de sinistros, recorrendo a
-aprendizado por transfer\^encia para conter a degrada\c{c}\~ao observada.
-A raiz do problema \'e a heterogeneidade n\~ao observada:
-\cite{mannering2016} argumentam que fatores contribuintes variam de forma
-sistem\'atica e n\~ao capturada entre contextos, gerando estimativas
+internacionalmente. \cite{man2022} avaliam a portabilidade espacial
+e temporal de modelos de previs\~ao de sinistros e recorrem a aprendizado
+por transfer\^encia para conter a degrada\c{c}\~ao observada. A origem do
+problema \'e a heterogeneidade n\~ao observada: segundo
+\cite{mannering2016}, fatores contribuintes variam de forma
+sistem\'atica e n\~ao capturada entre contextos, o que gera estimativas
 viesadas quando um modelo ajustado em uma regi\~ao \'e aplicado a outra.
 
-\textbf{Transferibilidade de modelos.} A avaliação de quanto um modelo ajustado em um contexto 
-preserva desempenho em outro constitui linha metodológica própria. [Xu et al. 2014] tratam o
-problema por atualização bayesiana, mostrando que o grau de consistência entre as 
-distribuições de origem e destino condiciona a transferibilidade e que a recalibração com 
-amostra reduzida da região-alvo recupera parte do desempenho perdido. [Man et al. 2022] recorrem a 
-aprendizado por transferência para o mesmo fim, reportando degradação sistemática sob aplicação direta e 
-ganhos sob adaptação. O que distingue este trabalho dessa linha é o propósito da medição: enquanto tais 
-estudos tratam a degradação como problema a ser mitigado, aqui ela é o objeto de interesse, pois a 
-magnitude da queda entre macrorregiões é o que determina se recomendações derivadas de um recorte 
-regional podem ser generalizadas ao país. A matriz de transferência completa 
-cumpre essa função diagnóstica, e não corretiva.
+\textbf{Transferibilidade de modelos.} Avaliar quanto um modelo ajustado
+em um contexto preserva de desempenho em outro constitui linha
+metodol\'ogica pr\'opria. \cite{xu2014} tratam o problema por
+atualiza\c{c}\~ao bayesiana e mostram que o grau de consist\^encia entre
+as distribui\c{c}\~oes de origem e destino condiciona a transferibilidade,
+e que a recalibra\c{c}\~ao com amostra reduzida da regi\~ao-alvo recupera
+parte do desempenho perdido. \cite{man2022} usam aprendizado por
+transfer\^encia com o mesmo fim e reportam degrada\c{c}\~ao
+sistem\'atica sob aplica\c{c}\~ao direta e ganhos sob adapta\c{c}\~ao.
+Este trabalho difere dessa linha no prop\'osito da medi\c{c}\~ao. Nesses
+estudos a degrada\c{c}\~ao \'e um problema a ser mitigado; aqui ela \'e o
+objeto de interesse, pois a magnitude da queda entre macrorregi\~oes
+indica se recomenda\c{c}\~oes derivadas de um recorte regional podem ser
+generalizadas ao pa\'is. A matriz de transfer\^encia completa \'e usada,
+portanto, como ferramenta de diagn\'ostico.
 
-\textbf{Posicionamento.} Nenhum desses trabalhos mede a relev\^ancia dos
-fatores de gravidade sob protocolo corrigido, nem avalia a estabilidade
+\textbf{Posicionamento.} Nenhum dos trabalhos citados mede a relev\^ancia
+dos fatores de gravidade sob protocolo corrigido nem avalia a estabilidade
 desse ordenamento entre as cinco macrorregi\~oes com controle de tamanho
-amostral. \'E essa a lacuna que este trabalho ocupa.
+amostral. Este trabalho pretende preencher essa lacuna.
 
 \section{M\'etodo}
 
-\textbf{Modelos.} Os algoritmos a serem utilizados e estudados neste trabalho serão o Random Forest, 
-o Support Vector Machine (SVM) e o Multi-Layer Perceptron (MLP). Para o modelo MLP, 
-a quantidade de camadas e de neurônios será definida ao longo do desenvolvimento, considerando a complexidade 
-do problema e os resultados obtidos durante a etapa de experimentação. A seleção e o ajuste dos hiperparâmetros 
-dos modelos também serão realizados de forma experimental, 
-buscando identificar as configurações que proporcionem o melhor desempenho para a tarefa proposta.
+\textbf{Dados.} Utilizam-se os microdados abertos da PRF \cite{prfdados}
+na vers\~ao agrupada por pessoa, variante que inclui todas as causas e
+tipos de acidente, referentes aos anos de 2021 a 2024, mesmo intervalo
+temporal adotado por \cite{gabardo2025}. Os arquivos CSV
+(ISO-8859-1) apresentam esquema id\^entico nos quatro anos, com 37
+atributos. A base bruta re\'une 2.117.994 registros de envolvidos,
+correspondentes a 270.097 acidentes distintos e 652.411 pessoas
+distintas. Cada registro \'e atribu\'ido a uma das cinco macrorregi\~oes
+do IBGE \cite{ibge2017} pela unidade federativa da ocorr\^encia. Na base
+anal\'itica, ap\'os as redu\c{c}\~oes descritas adiante, a
+distribui\c{c}\~ao \'e: Sudeste, 30,9\%; Sul, 29,7\%; Nordeste, 21,4\%;
+Centro-Oeste, 12,3\%; e Norte, 5,7\%, uma assimetria de mais de cinco
+vezes entre a maior e a menor macrorregi\~ao. A vari\'avel resposta \'e
+bin\'aria e deriva do atributo de estado f\'isico do envolvido, com valor
+positivo quando o desfecho \'e \'obito. Na base anal\'itica, com 608.921
+registros, a classe positiva corresponde a 3,72\%, o que d\'a uma
+raz\~ao de desbalanceamento de aproximadamente 1 para 26.
 
-\textbf{Dados.} Utilizam-se os microdados abertos da PRF na vers\~ao
-agrupada por pessoa, variante que inclui todas as causas e tipos de
-acidente, referentes aos anos de 2021 a 2024 --- mesmo intervalo temporal
-adotado pelo estudo de refer\^encia. Os arquivos CSV (ISO-8859-1)
-apresentam esquema id\^entico nos quatro anos, com 37 atributos.
-A base bruta re\'une 2.117.994 registros de envolvidos, correspondentes a
-270.097 acidentes distintos e 652.411 pessoas distintas. Cada registro
-\'e atribu\'ido a uma das cinco macrorregi\~oes do IBGE pela unidade
-federativa da ocorr\^encia. Na base anal\'itica, ap\'os as redu\c{c}\~oes
-descritas adiante, a distribui\c{c}\~ao \'e: Sudeste, 30,9\%; Sul, 29,7\%;
-Nordeste, 21,4\%; Centro-Oeste, 12,3\%; e Norte, 5,7\% --- assimetria de
-mais de cinco vezes entre a maior e a menor macrorregi\~ao. A vari\'avel
-resposta \'e bin\'aria e deriva do atributo de estado f\'isico do
-envolvido, assumindo valor positivo quando o desfecho \'e \'obito. Na
-base anal\'itica, que re\'une 608.921 registros, a classe positiva
-corresponde a 3,72\%, raz\~ao de desbalanceamento de aproximadamente 1
-para 26.
-
-\textbf{Algoritmos de aprendizado de máquina.} A etapa de replicação emprega os três algoritmos do estudo de referência — 
-k-vizinhos mais próximos, perceptron multicamadas e florestas aleatórias —, condição necessária para que a 
-comparação com os valores publicados seja legítima. As análises subsequentes acrescentam gradient boosting sobre 
-árvores, na implementação XGBoost, e uma máquina de vetores de suporte com kernel linear. A escolha não visa 
-maximizar desempenho, e sim cobrir famílias com capacidades de memorização distintas: modelos baseados em 
-distância e em margem linear ajustam-se a fronteiras globais, ao passo que ensembles de árvores particionam 
-o espaço de atributos com granularidade suficiente para isolar observações individuais. Essa diferença é 
-diagnóstica, pois o ganho espúrio produzido por contaminação do conjunto de avaliação cresce com a 
-capacidade de memorização; a comparação entre famílias sob as oito configurações do delineamento permite, 
-portanto, separar efeito de protocolo de efeito de modelo. Os hiperparâmetros dos três algoritmos 
-replicados são fixados nos valores reportados pelos autores; para os dois algoritmos acrescentados, 
-são fixados por busca conduzida uma única vez sobre a configuração integralmente corrigida e mantidos 
-constantes nas demais, de modo que nenhuma diferença observada entre configurações decorra de reotimização. 
-Adota-se o kernel linear na máquina de vetores de suporte porque o custo de treino dos kernels não lineares 
-é superquadrático no número de amostras, incompatível com as 33 execuções previstas entre delineamento 
-fatorial e matriz de transferência.
+\textbf{Algoritmos de aprendizado de m\'aquina.} A etapa de
+replica\c{c}\~ao emprega os tr\^es algoritmos usados por
+\cite{gabardo2025}: k-vizinhos mais pr\'oximos \cite{cover1967},
+perceptron multicamadas \cite{rumelhart1986} e florestas aleat\'orias
+\cite{breiman2001}. Essa condi\c{c}\~ao \'e necess\'aria para que a
+compara\c{c}\~ao com os valores publicados seja leg\'itima. As an\'alises
+seguintes acrescentam \emph{gradient boosting} sobre \'arvores, na
+implementa\c{c}\~ao XGBoost \cite{chen2016}, e uma m\'aquina de vetores
+de suporte com kernel linear \cite{cortes1995}. O objetivo da escolha
+n\~ao \'e maximizar desempenho, mas cobrir fam\'ilias com capacidades de
+memoriza\c{c}\~ao distintas. Modelos baseados em dist\^ancia e em margem
+linear ajustam-se a fronteiras globais, enquanto conjuntos de \'arvores
+particionam o espa\c{c}o de atributos com granularidade suficiente para
+isolar observa\c{c}\~oes individuais. Como o ganho esp\'urio produzido por
+contamina\c{c}\~ao do conjunto de avalia\c{c}\~ao cresce com a capacidade
+de memoriza\c{c}\~ao, comparar as fam\'ilias sob as oito
+configura\c{c}\~oes do delineamento permite separar o efeito do protocolo
+do efeito do modelo. Os hiperpar\^ametros dos tr\^es algoritmos
+replicados s\~ao fixados nos valores reportados por
+\cite{gabardo2025}. Para os dois algoritmos acrescentados, s\~ao
+definidos por uma busca conduzida uma \'unica vez sobre a
+configura\c{c}\~ao integralmente corrigida e mantidos constantes nas
+demais, de modo que nenhuma diferen\c{c}a observada entre
+configura\c{c}\~oes decorra de reotimiza\c{c}\~ao. Adota-se o kernel
+linear porque o custo de treino dos kernels n\~ao lineares cresce de
+forma superquadr\'atica com o n\'umero de amostras, o que \'e
+incompat\'ivel com as 33 execu\c{c}\~oes previstas entre o delineamento
+fatorial e a matriz de transfer\^encia.
 
 \textbf{Prepara\c{c}\~ao e decis\~oes de escopo.} Tr\^es decis\~oes
-definem a base anal\'itica. Primeiro, a variante replica cada envolvido por
-causa e por tipo: a base bruta tem 2.117.994 linhas para 652.411 pessoas;
-a restri\c{c}\~ao \`a causa principal reduz a 1.228.893, e a
-restri\c{c}\~ao ao tipo prim\'ario resulta em 716.779 registros, uma linha
-por envolvido por ocorr\^encia. A multiplicidade n\~ao compromete a
-independ\^encia entre parti\c{c}\~oes --- todas as linhas de um mesmo
-envolvido compartilham o identificador do acidente ---, mas distorce a
-pondera\c{c}\~ao, pois ocorr\^encias mais detalhadas contribuem
-desproporcionalmente para o ajuste. Segundo, 15,95\% n\~ao possuem
-r\'otulo utiliz\'avel (valores ausentes e ``n\~ao informado'') e s\~ao
-exclu\'idos, pois atribu\'i-los \`a classe negativa inflaria a maioria; a
-base anal\'itica re\'une 608.921 registros. Terceiro, atributos de
-contagem de ilesos, feridos leves, feridos graves e \'obitos s\~ao
-codifica\c{c}\~oes determin\'isticas do estado f\'isico ---
-coincid\^encia total com o r\'otulo ---, constituindo o alvo sob outra
-forma; s\~ao removidos, assim como os identificadores de registro, pessoa
-e ve\'iculo. A presen\c{c}a desses atributos entre os preditores do estudo
-de refer\^encia integra a replica\c{c}\~ao. Em raz\~ao da estrutura de
-agrupamento, adota-se particionamento por grupo pelo identificador do
-acidente em todas as oito configura\c{c}\~oes como decis\~ao de protocolo;
-a verifica\c{c}\~ao de integridade confirmou aus\^encia de colis\~ao de
+definem a base anal\'itica. Primeiro, a variante replica cada envolvido
+por causa e por tipo: a base bruta tem 2.117.994 linhas para 652.411
+pessoas; a restri\c{c}\~ao \`a causa principal reduz esse total a
+1.228.893, e a restri\c{c}\~ao ao tipo prim\'ario resulta em 716.779
+registros, uma linha por envolvido por ocorr\^encia. A multiplicidade
+n\~ao compromete a independ\^encia entre parti\c{c}\~oes, j\'a que todas
+as linhas de um mesmo envolvido compartilham o identificador do acidente,
+mas distorce a pondera\c{c}\~ao, pois ocorr\^encias mais detalhadas
+contribuem desproporcionalmente para o ajuste. Segundo, 15,95\% dos
+registros n\~ao possuem r\'otulo utiliz\'avel (valores ausentes e ``n\~ao
+informado'') e s\~ao exclu\'idos, pois atribu\'i-los \`a classe negativa
+inflaria a maioria; a base anal\'itica re\'une 608.921 registros.
+Terceiro, os atributos de contagem de ilesos, feridos leves, feridos
+graves e \'obitos s\~ao codifica\c{c}\~oes determin\'isticas do estado
+f\'isico (coincid\^encia total com o r\'otulo) e constituem o alvo sob
+outra forma. Por isso s\~ao removidos, assim como os identificadores de
+registro, pessoa e ve\'iculo. Verificar se esses atributos estavam entre
+os preditores de \cite{gabardo2025} faz parte da
+replica\c{c}\~ao. Em raz\~ao da estrutura de agrupamento, adota-se
+particionamento por grupo pelo identificador do acidente em todas as
+oito configura\c{c}\~oes, como decis\~ao de protocolo. A
+verifica\c{c}\~ao de integridade confirmou que n\~ao h\'a colis\~ao de
 identificadores entre os anos.
 
-\textbf{Implementa\c{c}\~ao.} A an\'alise \'e reimplementada em Python, com
-scikit-learn e imbalanced-learn. Antes de qualquer corre\c{c}\~ao, a
-configura\c{c}\~ao original \'e reproduzida integralmente, incluindo seus
-defeitos, e comparada aos valores publicados; sem essa equival\^encia,
-qualquer diferen\c{c}a posterior seria amb\'igua entre efeito da
-corre\c{c}\~ao e efeito da reimplementa\c{c}\~ao. Considera-se a
-replica\c{c}\~ao bem-sucedida quando o F1 da classe positiva difere em no
-m\'aximo 0,02 do valor publicado. Registra-se que o \emph{script}
-publicado n\~ao executa sem corre\c{c}\~ao de um erro de digita\c{c}\~ao
-em uma chamada de fun\c{c}\~ao. A etapa de replica\c{c}\~ao \'e
-conduzida sobre a variante padr\~ao utilizada pelos autores, restringindo
-a diverg\^encia de base \`as an\'alises subsequentes.
+\textbf{Implementa\c{c}\~ao.} A an\'alise \'e reimplementada em Python,
+com scikit-learn \cite{pedregosa2011} e imbalanced-learn
+\cite{lemaitre2017}. Antes de qualquer corre\c{c}\~ao, a
+configura\c{c}\~ao original \cite{gabardo2025codigo} \'e reproduzida
+integralmente, incluindo seus defeitos, e comparada aos valores
+publicados em \cite{gabardo2025}. Sem essa equival\^encia, qualquer
+diferen\c{c}a posterior seria amb\'igua entre efeito da corre\c{c}\~ao e
+efeito da reimplementa\c{c}\~ao. Considera-se a replica\c{c}\~ao
+bem-sucedida quando o F1 da classe positiva difere em no m\'aximo 0,02 do
+valor publicado. Registra-se que o \emph{script} disponibilizado pelos
+autores \cite{gabardo2025codigo} n\~ao executa sem a corre\c{c}\~ao de um
+erro de digita\c{c}\~ao em uma chamada de fun\c{c}\~ao. A etapa de
+replica\c{c}\~ao \'e conduzida sobre a variante padr\~ao utilizada pelos
+autores, e a diverg\^encia de base fica restrita \`as an\'alises
+seguintes.
 
-
-\textbf{Hiperpar\^ametros e m\'etricas.} Fixados os hiperpar\^ametros nos
-valores do trabalho original, sem reotimiza\c{c}\~ao entre
-configura\c{c}\~oes --- pois o objeto de compara\c{c}\~ao \'e o protocolo,
-n\~ao o modelo ---, a m\'etrica prim\'aria \'e o F1 da classe positiva,
-com precis\~ao, revoca\c{c}\~ao e \'area sob a curva
-precis\~ao-revoca\c{c}\~ao reportadas separadamente, expressas como
-m\'edia e desvio-padr\~ao entre as dobras de valida\c{c}\~ao cruzada
-estratificada de cinco dobras. A dispers\~ao entre dobras \'e informativa
-por si s\'o: configura\c{c}\~oes contaminadas devem apresentar vari\^ancia
-anormalmente baixa, evid\^encia de vazamento independente do valor
-absoluto da m\'etrica.
+\textbf{Hiperpar\^ametros e m\'etricas.} Os hiperpar\^ametros s\~ao
+fixados nos valores de \cite{gabardo2025}, sem reotimiza\c{c}\~ao
+entre configura\c{c}\~oes, porque o objeto de compara\c{c}\~ao \'e o
+protocolo e n\~ao o modelo. A m\'etrica prim\'aria \'e o F1 da classe
+positiva. Precis\~ao, revoca\c{c}\~ao e \'area sob a curva
+precis\~ao-revoca\c{c}\~ao \cite{saito2015} s\~ao reportadas
+separadamente, como m\'edia e desvio-padr\~ao entre as dobras de uma
+valida\c{c}\~ao cruzada estratificada de cinco dobras. A dispers\~ao
+entre dobras tamb\'em \'e informativa: configura\c{c}\~oes contaminadas
+tendem a apresentar vari\^ancia anormalmente baixa, o que constitui
+evid\^encia de vazamento \cite{kaufman2012,kapoor2023} independente do
+valor absoluto da m\'etrica.
 
 \textbf{Generaliza\c{c}\~ao regional.} Constr\'oi-se uma matriz de
 transfer\^encia $5\times 5$: para cada macrorregi\~ao $i$, treina-se um
 modelo exclusivamente com seus registros e avalia-se sobre cada
 macrorregi\~ao $j$, incluindo a pr\'opria. O elemento $M_{ij}$ \'e o F1
-da classe positiva; a diagonal representa o desempenho intrarregional
-sobre parti\c{c}\~ao retida e os elementos fora da diagonal representam a
-transfer\^encia, com degrada\c{c}\~ao relativa definida como
+da classe positiva. A diagonal representa o desempenho intrarregional
+sobre parti\c{c}\~ao retida, e os elementos fora da diagonal representam
+a transfer\^encia, com degrada\c{c}\~ao relativa definida como
 $(M_{ii}-M_{ij})/M_{ii}$. A matriz completa \'e prefer\'ivel \`a
 avalia\c{c}\~ao de uma \'unica origem porque permite distinguir a
 hip\'otese de que uma regi\~ao espec\'ifica n\~ao exporta seu modelo da
@@ -250,19 +255,20 @@ volume de registros difere em fator superior a cinco entre a maior e a
 menor macrorregi\~ao, todos os conjuntos de treino s\~ao subamostrados
 para o $n$ da regi\~ao Norte, preservando a propor\c{c}\~ao de classes,
 com repeti\c{c}\~ao em amostragens independentes e agrega\c{c}\~ao dos
-resultados --- sem esse controle, diferen\c{c}a de tamanho amostral seria
-interpretada como heterogeneidade regional.
+resultados. Sem esse controle, a diferen\c{c}a de tamanho amostral
+poderia ser interpretada como heterogeneidade regional.
 
-\textbf{Estabilidade dos fatores.} Os valores SHAP s\~ao calculados sobre
-as parti\c{c}\~oes de valida\c{c}\~ao e convertidos em ordenamento de
-import\^ancia. Realizam-se duas compara\c{c}\~oes: o ordenamento sob
-protocolo original \emph{versus} corrigido, na mesma regi\~ao; e os
-ordenamentos entre macrorregi\~oes sob protocolo corrigido. A
-concord\^ancia \'e quantificada pelo tau de Kendall entre ordenamentos
-completos e pela sobreposi\c{c}\~ao relativa entre os dez atributos mais
-influentes, com $k = 5$ como verifica\c{c}\~ao de robustez. A
-concord\^ancia observada determina se os fatores s\~ao robustos ou se
-constituem artefato de protocolo ou especificidade regional.
+\textbf{Estabilidade dos fatores.} Os valores SHAP \cite{lundberg2017}
+s\~ao calculados sobre as parti\c{c}\~oes de valida\c{c}\~ao e
+convertidos em ordenamento de import\^ancia. Realizam-se duas
+compara\c{c}\~oes: o ordenamento sob protocolo original \emph{versus}
+corrigido, na mesma regi\~ao, e os ordenamentos entre macrorregi\~oes sob
+protocolo corrigido. A concord\^ancia \'e quantificada pelo tau de
+Kendall \cite{kendall1938} entre ordenamentos completos e pela
+sobreposi\c{c}\~ao relativa entre os dez atributos mais influentes, com
+$k = 5$ como verifica\c{c}\~ao de robustez. Concord\^ancia alta indica
+fatores robustos; concord\^ancia baixa indica que o ordenamento \'e
+artefato de protocolo ou espec\'ifico de uma regi\~ao.
 
 \textbf{Reprodutibilidade.} Sementes aleat\'orias s\~ao fixadas e
 reportadas; c\'odigo e vers\~oes de bibliotecas s\~ao depositados em
@@ -273,8 +279,8 @@ gr\'afico comparativo de estabilidade dos fatores.
 
 \section{Cronograma}
 
-Os marcos, amarrados \`as datas da disciplina em 2026, s\~ao apresentados
-a seguir.
+Os marcos, vinculados \`as datas da disciplina em 2026, s\~ao
+apresentados na Tabela~\ref{tab:cronograma}.
 
 \begin{table}[H]
 \centering
