@@ -1,0 +1,486 @@
+{
+ "funil": {
+  "base bruta": 4069971,
+  "causa_principal == Sim": 2626579,
+  "ordem_tipo_acidente == 1": 1654055,
+  "com rótulo": 1415582
+ },
+ "regioes": {
+  "Norte": {
+   "registros": 83512,
+   "acidentes": 34655,
+   "obitos": 3954,
+   "letalidade": 4.73,
+   "pct_registros": 5.9,
+   "pct_moto": 22.33,
+   "pct_pista_simples": 68.91,
+   "pct_rural": 55.96
+  },
+  "Nordeste": {
+   "registros": 302635,
+   "acidentes": 133250,
+   "obitos": 16082,
+   "letalidade": 5.31,
+   "pct_registros": 21.38,
+   "pct_moto": 24.27,
+   "pct_pista_simples": 60.48,
+   "pct_rural": 55.96
+  },
+  "Centro-Oeste": {
+   "registros": 173294,
+   "acidentes": 74875,
+   "obitos": 6534,
+   "letalidade": 3.77,
+   "pct_registros": 12.24,
+   "pct_moto": 15.41,
+   "pct_pista_simples": 54.7,
+   "pct_rural": 62.35
+  },
+  "Sudeste": {
+   "registros": 435386,
+   "acidentes": 192666,
+   "obitos": 12881,
+   "letalidade": 2.96,
+   "pct_registros": 30.76,
+   "pct_moto": 19.62,
+   "pct_pista_simples": 43.18,
+   "pct_rural": 59.43
+  },
+  "Sul": {
+   "registros": 420755,
+   "acidentes": 185353,
+   "obitos": 11371,
+   "letalidade": 2.7,
+   "pct_registros": 29.72,
+   "pct_moto": 17.03,
+   "pct_pista_simples": 51.25,
+   "pct_rural": 54.86
+  }
+ },
+ "brasil": {
+  "registros": 1415582,
+  "acidentes": 620799,
+  "obitos": 50822,
+  "letalidade": 3.59
+ },
+ "letalidade_ano": {
+  "Centro-Oeste": {
+   "2017": 3.13,
+   "2018": 3.51,
+   "2019": 3.65,
+   "2020": 3.86,
+   "2021": 3.93,
+   "2022": 4.27,
+   "2023": 4.22,
+   "2024": 3.74,
+   "2025": 3.81
+  },
+  "Nordeste": {
+   "2017": 5.03,
+   "2018": 5.09,
+   "2019": 5.09,
+   "2020": 5.79,
+   "2021": 5.69,
+   "2022": 5.46,
+   "2023": 5.15,
+   "2024": 5.32,
+   "2025": 5.37
+  },
+  "Norte": {
+   "2017": 3.83,
+   "2018": 3.84,
+   "2019": 4.63,
+   "2020": 4.2,
+   "2021": 4.89,
+   "2022": 5.12,
+   "2023": 5.34,
+   "2024": 5.51,
+   "2025": 5.58
+  },
+  "Sudeste": {
+   "2017": 2.82,
+   "2018": 2.79,
+   "2019": 2.98,
+   "2020": 3.3,
+   "2021": 3.23,
+   "2022": 3.04,
+   "2023": 2.9,
+   "2024": 2.93,
+   "2025": 2.78
+  },
+  "Sul": {
+   "2017": 2.33,
+   "2018": 2.59,
+   "2019": 2.58,
+   "2020": 2.87,
+   "2021": 2.92,
+   "2022": 2.84,
+   "2023": 2.67,
+   "2024": 2.84,
+   "2025": 2.83
+  }
+ },
+ "letalidade_ano_brasil": {
+  "2017": 3.22,
+  "2018": 3.38,
+  "2019": 3.48,
+  "2020": 3.84,
+  "2021": 3.84,
+  "2022": 3.76,
+  "2023": 3.6,
+  "2024": 3.68,
+  "2025": 3.64
+ },
+ "letalidade_categorias": {
+  "Envolvido: pedestre": {
+   "Norte": 24.72,
+   "Nordeste": 29.29,
+   "Centro-Oeste": 25.82,
+   "Sudeste": 24.93,
+   "Sul": 25.56
+  },
+  "Atropelamento de pedestre": {
+   "Norte": 13.86,
+   "Nordeste": 16.5,
+   "Centro-Oeste": 12.72,
+   "Sudeste": 13.33,
+   "Sul": 13.18
+  },
+  "Colisão frontal": {
+   "Norte": 14.82,
+   "Nordeste": 14.2,
+   "Centro-Oeste": 14.75,
+   "Sudeste": 9.53,
+   "Sul": 9.52
+  },
+  "Veículo: bicicleta": {
+   "Norte": 11.12,
+   "Nordeste": 16.27,
+   "Centro-Oeste": 11.61,
+   "Sudeste": 9.3,
+   "Sul": 8.16
+  },
+  "Veículo: motocicleta": {
+   "Norte": 8.15,
+   "Nordeste": 8.42,
+   "Centro-Oeste": 5.04,
+   "Sudeste": 3.26,
+   "Sul": 3.06
+  },
+  "Plena noite": {
+   "Norte": 6.88,
+   "Nordeste": 7.86,
+   "Centro-Oeste": 4.84,
+   "Sudeste": 4.29,
+   "Sul": 3.97
+  },
+  "Pista simples": {
+   "Norte": 6.01,
+   "Nordeste": 7.04,
+   "Centro-Oeste": 4.96,
+   "Sudeste": 3.9,
+   "Sul": 3.36
+  },
+  "Área rural": {
+   "Norte": 6.8,
+   "Nordeste": 7.12,
+   "Centro-Oeste": 4.76,
+   "Sudeste": 3.61,
+   "Sul": 3.43
+  },
+  "Saída de leito carroçável": {
+   "Norte": 4.98,
+   "Nordeste": 5.53,
+   "Centro-Oeste": 3.15,
+   "Sudeste": 2.89,
+   "Sul": 2.78
+  },
+  "Veículo: automóvel": {
+   "Norte": 3.23,
+   "Nordeste": 3.32,
+   "Centro-Oeste": 3.21,
+   "Sudeste": 2.08,
+   "Sul": 2.25
+  },
+  "Pista dupla": {
+   "Norte": 2.03,
+   "Nordeste": 2.74,
+   "Centro-Oeste": 2.34,
+   "Sudeste": 2.36,
+   "Sul": 2.05
+  },
+  "Colisão traseira": {
+   "Norte": 2.6,
+   "Nordeste": 2.49,
+   "Centro-Oeste": 1.9,
+   "Sudeste": 1.37,
+   "Sul": 1.13
+  },
+  "Todos os envolvidos": {
+   "Norte": 4.73,
+   "Nordeste": 5.31,
+   "Centro-Oeste": 3.77,
+   "Sudeste": 2.96,
+   "Sul": 2.7
+  }
+ },
+ "participacao_categorias": {
+  "Envolvido: pedestre": {
+   "Norte": 2.13,
+   "Nordeste": 2.7,
+   "Centro-Oeste": 1.79,
+   "Sudeste": 2.36,
+   "Sul": 1.77
+  },
+  "Atropelamento de pedestre": {
+   "Norte": 3.94,
+   "Nordeste": 4.81,
+   "Centro-Oeste": 3.62,
+   "Sudeste": 4.51,
+   "Sul": 3.53
+  },
+  "Colisão frontal": {
+   "Norte": 10.66,
+   "Nordeste": 11.87,
+   "Centro-Oeste": 8.64,
+   "Sudeste": 8.01,
+   "Sul": 9.34
+  },
+  "Veículo: bicicleta": {
+   "Norte": 1.82,
+   "Nordeste": 1.21,
+   "Centro-Oeste": 0.97,
+   "Sudeste": 1.25,
+   "Sul": 1.16
+  },
+  "Veículo: motocicleta": {
+   "Norte": 22.33,
+   "Nordeste": 24.27,
+   "Centro-Oeste": 15.41,
+   "Sudeste": 19.62,
+   "Sul": 17.03
+  },
+  "Plena noite": {
+   "Norte": 31.47,
+   "Nordeste": 34.47,
+   "Centro-Oeste": 33.05,
+   "Sudeste": 33.13,
+   "Sul": 33.26
+  },
+  "Pista simples": {
+   "Norte": 68.91,
+   "Nordeste": 60.48,
+   "Centro-Oeste": 54.7,
+   "Sudeste": 43.18,
+   "Sul": 51.25
+  },
+  "Área rural": {
+   "Norte": 55.96,
+   "Nordeste": 55.96,
+   "Centro-Oeste": 62.35,
+   "Sudeste": 59.43,
+   "Sul": 54.86
+  },
+  "Saída de leito carroçável": {
+   "Norte": 11.87,
+   "Nordeste": 9.83,
+   "Centro-Oeste": 18.0,
+   "Sudeste": 11.26,
+   "Sul": 12.38
+  },
+  "Veículo: automóvel": {
+   "Norte": 29.79,
+   "Nordeste": 36.0,
+   "Centro-Oeste": 40.14,
+   "Sudeste": 42.78,
+   "Sul": 47.48
+  },
+  "Pista dupla": {
+   "Norte": 27.21,
+   "Nordeste": 32.71,
+   "Centro-Oeste": 42.99,
+   "Sudeste": 45.63,
+   "Sul": 39.13
+  },
+  "Colisão traseira": {
+   "Norte": 21.62,
+   "Nordeste": 22.78,
+   "Centro-Oeste": 22.53,
+   "Sudeste": 23.65,
+   "Sul": 22.92
+  }
+ },
+ "associacao_periodo": {
+  "anos": "2021-2025",
+  "registros": 774920
+ },
+ "cramer_v": {
+  "Tipo de acidente": {
+   "Norte": 0.2015,
+   "Nordeste": 0.2044,
+   "Centro-Oeste": 0.2117,
+   "Sudeste": 0.1848,
+   "Sul": 0.1942
+  },
+  "Causa do acidente": {
+   "Norte": 0.1787,
+   "Nordeste": 0.1841,
+   "Centro-Oeste": 0.1635,
+   "Sudeste": 0.1676,
+   "Sul": 0.1825
+  },
+  "Tipo de envolvido": {
+   "Norte": 0.1428,
+   "Nordeste": 0.1808,
+   "Centro-Oeste": 0.152,
+   "Sudeste": 0.2055,
+   "Sul": 0.1873
+  },
+  "Tipo de veículo": {
+   "Norte": 0.1278,
+   "Nordeste": 0.1274,
+   "Centro-Oeste": 0.0733,
+   "Sudeste": 0.0679,
+   "Sul": 0.0513
+  },
+  "Uso do solo": {
+   "Norte": 0.113,
+   "Nordeste": 0.0932,
+   "Centro-Oeste": 0.0686,
+   "Sudeste": 0.0462,
+   "Sul": 0.0534
+  },
+  "Faixa horária": {
+   "Norte": 0.0871,
+   "Nordeste": 0.1022,
+   "Centro-Oeste": 0.0481,
+   "Sudeste": 0.0656,
+   "Sul": 0.0527
+  },
+  "Fase do dia": {
+   "Norte": 0.0886,
+   "Nordeste": 0.0975,
+   "Centro-Oeste": 0.0455,
+   "Sudeste": 0.0639,
+   "Sul": 0.0593
+  },
+  "Tipo de pista": {
+   "Norte": 0.0869,
+   "Nordeste": 0.1007,
+   "Centro-Oeste": 0.0678,
+   "Sudeste": 0.0458,
+   "Sul": 0.0451
+  },
+  "Traçado da via": {
+   "Norte": 0.0869,
+   "Nordeste": 0.065,
+   "Centro-Oeste": 0.0474,
+   "Sudeste": 0.0464,
+   "Sul": 0.0676
+  },
+  "Idade do veículo": {
+   "Norte": 0.0405,
+   "Nordeste": 0.0693,
+   "Centro-Oeste": 0.0331,
+   "Sudeste": 0.0314,
+   "Sul": 0.0365
+  },
+  "Faixa etária": {
+   "Norte": 0.045,
+   "Nordeste": 0.0493,
+   "Centro-Oeste": 0.0401,
+   "Sudeste": 0.0281,
+   "Sul": 0.0331
+  },
+  "Sexo": {
+   "Norte": 0.0442,
+   "Nordeste": 0.0344,
+   "Centro-Oeste": 0.0265,
+   "Sudeste": 0.0261,
+   "Sul": 0.0255
+  },
+  "Condição meteorológica": {
+   "Norte": 0.0579,
+   "Nordeste": 0.0317,
+   "Centro-Oeste": 0.0186,
+   "Sudeste": 0.0157,
+   "Sul": 0.0149
+  },
+  "Dia da semana": {
+   "Norte": 0.0352,
+   "Nordeste": 0.0455,
+   "Centro-Oeste": 0.0203,
+   "Sudeste": 0.0158,
+   "Sul": 0.0125
+  },
+  "Sentido da via": {
+   "Norte": 0.022,
+   "Nordeste": 0.0154,
+   "Centro-Oeste": 0.0203,
+   "Sudeste": 0.0045,
+   "Sul": 0.0058
+  }
+ },
+ "kendall_tau_pares": {
+  "Norte x Nordeste": {
+   "tau": 0.733,
+   "top5_comum": 4
+  },
+  "Norte x Centro-Oeste": {
+   "tau": 0.771,
+   "top5_comum": 5
+  },
+  "Norte x Sudeste": {
+   "tau": 0.771,
+   "top5_comum": 4
+  },
+  "Norte x Sul": {
+   "tau": 0.733,
+   "top5_comum": 3
+  },
+  "Nordeste x Centro-Oeste": {
+   "tau": 0.81,
+   "top5_comum": 4
+  },
+  "Nordeste x Sudeste": {
+   "tau": 0.848,
+   "top5_comum": 5
+  },
+  "Nordeste x Sul": {
+   "tau": 0.695,
+   "top5_comum": 3
+  },
+  "Centro-Oeste x Sudeste": {
+   "tau": 0.771,
+   "top5_comum": 4
+  },
+  "Centro-Oeste x Sul": {
+   "tau": 0.695,
+   "top5_comum": 3
+  },
+  "Sudeste x Sul": {
+   "tau": 0.81,
+   "top5_comum": 3
+  }
+ },
+ "categorias_por_ano": {
+  "causa_acidente": {
+   "2017": 24,
+   "2018": 31,
+   "2019": 36,
+   "2020": 62,
+   "2021": 71,
+   "2022": 71,
+   "2023": 75,
+   "2024": 69,
+   "2025": 69
+  },
+  "causa_so_ate_2020": 15,
+  "causa_so_desde_2021": 27,
+  "tipo_acidente_bruto": 21,
+  "tipo_acidente_harmonizado": 17,
+  "tracado_via_bruto": 1310,
+  "tracado_via_canonico": 379,
+  "tracado_via_um_descritor": 85.01
+ }
+}

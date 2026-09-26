@@ -24,3 +24,9 @@ auto/
 # Build 
 build/
 overleaf/
+
+# Figuras do artigo (geradas por src/exploratoria.py)
+!figuras/*.pdf
+
+# Python
+__pycache__/
