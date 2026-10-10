@@ -1,0 +1,426 @@
+modelo,regiao,dobra,atributo,shap_abs_medio
+XGBoost,Norte,0,Tipo de envolvido,0.0638171136379242
+XGBoost,Norte,0,Tipo de acidente,0.49890533089637756
+XGBoost,Norte,0,Causa do acidente,0.4320089817047119
+XGBoost,Norte,0,Tipo de veículo,0.743083655834198
+XGBoost,Norte,0,Tipo de pista,0.1335168480873108
+XGBoost,Norte,0,Uso do solo,0.4169211983680725
+XGBoost,Norte,0,Fase do dia,0.09562604129314423
+XGBoost,Norte,0,Sexo,0.04067392274737358
+XGBoost,Norte,0,Condição meteorológica,0.040936604142189026
+XGBoost,Norte,0,Sentido da via,0.006128601264208555
+XGBoost,Norte,0,Dia da semana,0.055694591253995895
+XGBoost,Norte,0,Idade,0.12909895181655884
+XGBoost,Norte,0,Idade do veículo,0.07331044971942902
+XGBoost,Norte,0,Hora,0.10005234181880951
+XGBoost,Norte,0,Ano,0.012492881156504154
+XGBoost,Norte,0,Marca do veículo,0.03966774791479111
+XGBoost,Norte,0,Traçado da via,0.0632556900382042
+XGBoost,Nordeste,0,Tipo de envolvido,0.02621636912226677
+XGBoost,Nordeste,0,Tipo de acidente,0.3989495038986206
+XGBoost,Nordeste,0,Causa do acidente,0.46698272228240967
+XGBoost,Nordeste,0,Tipo de veículo,0.7556703686714172
+XGBoost,Nordeste,0,Tipo de pista,0.2759377360343933
+XGBoost,Nordeste,0,Uso do solo,0.30682724714279175
+XGBoost,Nordeste,0,Fase do dia,0.12246088683605194
+XGBoost,Nordeste,0,Sexo,0.004447563551366329
+XGBoost,Nordeste,0,Condição meteorológica,0.04717129096388817
+XGBoost,Nordeste,0,Sentido da via,0.0
+XGBoost,Nordeste,0,Dia da semana,0.027771903201937675
+XGBoost,Nordeste,0,Idade,0.1535109281539917
+XGBoost,Nordeste,0,Idade do veículo,0.1543407142162323
+XGBoost,Nordeste,0,Hora,0.08331049233675003
+XGBoost,Nordeste,0,Ano,0.013597333803772926
+XGBoost,Nordeste,0,Marca do veículo,0.1578567773103714
+XGBoost,Nordeste,0,Traçado da via,0.0498383603990078
+XGBoost,Centro-Oeste,0,Tipo de envolvido,0.02646237052977085
+XGBoost,Centro-Oeste,0,Tipo de acidente,0.416085809469223
+XGBoost,Centro-Oeste,0,Causa do acidente,0.457800954580307
+XGBoost,Centro-Oeste,0,Tipo de veículo,0.5172201991081238
+XGBoost,Centro-Oeste,0,Tipo de pista,0.16548870503902435
+XGBoost,Centro-Oeste,0,Uso do solo,0.2707490622997284
+XGBoost,Centro-Oeste,0,Fase do dia,0.05391600355505943
+XGBoost,Centro-Oeste,0,Sexo,0.03923427313566208
+XGBoost,Centro-Oeste,0,Condição meteorológica,0.029324671253561974
+XGBoost,Centro-Oeste,0,Sentido da via,0.02822362445294857
+XGBoost,Centro-Oeste,0,Dia da semana,0.05363908410072327
+XGBoost,Centro-Oeste,0,Idade,0.16083508729934692
+XGBoost,Centro-Oeste,0,Idade do veículo,0.09403260797262192
+XGBoost,Centro-Oeste,0,Hora,0.0439116507768631
+XGBoost,Centro-Oeste,0,Ano,0.011644457466900349
+XGBoost,Centro-Oeste,0,Marca do veículo,0.0887024849653244
+XGBoost,Centro-Oeste,0,Traçado da via,0.08093074709177017
+XGBoost,Sudeste,0,Tipo de envolvido,0.036321669816970825
+XGBoost,Sudeste,0,Tipo de acidente,0.575428307056427
+XGBoost,Sudeste,0,Causa do acidente,0.47939059138298035
+XGBoost,Sudeste,0,Tipo de veículo,0.5020396113395691
+XGBoost,Sudeste,0,Tipo de pista,0.07804691046476364
+XGBoost,Sudeste,0,Uso do solo,0.21457934379577637
+XGBoost,Sudeste,0,Fase do dia,0.13635949790477753
+XGBoost,Sudeste,0,Sexo,0.058428239077329636
+XGBoost,Sudeste,0,Condição meteorológica,0.10961258411407471
+XGBoost,Sudeste,0,Sentido da via,0.004897120408713818
+XGBoost,Sudeste,0,Dia da semana,0.025730274617671967
+XGBoost,Sudeste,0,Idade,0.1354333758354187
+XGBoost,Sudeste,0,Idade do veículo,0.07247493416070938
+XGBoost,Sudeste,0,Hora,0.11924315989017487
+XGBoost,Sudeste,0,Ano,0.015930190682411194
+XGBoost,Sudeste,0,Marca do veículo,0.05239993333816528
+XGBoost,Sudeste,0,Traçado da via,0.08009771257638931
+XGBoost,Sul,0,Tipo de envolvido,0.006813874933868647
+XGBoost,Sul,0,Tipo de acidente,0.5956510305404663
+XGBoost,Sul,0,Causa do acidente,0.5144628882408142
+XGBoost,Sul,0,Tipo de veículo,0.45152172446250916
+XGBoost,Sul,0,Tipo de pista,0.03626615181565285
+XGBoost,Sul,0,Uso do solo,0.20255900919437408
+XGBoost,Sul,0,Fase do dia,0.20856255292892456
+XGBoost,Sul,0,Sexo,0.011657015420496464
+XGBoost,Sul,0,Condição meteorológica,0.04501131922006607
+XGBoost,Sul,0,Sentido da via,0.020656948909163475
+XGBoost,Sul,0,Dia da semana,0.043278008699417114
+XGBoost,Sul,0,Idade,0.12597864866256714
+XGBoost,Sul,0,Idade do veículo,0.16308915615081787
+XGBoost,Sul,0,Hora,0.04381024092435837
+XGBoost,Sul,0,Ano,0.01669331081211567
+XGBoost,Sul,0,Marca do veículo,0.047118283808231354
+XGBoost,Sul,0,Traçado da via,0.09256799519062042
+XGBoost,Norte,1,Tipo de envolvido,0.04651874676346779
+XGBoost,Norte,1,Tipo de acidente,0.38800927996635437
+XGBoost,Norte,1,Causa do acidente,0.5091435313224792
+XGBoost,Norte,1,Tipo de veículo,0.6591756939888
+XGBoost,Norte,1,Tipo de pista,0.16374656558036804
+XGBoost,Norte,1,Uso do solo,0.4158017039299011
+XGBoost,Norte,1,Fase do dia,0.0797329992055893
+XGBoost,Norte,1,Sexo,0.03799710422754288
+XGBoost,Norte,1,Condição meteorológica,0.03907505050301552
+XGBoost,Norte,1,Sentido da via,0.011753425002098083
+XGBoost,Norte,1,Dia da semana,0.040795665234327316
+XGBoost,Norte,1,Idade,0.10546024888753891
+XGBoost,Norte,1,Idade do veículo,0.08685453236103058
+XGBoost,Norte,1,Hora,0.11209803819656372
+XGBoost,Norte,1,Ano,0.005973941180855036
+XGBoost,Norte,1,Marca do veículo,0.10540090501308441
+XGBoost,Norte,1,Traçado da via,0.09013871848583221
+XGBoost,Nordeste,1,Tipo de envolvido,0.02420022524893284
+XGBoost,Nordeste,1,Tipo de acidente,0.4485611915588379
+XGBoost,Nordeste,1,Causa do acidente,0.4276304841041565
+XGBoost,Nordeste,1,Tipo de veículo,0.7651894092559814
+XGBoost,Nordeste,1,Tipo de pista,0.25847190618515015
+XGBoost,Nordeste,1,Uso do solo,0.3630381226539612
+XGBoost,Nordeste,1,Fase do dia,0.06792537122964859
+XGBoost,Nordeste,1,Sexo,0.03878628462553024
+XGBoost,Nordeste,1,Condição meteorológica,0.013951923698186874
+XGBoost,Nordeste,1,Sentido da via,0.031086500734090805
+XGBoost,Nordeste,1,Dia da semana,0.05791913717985153
+XGBoost,Nordeste,1,Idade,0.12991280853748322
+XGBoost,Nordeste,1,Idade do veículo,0.058710791170597076
+XGBoost,Nordeste,1,Hora,0.12416902184486389
+XGBoost,Nordeste,1,Ano,0.036813270300626755
+XGBoost,Nordeste,1,Marca do veículo,0.12068229168653488
+XGBoost,Nordeste,1,Traçado da via,0.030451465398073196
+XGBoost,Centro-Oeste,1,Tipo de envolvido,0.014501550234854221
+XGBoost,Centro-Oeste,1,Tipo de acidente,0.5094985961914062
+XGBoost,Centro-Oeste,1,Causa do acidente,0.3444318175315857
+XGBoost,Centro-Oeste,1,Tipo de veículo,0.39189454913139343
+XGBoost,Centro-Oeste,1,Tipo de pista,0.10643486678600311
+XGBoost,Centro-Oeste,1,Uso do solo,0.2752522826194763
+XGBoost,Centro-Oeste,1,Fase do dia,0.03727495297789574
+XGBoost,Centro-Oeste,1,Sexo,0.04323398321866989
+XGBoost,Centro-Oeste,1,Condição meteorológica,0.05679141730070114
+XGBoost,Centro-Oeste,1,Sentido da via,0.016349419951438904
+XGBoost,Centro-Oeste,1,Dia da semana,0.05574372038245201
+XGBoost,Centro-Oeste,1,Idade,0.12813305854797363
+XGBoost,Centro-Oeste,1,Idade do veículo,0.12450503557920456
+XGBoost,Centro-Oeste,1,Hora,0.08298193663358688
+XGBoost,Centro-Oeste,1,Ano,0.03097696788609028
+XGBoost,Centro-Oeste,1,Marca do veículo,0.12262331694364548
+XGBoost,Centro-Oeste,1,Traçado da via,0.04113829508423805
+XGBoost,Sudeste,1,Tipo de envolvido,0.042985234409570694
+XGBoost,Sudeste,1,Tipo de acidente,0.4296349585056305
+XGBoost,Sudeste,1,Causa do acidente,0.4912411570549011
+XGBoost,Sudeste,1,Tipo de veículo,0.5466839671134949
+XGBoost,Sudeste,1,Tipo de pista,0.06575822830200195
+XGBoost,Sudeste,1,Uso do solo,0.2287641167640686
+XGBoost,Sudeste,1,Fase do dia,0.10727088898420334
+XGBoost,Sudeste,1,Sexo,0.08520989120006561
+XGBoost,Sudeste,1,Condição meteorológica,0.07550938427448273
+XGBoost,Sudeste,1,Sentido da via,0.0
+XGBoost,Sudeste,1,Dia da semana,0.05971480533480644
+XGBoost,Sudeste,1,Idade,0.13062329590320587
+XGBoost,Sudeste,1,Idade do veículo,0.13882209360599518
+XGBoost,Sudeste,1,Hora,0.08221224695444107
+XGBoost,Sudeste,1,Ano,0.048993125557899475
+XGBoost,Sudeste,1,Marca do veículo,0.11563915759325027
+XGBoost,Sudeste,1,Traçado da via,0.08398237824440002
+XGBoost,Sul,1,Tipo de envolvido,0.01825917884707451
+XGBoost,Sul,1,Tipo de acidente,0.5726442933082581
+XGBoost,Sul,1,Causa do acidente,0.5283692479133606
+XGBoost,Sul,1,Tipo de veículo,0.42642948031425476
+XGBoost,Sul,1,Tipo de pista,0.03153149038553238
+XGBoost,Sul,1,Uso do solo,0.17806823551654816
+XGBoost,Sul,1,Fase do dia,0.09011037647724152
+XGBoost,Sul,1,Sexo,0.0986003652215004
+XGBoost,Sul,1,Condição meteorológica,0.031894709914922714
+XGBoost,Sul,1,Sentido da via,0.010900584049522877
+XGBoost,Sul,1,Dia da semana,0.06494293361902237
+XGBoost,Sul,1,Idade,0.154981330037117
+XGBoost,Sul,1,Idade do veículo,0.10134552419185638
+XGBoost,Sul,1,Hora,0.09069995582103729
+XGBoost,Sul,1,Ano,0.0342940054833889
+XGBoost,Sul,1,Marca do veículo,0.044226765632629395
+XGBoost,Sul,1,Traçado da via,0.11821529269218445
+XGBoost,Norte,2,Tipo de envolvido,0.02455385960638523
+XGBoost,Norte,2,Tipo de acidente,0.45017242431640625
+XGBoost,Norte,2,Causa do acidente,0.4357619881629944
+XGBoost,Norte,2,Tipo de veículo,0.7385711073875427
+XGBoost,Norte,2,Tipo de pista,0.12744373083114624
+XGBoost,Norte,2,Uso do solo,0.499790757894516
+XGBoost,Norte,2,Fase do dia,0.08800982683897018
+XGBoost,Norte,2,Sexo,0.05204014107584953
+XGBoost,Norte,2,Condição meteorológica,0.03122127428650856
+XGBoost,Norte,2,Sentido da via,0.0
+XGBoost,Norte,2,Dia da semana,0.04819983243942261
+XGBoost,Norte,2,Idade,0.12678508460521698
+XGBoost,Norte,2,Idade do veículo,0.1025378480553627
+XGBoost,Norte,2,Hora,0.14187301695346832
+XGBoost,Norte,2,Ano,0.02090987004339695
+XGBoost,Norte,2,Marca do veículo,0.0404430516064167
+XGBoost,Norte,2,Traçado da via,0.09394925087690353
+XGBoost,Nordeste,2,Tipo de envolvido,0.023921815678477287
+XGBoost,Nordeste,2,Tipo de acidente,0.4930862784385681
+XGBoost,Nordeste,2,Causa do acidente,0.43656885623931885
+XGBoost,Nordeste,2,Tipo de veículo,0.7248293161392212
+XGBoost,Nordeste,2,Tipo de pista,0.18018139898777008
+XGBoost,Nordeste,2,Uso do solo,0.37722519040107727
+XGBoost,Nordeste,2,Fase do dia,0.12051131576299667
+XGBoost,Nordeste,2,Sexo,0.041014257818460464
+XGBoost,Nordeste,2,Condição meteorológica,0.013171065598726273
+XGBoost,Nordeste,2,Sentido da via,0.0063389744609594345
+XGBoost,Nordeste,2,Dia da semana,0.027649149298667908
+XGBoost,Nordeste,2,Idade,0.17269675433635712
+XGBoost,Nordeste,2,Idade do veículo,0.0817263200879097
+XGBoost,Nordeste,2,Hora,0.12597957253456116
+XGBoost,Nordeste,2,Ano,0.028848428279161453
+XGBoost,Nordeste,2,Marca do veículo,0.14909903705120087
+XGBoost,Nordeste,2,Traçado da via,0.03969326242804527
+XGBoost,Centro-Oeste,2,Tipo de envolvido,0.041437778621912
+XGBoost,Centro-Oeste,2,Tipo de acidente,0.5170137882232666
+XGBoost,Centro-Oeste,2,Causa do acidente,0.40026766061782837
+XGBoost,Centro-Oeste,2,Tipo de veículo,0.46051648259162903
+XGBoost,Centro-Oeste,2,Tipo de pista,0.143216073513031
+XGBoost,Centro-Oeste,2,Uso do solo,0.26335281133651733
+XGBoost,Centro-Oeste,2,Fase do dia,0.0477588027715683
+XGBoost,Centro-Oeste,2,Sexo,0.0
+XGBoost,Centro-Oeste,2,Condição meteorológica,0.033630289137363434
+XGBoost,Centro-Oeste,2,Sentido da via,0.02876993641257286
+XGBoost,Centro-Oeste,2,Dia da semana,0.0552043579518795
+XGBoost,Centro-Oeste,2,Idade,0.15612883865833282
+XGBoost,Centro-Oeste,2,Idade do veículo,0.0568394772708416
+XGBoost,Centro-Oeste,2,Hora,0.04421374946832657
+XGBoost,Centro-Oeste,2,Ano,0.02749462239444256
+XGBoost,Centro-Oeste,2,Marca do veículo,0.07795097678899765
+XGBoost,Centro-Oeste,2,Traçado da via,0.04953692853450775
+XGBoost,Sudeste,2,Tipo de envolvido,0.036626555025577545
+XGBoost,Sudeste,2,Tipo de acidente,0.5191999077796936
+XGBoost,Sudeste,2,Causa do acidente,0.4857661724090576
+XGBoost,Sudeste,2,Tipo de veículo,0.5412502884864807
+XGBoost,Sudeste,2,Tipo de pista,0.08029023557901382
+XGBoost,Sudeste,2,Uso do solo,0.18714649975299835
+XGBoost,Sudeste,2,Fase do dia,0.05309710651636124
+XGBoost,Sudeste,2,Sexo,0.02152513898909092
+XGBoost,Sudeste,2,Condição meteorológica,0.09625861048698425
+XGBoost,Sudeste,2,Sentido da via,0.012940090149641037
+XGBoost,Sudeste,2,Dia da semana,0.057025518268346786
+XGBoost,Sudeste,2,Idade,0.08767513185739517
+XGBoost,Sudeste,2,Idade do veículo,0.13080677390098572
+XGBoost,Sudeste,2,Hora,0.14842873811721802
+XGBoost,Sudeste,2,Ano,0.04290840029716492
+XGBoost,Sudeste,2,Marca do veículo,0.08059300482273102
+XGBoost,Sudeste,2,Traçado da via,0.08941689133644104
+XGBoost,Sul,2,Tipo de envolvido,0.02521967515349388
+XGBoost,Sul,2,Tipo de acidente,0.584697961807251
+XGBoost,Sul,2,Causa do acidente,0.44484686851501465
+XGBoost,Sul,2,Tipo de veículo,0.34889575839042664
+XGBoost,Sul,2,Tipo de pista,0.01839030161499977
+XGBoost,Sul,2,Uso do solo,0.26158079504966736
+XGBoost,Sul,2,Fase do dia,0.053002506494522095
+XGBoost,Sul,2,Sexo,0.027641277760267258
+XGBoost,Sul,2,Condição meteorológica,0.01815609820187092
+XGBoost,Sul,2,Sentido da via,0.01530641969293356
+XGBoost,Sul,2,Dia da semana,0.02675166167318821
+XGBoost,Sul,2,Idade,0.16512300074100494
+XGBoost,Sul,2,Idade do veículo,0.19223836064338684
+XGBoost,Sul,2,Hora,0.13468147814273834
+XGBoost,Sul,2,Ano,0.025210369378328323
+XGBoost,Sul,2,Marca do veículo,0.07226927578449249
+XGBoost,Sul,2,Traçado da via,0.12228905409574509
+XGBoost,Norte,3,Tipo de envolvido,0.03180113062262535
+XGBoost,Norte,3,Tipo de acidente,0.44309645891189575
+XGBoost,Norte,3,Causa do acidente,0.47871118783950806
+XGBoost,Norte,3,Tipo de veículo,0.7045376300811768
+XGBoost,Norte,3,Tipo de pista,0.15668490529060364
+XGBoost,Norte,3,Uso do solo,0.4447263479232788
+XGBoost,Norte,3,Fase do dia,0.1326071321964264
+XGBoost,Norte,3,Sexo,0.04678073152899742
+XGBoost,Norte,3,Condição meteorológica,0.04333775117993355
+XGBoost,Norte,3,Sentido da via,0.0008002992835827172
+XGBoost,Norte,3,Dia da semana,0.07325957715511322
+XGBoost,Norte,3,Idade,0.09980802983045578
+XGBoost,Norte,3,Idade do veículo,0.08579302579164505
+XGBoost,Norte,3,Hora,0.13487508893013
+XGBoost,Norte,3,Ano,0.005426726303994656
+XGBoost,Norte,3,Marca do veículo,0.05664362758398056
+XGBoost,Norte,3,Traçado da via,0.12226396799087524
+XGBoost,Nordeste,3,Tipo de envolvido,0.03221430256962776
+XGBoost,Nordeste,3,Tipo de acidente,0.5388525128364563
+XGBoost,Nordeste,3,Causa do acidente,0.4496522843837738
+XGBoost,Nordeste,3,Tipo de veículo,0.7709686160087585
+XGBoost,Nordeste,3,Tipo de pista,0.2350628674030304
+XGBoost,Nordeste,3,Uso do solo,0.30104944109916687
+XGBoost,Nordeste,3,Fase do dia,0.09250508248806
+XGBoost,Nordeste,3,Sexo,0.015328512527048588
+XGBoost,Nordeste,3,Condição meteorológica,0.016065804287791252
+XGBoost,Nordeste,3,Sentido da via,0.00045498108374886215
+XGBoost,Nordeste,3,Dia da semana,0.06836678087711334
+XGBoost,Nordeste,3,Idade,0.15326480567455292
+XGBoost,Nordeste,3,Idade do veículo,0.17796814441680908
+XGBoost,Nordeste,3,Hora,0.1243208721280098
+XGBoost,Nordeste,3,Ano,0.025021780282258987
+XGBoost,Nordeste,3,Marca do veículo,0.0386410653591156
+XGBoost,Nordeste,3,Traçado da via,0.03633079305291176
+XGBoost,Centro-Oeste,3,Tipo de envolvido,0.03963842988014221
+XGBoost,Centro-Oeste,3,Tipo de acidente,0.49614664912223816
+XGBoost,Centro-Oeste,3,Causa do acidente,0.3882094919681549
+XGBoost,Centro-Oeste,3,Tipo de veículo,0.4719488024711609
+XGBoost,Centro-Oeste,3,Tipo de pista,0.18368421494960785
+XGBoost,Centro-Oeste,3,Uso do solo,0.2404027134180069
+XGBoost,Centro-Oeste,3,Fase do dia,0.05395638570189476
+XGBoost,Centro-Oeste,3,Sexo,0.0020038157235831022
+XGBoost,Centro-Oeste,3,Condição meteorológica,0.02942405454814434
+XGBoost,Centro-Oeste,3,Sentido da via,0.005127530079334974
+XGBoost,Centro-Oeste,3,Dia da semana,0.04131890460848808
+XGBoost,Centro-Oeste,3,Idade,0.1618773490190506
+XGBoost,Centro-Oeste,3,Idade do veículo,0.12038520723581314
+XGBoost,Centro-Oeste,3,Hora,0.09087734669446945
+XGBoost,Centro-Oeste,3,Ano,0.033311501145362854
+XGBoost,Centro-Oeste,3,Marca do veículo,0.050770603120326996
+XGBoost,Centro-Oeste,3,Traçado da via,0.08071380108594894
+XGBoost,Sudeste,3,Tipo de envolvido,0.03662536293268204
+XGBoost,Sudeste,3,Tipo de acidente,0.39052578806877136
+XGBoost,Sudeste,3,Causa do acidente,0.5247624516487122
+XGBoost,Sudeste,3,Tipo de veículo,0.5949470400810242
+XGBoost,Sudeste,3,Tipo de pista,0.10234898328781128
+XGBoost,Sudeste,3,Uso do solo,0.29964515566825867
+XGBoost,Sudeste,3,Fase do dia,0.08486545830965042
+XGBoost,Sudeste,3,Sexo,0.0471603199839592
+XGBoost,Sudeste,3,Condição meteorológica,0.030059844255447388
+XGBoost,Sudeste,3,Sentido da via,0.005035830195993185
+XGBoost,Sudeste,3,Dia da semana,0.09038103371858597
+XGBoost,Sudeste,3,Idade,0.16808952391147614
+XGBoost,Sudeste,3,Idade do veículo,0.13258841633796692
+XGBoost,Sudeste,3,Hora,0.10634885728359222
+XGBoost,Sudeste,3,Ano,0.024353763088583946
+XGBoost,Sudeste,3,Marca do veículo,0.06272377073764801
+XGBoost,Sudeste,3,Traçado da via,0.07081333547830582
+XGBoost,Sul,3,Tipo de envolvido,0.028771959245204926
+XGBoost,Sul,3,Tipo de acidente,0.5355162024497986
+XGBoost,Sul,3,Causa do acidente,0.6112774014472961
+XGBoost,Sul,3,Tipo de veículo,0.4338858127593994
+XGBoost,Sul,3,Tipo de pista,0.04819846525788307
+XGBoost,Sul,3,Uso do solo,0.18945258855819702
+XGBoost,Sul,3,Fase do dia,0.10678933560848236
+XGBoost,Sul,3,Sexo,0.018089793622493744
+XGBoost,Sul,3,Condição meteorológica,0.03157423436641693
+XGBoost,Sul,3,Sentido da via,0.01615815982222557
+XGBoost,Sul,3,Dia da semana,0.04581853002309799
+XGBoost,Sul,3,Idade,0.17367611825466156
+XGBoost,Sul,3,Idade do veículo,0.15737096965312958
+XGBoost,Sul,3,Hora,0.09081590920686722
+XGBoost,Sul,3,Ano,0.02134624309837818
+XGBoost,Sul,3,Marca do veículo,0.029441915452480316
+XGBoost,Sul,3,Traçado da via,0.14924035966396332
+XGBoost,Norte,4,Tipo de envolvido,0.055353958159685135
+XGBoost,Norte,4,Tipo de acidente,0.4517095983028412
+XGBoost,Norte,4,Causa do acidente,0.4549388885498047
+XGBoost,Norte,4,Tipo de veículo,0.7393317222595215
+XGBoost,Norte,4,Tipo de pista,0.18578769266605377
+XGBoost,Norte,4,Uso do solo,0.39063674211502075
+XGBoost,Norte,4,Fase do dia,0.08762151747941971
+XGBoost,Norte,4,Sexo,0.025655049830675125
+XGBoost,Norte,4,Condição meteorológica,0.01603904366493225
+XGBoost,Norte,4,Sentido da via,0.004241601563990116
+XGBoost,Norte,4,Dia da semana,0.05445246770977974
+XGBoost,Norte,4,Idade,0.09013576805591583
+XGBoost,Norte,4,Idade do veículo,0.0867530032992363
+XGBoost,Norte,4,Hora,0.13436384499073029
+XGBoost,Norte,4,Ano,0.0138205261901021
+XGBoost,Norte,4,Marca do veículo,0.0512237511575222
+XGBoost,Norte,4,Traçado da via,0.100117988884449
+XGBoost,Nordeste,4,Tipo de envolvido,0.046057965606451035
+XGBoost,Nordeste,4,Tipo de acidente,0.4950370788574219
+XGBoost,Nordeste,4,Causa do acidente,0.42548105120658875
+XGBoost,Nordeste,4,Tipo de veículo,0.6898784041404724
+XGBoost,Nordeste,4,Tipo de pista,0.23373834788799286
+XGBoost,Nordeste,4,Uso do solo,0.33878403902053833
+XGBoost,Nordeste,4,Fase do dia,0.1191234365105629
+XGBoost,Nordeste,4,Sexo,0.07156188786029816
+XGBoost,Nordeste,4,Condição meteorológica,0.029546890407800674
+XGBoost,Nordeste,4,Sentido da via,0.009002186357975006
+XGBoost,Nordeste,4,Dia da semana,0.036901798099279404
+XGBoost,Nordeste,4,Idade,0.14011426270008087
+XGBoost,Nordeste,4,Idade do veículo,0.12087249010801315
+XGBoost,Nordeste,4,Hora,0.11980333924293518
+XGBoost,Nordeste,4,Ano,0.00692704925313592
+XGBoost,Nordeste,4,Marca do veículo,0.11063273251056671
+XGBoost,Nordeste,4,Traçado da via,0.06520921736955643
+XGBoost,Centro-Oeste,4,Tipo de envolvido,0.014919990673661232
+XGBoost,Centro-Oeste,4,Tipo de acidente,0.46403712034225464
+XGBoost,Centro-Oeste,4,Causa do acidente,0.4520840644836426
+XGBoost,Centro-Oeste,4,Tipo de veículo,0.5298037528991699
+XGBoost,Centro-Oeste,4,Tipo de pista,0.160560742020607
+XGBoost,Centro-Oeste,4,Uso do solo,0.2605392634868622
+XGBoost,Centro-Oeste,4,Fase do dia,0.054947011172771454
+XGBoost,Centro-Oeste,4,Sexo,0.05813648924231529
+XGBoost,Centro-Oeste,4,Condição meteorológica,0.008308881893754005
+XGBoost,Centro-Oeste,4,Sentido da via,0.012642829678952694
+XGBoost,Centro-Oeste,4,Dia da semana,0.08794138580560684
+XGBoost,Centro-Oeste,4,Idade,0.12398035824298859
+XGBoost,Centro-Oeste,4,Idade do veículo,0.1276979148387909
+XGBoost,Centro-Oeste,4,Hora,0.08083126693964005
+XGBoost,Centro-Oeste,4,Ano,0.007750739809125662
+XGBoost,Centro-Oeste,4,Marca do veículo,0.06738974899053574
+XGBoost,Centro-Oeste,4,Traçado da via,0.03756149113178253
+XGBoost,Sudeste,4,Tipo de envolvido,0.037150684744119644
+XGBoost,Sudeste,4,Tipo de acidente,0.5222318768501282
+XGBoost,Sudeste,4,Causa do acidente,0.43796461820602417
+XGBoost,Sudeste,4,Tipo de veículo,0.44285717606544495
+XGBoost,Sudeste,4,Tipo de pista,0.08521028608083725
+XGBoost,Sudeste,4,Uso do solo,0.21835649013519287
+XGBoost,Sudeste,4,Fase do dia,0.032791800796985626
+XGBoost,Sudeste,4,Sexo,0.03997378796339035
+XGBoost,Sudeste,4,Condição meteorológica,0.05767587572336197
+XGBoost,Sudeste,4,Sentido da via,0.0027894123923033476
+XGBoost,Sudeste,4,Dia da semana,0.03239036723971367
+XGBoost,Sudeste,4,Idade,0.14411142468452454
+XGBoost,Sudeste,4,Idade do veículo,0.13944345712661743
+XGBoost,Sudeste,4,Hora,0.13192754983901978
+XGBoost,Sudeste,4,Ano,0.08059671521186829
+XGBoost,Sudeste,4,Marca do veículo,0.07387487590312958
+XGBoost,Sudeste,4,Traçado da via,0.04470827430486679
+XGBoost,Sul,4,Tipo de envolvido,0.043560758233070374
+XGBoost,Sul,4,Tipo de acidente,0.539485514163971
+XGBoost,Sul,4,Causa do acidente,0.46726784110069275
+XGBoost,Sul,4,Tipo de veículo,0.3830292522907257
+XGBoost,Sul,4,Tipo de pista,0.0691286027431488
+XGBoost,Sul,4,Uso do solo,0.2334960699081421
+XGBoost,Sul,4,Fase do dia,0.1739141196012497
+XGBoost,Sul,4,Sexo,0.00888173095881939
+XGBoost,Sul,4,Condição meteorológica,0.012408013455569744
+XGBoost,Sul,4,Sentido da via,0.004682622384279966
+XGBoost,Sul,4,Dia da semana,0.055630333721637726
+XGBoost,Sul,4,Idade,0.12508541345596313
+XGBoost,Sul,4,Idade do veículo,0.1379881650209427
+XGBoost,Sul,4,Hora,0.1298218071460724
+XGBoost,Sul,4,Ano,0.020870383828878403
+XGBoost,Sul,4,Marca do veículo,0.0735504999756813
+XGBoost,Sul,4,Traçado da via,0.1122693419456482

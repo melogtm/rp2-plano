@@ -1,0 +1,112 @@
+{
+ "semente": 42,
+ "dobras": 5,
+ "n_subamostra_treino": 32693,
+ "corte_interno": "GroupShuffleSplit por id: 80% ajuste, 20% limiar",
+ "busca_registros_reservados": 60000,
+ "codificacao_marca": "GroupTargetEncoder m=10, 5 dobras por id",
+ "hiperparametros": {
+  "learning_rate": 0.1,
+  "tree_method": "hist",
+  "enable_categorical": true,
+  "n_jobs": -1,
+  "max_depth": 4,
+  "min_child_weight": 5,
+  "n_estimators": 74
+ },
+ "busca": [
+  {
+   "max_depth": 4,
+   "min_child_weight": 1,
+   "auc_pr": 0.231631000351881,
+   "dp": 0.011567110182635907,
+   "arvores": 50
+  },
+  {
+   "max_depth": 4,
+   "min_child_weight": 5,
+   "auc_pr": 0.2331912762812179,
+   "dp": 0.01350026518534842,
+   "arvores": 74
+  },
+  {
+   "max_depth": 6,
+   "min_child_weight": 1,
+   "auc_pr": 0.22645718242557103,
+   "dp": 0.014794665639415934,
+   "arvores": 41
+  },
+  {
+   "max_depth": 6,
+   "min_child_weight": 5,
+   "auc_pr": 0.22933451611879155,
+   "dp": 0.010655173361929464,
+   "arvores": 31
+  },
+  {
+   "max_depth": 8,
+   "min_child_weight": 1,
+   "auc_pr": 0.20941881499106088,
+   "dp": 0.01227601511983139,
+   "arvores": 17
+  },
+  {
+   "max_depth": 8,
+   "min_child_weight": 5,
+   "auc_pr": 0.22449254494430337,
+   "dp": 0.011099481843321811,
+   "arvores": 14
+  }
+ ],
+ "atributos_sem_lugar": [
+  "tipo_envolvido",
+  "tipo_acidente_h",
+  "causa_acidente",
+  "tipo_veiculo",
+  "tipo_pista",
+  "uso_solo",
+  "fase_dia",
+  "sexo",
+  "condicao_metereologica",
+  "sentido_via",
+  "dia_semana",
+  "idade_n",
+  "idade_veiculo_n",
+  "hora",
+  "ano",
+  "tracado_Aclive",
+  "tracado_Curva",
+  "tracado_Declive",
+  "tracado_Desvio Temporário",
+  "tracado_Em Obras",
+  "tracado_Interseção de Vias",
+  "tracado_Ponte",
+  "tracado_Reta",
+  "tracado_Retorno Regulamentado",
+  "tracado_Rotatória",
+  "tracado_Túnel",
+  "tracado_Viaduto",
+  "marca"
+ ],
+ "lugar": [
+  "municipio",
+  "br",
+  "delegacia",
+  "km",
+  "latitude",
+  "longitude"
+ ],
+ "versoes": {
+  "python": "3.14.8",
+  "xgboost": "3.4.1",
+  "scikit-learn": "1.9.1",
+  "pandas": "3.0.6"
+ },
+ "funil": {
+  "base bruta": 2702004,
+  "causa_principal == Sim": 1574976,
+  "ordem_tipo_acidente == 1": 911408,
+  "com rótulo": 774920
+ },
+ "duracao_s": 486
+}

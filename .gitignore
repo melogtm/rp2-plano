@@ -30,3 +30,7 @@ overleaf/
 
 # Python
 __pycache__/
+
+# Dados: só os CSV comprimidos (.xz) vão para o git
+data/*.csv
+data/*.parquet
