@@ -42,14 +42,10 @@ relevantes para o óbito de envolvidos em acidentes nas rodovias federais
 e verificar se esses fatores e a capacidade de predição se mantêm entre
 as cinco macrorregiões do IBGE. A base reúne os microdados abertos da
 Polícia Rodoviária Federal de 2017 a 2025, com 1.415.582 envolvidos e
-50.822 óbitos. Este relatório apresenta a análise exploratória. A
-letalidade por envolvido varia de 2,70\% no Sul a 5,31\% no Nordeste, e
-no Norte subiu de 3,83\% em 2017 para 5,58\% em 2025. Motocicleta, pista
-simples e acidente em área rural são quase duas vezes mais letais no
-Norte e no Nordeste do que no Sul e no Sudeste, enquanto o atropelamento
-tem letalidade parecida em todas as regiões. O ordenamento dos atributos
-por associação com o óbito coincide nos três primeiros e diverge nos
-intermediários, o que antecipa a pergunta central do trabalho.
+50.822 óbitos. Quatro algoritmos de aprendizagem de máquina (kNN, MLP,
+XGBoost e SVM) serão treinados e analisados em cada região. A
+relevância dos fatores será medida por valores SHAP, o desempenho pelo
+F1 da classe óbito e a concordância entre regiões pelo tau de Kendall.
 \end{resumo}
 
 
@@ -59,52 +55,57 @@ Em 2024, as rodovias federais brasileiras registraram 6.160 mortes, o
 maior número em cinco anos \cite{prf2024}. Entre 2017 e 2025, os
 microdados abertos da Polícia Rodoviária Federal (PRF) somam 50.822
 óbitos de envolvidos em acidentes nessas rodovias \cite{prfdados}. O
-problema é global: a Organização Mundial da Saúde estima 1,19 milhão de
-mortes no trânsito em 2021, e o trânsito é a principal causa de morte
-entre pessoas de 5 a 29 anos \cite{oms2023}. O Brasil é signatário da
-Agenda 2030, cuja meta 3.6 prevê reduzir pela metade as mortes e lesões
-no trânsito \cite{onu2015}.
+problema é de ordem global: a Organização Mundial da Saúde estima 1,19
+milhão de mortes no trânsito em 2021, e o trânsito é a principal causa
+de morte entre pessoas de 5 a 29 anos \cite{oms2023}. Entretanto, esse
+risco não se distribui de forma homogênea pelo território. O número de
+vítimas das rodovias federais teve tendências diferentes entre
+macrorregiões antes e depois da Década de Ação pela Segurança no
+Trânsito \cite{andrade2019}. A mortalidade no trânsito caiu mais no Sul
+e no Sudeste entre 2000 e 2018, enquanto a de motociclistas cresceu,
+com aglomerados de alta mortalidade no Nordeste, no Norte e no
+Centro-Oeste \cite{malta2023}. Como frota, malha viária, clima e
+capacidade de fiscalização diferem entre as regiões, uma política
+nacional única pode investir onde o risco é menor e deixar de atuar onde
+ele é maior. Quando os fatores contribuintes variam entre contextos e o
+modelo não representa essa variação, as estimativas ficam enviesadas
+\cite{mannering2016}.
 
-O custo não se limita às mortes. \cite{carvalho2020} estima que os
-acidentes de trânsito custam à sociedade brasileira cerca de R\$ 50
-bilhões por ano, em sua maior parte por perda de produção das vítimas e
-por custos hospitalares. Os sobreviventes carregam lesões que podem gerar
-incapacidade permanente, e a meta-análise de \cite{craig2016} mostra que
-pessoas feridas em acidentes de veículos apresentam sofrimento
-psicológico maior que o de pessoas não feridas, e que esse sofrimento
-permanece elevado por pelo menos três anos após o acidente.
+Além das mortes, os acidentes de trânsito custam à sociedade brasileira
+cerca de R\$ 50 bilhões por ano, em sua maior parte por perda de
+produção das vítimas e por custos hospitalares \cite{carvalho2020}. Os
+sobreviventes, por sua vez, carregam lesões que podem gerar incapacidade permanente.
+Uma meta-análise mostra ainda que pessoas feridas em acidentes de
+veículos apresentam sofrimento psicológico maior que o de pessoas não
+feridas, e que esse sofrimento permanece elevado por pelo menos três
+anos após o acidente \cite{craig2016}.
 
-Esse risco não se distribui de forma homogênea pelo território.
-\cite{andrade2019} encontraram tendências diferentes no número de
-vítimas das rodovias federais entre macrorregiões, antes e depois da
-Década de Ação pela Segurança no Trânsito. \cite{malta2023} mostram que a
-mortalidade no trânsito caiu mais no Sul e no Sudeste entre 2000 e 2018,
-enquanto a de motociclistas cresceu, com aglomerados de alta mortalidade
-no Nordeste, no Norte e no Centro-Oeste. Frota, malha viária, clima e
-capacidade de fiscalização diferem entre as regiões. Uma política
-nacional única pode, assim, investir onde o risco é menor e deixar de
-atuar onde ele é maior. \cite{mannering2016} formalizam esse ponto:
-quando os fatores contribuintes variam entre contextos e o modelo não
-representa essa variação, as estimativas ficam viesadas.
+Nesse contexto, a formulação de políticas públicas para reduzir
+acidentes é uma prioridade central das autoridades, visto que o Brasil
+é signatário da Agenda 2030 da Organização das Nações Unidas (ONU),
+cuja meta 3.6 prevê reduzir pela metade as mortes e lesões no trânsito
+\cite{onu2015}. Para orientar essas políticas, é preciso conhecer os
+fatores associados à gravidade dos acidentes em cada macrorregião
+brasileira, para que a ação tomada seja mais precisa e eficaz.
 
-O aprendizado de máquina oferece meios para identificar esses fatores em
-bases de grande volume, com relações não lineares e interações entre
+Algoritmos preditivos de aprendizado de máquina conseguem identificar esses fatores
+em bases de grande volume, com relações não lineares e interações entre
 atributos \cite{ali2024}. Métodos de explicação como o SHAP
 \cite{lundberg2017} atribuem a cada atributo uma contribuição para cada
-predição e permitem ordenar os fatores por relevância, como fizeram
-\cite{parsa2020} na detecção de acidentes em vias expressas. Treinando um
-modelo por macrorregião e comparando os ordenamentos obtidos, é possível
-dizer quais fatores são comuns ao país e quais são específicos de uma
-região. A mesma estrutura permite medir quanto um modelo treinado em uma
-região perde ao ser aplicado em outra.
+predição e permitem ordenar os fatores por relevância, como já foi feito
+na detecção de acidentes em vias expressas \cite{parsa2020}. Ao treinar
+um modelo por macrorregião e comparar os ordenamentos obtidos, é
+possível dizer quais fatores são comuns ao país e quais são específicos
+de uma região. Além disso, a mesma estrutura permite medir quanto um
+modelo treinado em uma região perde ao ser aplicado em outra.
 
-Para a região Sul, \cite{gabardo2025} treinaram k-vizinhos mais
-próximos, perceptron multicamadas e florestas aleatórias sobre dados da
-PRF de 2021 a 2024, usaram SHAP para ordenar os fatores de risco e
-derivaram recomendações de segurança viária. Os autores publicaram o
-código \cite{gabardo2025codigo}, o que torna o estudo reprodutível, e
-apontam a extensão a outras regiões como trabalho futuro. Este trabalho
-segue essa direção.
+Na região Sul, por exemplo, um estudo treinou k-vizinhos mais próximos,
+perceptron multicamadas e florestas aleatórias sobre dados da PRF de
+2021 a 2024, usou SHAP para ordenar os fatores de risco e derivou
+recomendações de segurança viária \cite{gabardo2025}. Os autores
+publicaram o código \cite{gabardo2025codigo}, o que torna o estudo
+reprodutível, e apontam a extensão a outras regiões como trabalho
+futuro, direção que este trabalho segue.
 
 \textbf{Objetivo.} Identificar, por meio de algoritmos de aprendizado de
 máquina, os principais fatores associados à gravidade de acidentes em
@@ -169,13 +170,11 @@ modo que usá-la equivaleria a informar o desfecho ao modelo.
 
 \subsection{Modelos de aprendizagem}
 
-São usados cinco classificadores. Os três empregados por
-\cite{gabardo2025} permitem comparar os resultados com os do Sul:
+São usados quatro classificadores. Dois deles foram empregados no estudo
+da região Sul \cite{gabardo2025} e permitem comparar os resultados:
 k-vizinhos mais próximos (kNN), que classifica pela classe dos vizinhos
-no espaço de atributos \cite{cover1967}; perceptron multicamadas (MLP),
-rede neural ajustada por retropropagação \cite{rumelhart1986}; e
-florestas aleatórias, conjunto de árvores de decisão treinadas em
-amostras e subconjuntos de atributos distintos \cite{breiman2001}.
+no espaço de atributos \cite{cover1967}, e perceptron multicamadas (MLP),
+rede neural ajustada por retropropagação \cite{rumelhart1986}.
 Acrescentam-se o XGBoost, que constrói árvores rasas em sequência, cada
 uma corrigindo o erro das anteriores \cite{chen2016}, e uma máquina de
 vetores de suporte com kernel linear \cite{cortes1995}, referência de
@@ -239,83 +238,85 @@ principais.
 
 \subsection{Predição de gravidade com dados da PRF}
 
-\cite{gabardo2025} é o estudo mais próximo deste. Os autores usaram os
-registros da região Sul de 2021 a 2024 para prever se um acidente teve
-vítima fatal, com kNN, MLP e florestas aleatórias, balanceamento por
-SMOTE \cite{chawla2002} e codificação por alvo do par rodovia e
-quilômetro. O objetivo foi identificar, com SHAP, os fatores de risco e
-traduzi-los em recomendações. Localização na rodovia, tipo de acidente
-e tipo de pista lideraram o ordenamento. Este trabalho usa os mesmos
-três algoritmos, mas estende a análise às cinco macrorregiões e ao
-período de 2017 a 2025, prevê o óbito de cada envolvido em vez da
-classificação do acidente e compara os ordenamentos entre regiões.
-
-\cite{mafort2025} compararam sete classificadores para prever a
-gravidade de acidentes nas rodovias federais do Rio de Janeiro entre
-2020 e 2023. A regressão logística obteve a maior acurácia (73,85\%), e
-os fatores foram interpretados com LIME. O recorte é um único estado, e
-o objetivo foi selecionar o melhor classificador. Aqui a comparação
-central é entre regiões, e não entre algoritmos.
-
-\cite{franceschi2022} ajustaram uma regressão logística multinomial aos
-acidentes das rodovias federais de todo o país entre 2017 e 2019, com a
-gravidade em três níveis (sem vítimas, com feridos e com mortos). O
-objetivo foi estimar os fatores associados à gravidade para orientar
-políticas de segurança. O envolvimento de pedestres foi o fator de maior
-efeito, e condições que favorecem velocidades altas, como tempo bom e
-horários de pouco tráfego, também aumentaram a gravidade. O modelo
-estima um efeito para o país inteiro. Este trabalho estima os fatores
-separadamente por região, com modelos capazes de representar
-interações, e testa se o efeito observado em uma região se repete nas
-outras.
-
-\cite{soliani2024} estudaram uma década de acidentes com caminhões nas
-rodovias federais, combinando análise descritiva das causas com
-classificadores como XGBoost e LightGBM, que atingiram 73\% de acurácia.
-O objetivo foi apontar as causas dos acidentes graves com caminhoneiros.
-Identificaram pistas simples como mais propensas a acidentes e um
-aumento das mortes a partir de 2017. O escopo é restrito a um tipo de
-veículo, enquanto este trabalho inclui todos os envolvidos e trata o
-tipo de veículo como um dos fatores cuja relevância pode variar entre
+O estudo mais próximo deste usou os registros da região Sul de 2021 a
+2024 para prever se um acidente teve vítima fatal, com kNN, MLP e
+florestas aleatórias, balanceamento por SMOTE \cite{chawla2002} e
+codificação por alvo do par rodovia e quilômetro \cite{gabardo2025}. O
+objetivo foi identificar, com SHAP, os fatores de risco e traduzi-los em
+recomendações. Localização na rodovia, tipo de acidente e tipo de pista
+lideraram o ordenamento. Dois desses algoritmos, kNN e MLP, são usados aqui, mas
+a análise se estende às cinco macrorregiões e ao período de 2017 a
+2025, o alvo passa a ser o óbito de cada envolvido em vez da
+classificação do acidente, e os ordenamentos são comparados entre
 regiões.
+
+Na previsão da gravidade de acidentes nas rodovias federais do Rio de
+Janeiro entre 2020 e 2023, sete classificadores foram comparados, e a
+regressão logística obteve a maior acurácia (73,85\%), com os fatores
+interpretados por LIME \cite{mafort2025}. O objetivo foi selecionar o
+melhor classificador em um único estado, enquanto a comparação central
+deste trabalho é entre regiões.
+
+Uma regressão logística multinomial foi ajustada aos acidentes das
+rodovias federais de todo o país entre 2017 e 2019, com a gravidade em
+três níveis: sem vítimas, com feridos e com mortos
+\cite{franceschi2022}. O objetivo foi estimar os fatores associados à
+gravidade para orientar políticas de segurança. O envolvimento de
+pedestres foi o fator de maior efeito, e condições que favorecem
+velocidades altas, como tempo bom e horários de pouco tráfego, também
+aumentaram a gravidade. O modelo estima um efeito para o país inteiro.
+Aqui os fatores são estimados separadamente por região, com modelos
+capazes de representar interações, para testar se o efeito observado em
+uma região se repete nas outras.
+
+Uma década de acidentes com caminhões nas rodovias federais foi
+estudada combinando análise descritiva das causas com classificadores
+como XGBoost e LightGBM, que atingiram 73\% de acurácia
+\cite{soliani2024}. O objetivo foi apontar as causas dos acidentes
+graves com caminhoneiros. Pistas simples se mostraram mais propensas a
+acidentes, e as mortes aumentaram a partir de 2017. O escopo se
+restringe a um tipo de veículo. Neste trabalho entram todos os
+envolvidos, e o tipo de veículo é um dos fatores cuja relevância pode
+variar entre regiões.
 
 \subsection{Diferenças regionais na mortalidade no trânsito}
 
-\cite{andrade2019} analisaram séries do número de vítimas nas rodovias
-federais por macrorregião antes e depois da Década de Ação pela
-Segurança no Trânsito, com o objetivo de avaliar o efeito dessa política.
-As tendências diferiram entre regiões ao longo do período.
-\cite{malta2023} estudaram a mortalidade no trânsito nos municípios
-brasileiros de 2000 a 2018, para relacionar os padrões com porte e renda dos municípios.
-Encontraram queda maior no Sul e no Sudeste, aumento das mortes de
-motociclistas e aglomerados de alta mortalidade no Nordeste, no Norte e
-no Centro-Oeste. Os dois estudos descrevem taxas agregadas e não
-modelam os fatores de cada acidente. Este trabalho parte da mesma
-constatação de heterogeneidade e pergunta se ela aparece também nos
-fatores que um modelo preditivo considera relevantes.
+Séries do número de vítimas nas rodovias federais por macrorregião
+foram analisadas antes e depois da Década de Ação pela Segurança no
+Trânsito, com o objetivo de avaliar o efeito dessa política, e as
+tendências diferiram entre regiões ao longo do período
+\cite{andrade2019}. Nos municípios brasileiros, entre 2000 e 2018, a
+mortalidade no trânsito caiu mais no Sul e no Sudeste, as mortes de
+motociclistas aumentaram e surgiram aglomerados de alta mortalidade no
+Nordeste, no Norte e no Centro-Oeste \cite{malta2023}. Nesse estudo, o
+objetivo foi relacionar os padrões ao porte e à renda dos municípios.
+Os dois estudos descrevem taxas agregadas, sem modelar os fatores de
+cada acidente. A heterogeneidade que eles constatam é o ponto de partida
+deste trabalho, que pergunta se ela aparece também nos fatores que um
+modelo preditivo considera relevantes.
 
 \subsection{Interpretação e transferência de modelos}
 
-\cite{parsa2020} usaram XGBoost e SHAP para detectar acidentes em vias
-expressas de Chicago a partir de dados de tráfego em tempo real, com o
-objetivo de identificar quais variáveis mais contribuem para a detecção.
-O trabalho mostra como o SHAP transforma um modelo de alta capacidade em
-um ordenamento de fatores, que é o uso adotado aqui. A revisão
-sistemática de \cite{ali2024} sobre predição de acidentes com
-aprendizado de máquina aponta, entre as lacunas da área, a falta de
-padronização das classes de gravidade entre estudos. Por isso este
-trabalho define o alvo de forma explícita, no nível do envolvido.
+Na detecção de acidentes em vias expressas de Chicago a partir de dados
+de tráfego em tempo real, XGBoost e SHAP foram usados com o objetivo de
+identificar quais variáveis mais contribuem para a detecção
+\cite{parsa2020}. O trabalho mostra como o SHAP transforma um modelo de
+alta capacidade em um ordenamento de fatores, uso adotado também aqui.
+Uma revisão sistemática sobre predição de acidentes com aprendizado de
+máquina aponta, entre as lacunas da área, a falta de padronização das
+classes de gravidade entre estudos \cite{ali2024}. Por isso o alvo deste
+trabalho é definido de forma explícita, no nível do envolvido.
 
-\cite{xu2014} avaliaram a transferibilidade espacial e temporal de
-modelos de risco de acidente em tempo real e propuseram atualização
-bayesiana para melhorar o desempenho no local de destino.
-\cite{man2022} treinaram uma rede neural com dados da rodovia M1, no
-Reino Unido, e a aplicaram a outras rodovias e anos. A aplicação direta
-não funcionou, e o desempenho só foi recuperado com aprendizado por
-transferência. Nesses estudos o
-objetivo é reduzir a perda de desempenho. Neste trabalho a perda é o
-objeto de medida: sua magnitude entre macrorregiões indica se fatores e
-recomendações obtidos em uma região valem para as demais.
+A transferibilidade espacial e temporal de modelos de risco de acidente
+em tempo real já foi avaliada, com a proposta de uma atualização
+bayesiana para melhorar o desempenho no local de destino \cite{xu2014}.
+Em outro estudo, uma rede neural treinada com dados da rodovia M1, no
+Reino Unido, foi aplicada a outras rodovias e anos \cite{man2022}. A
+aplicação direta não funcionou, e o desempenho só foi recuperado com
+aprendizado por transferência. Nesses estudos o objetivo é reduzir a
+perda de desempenho. Aqui a perda é o que se mede, e sua magnitude entre
+macrorregiões indica se fatores e recomendações obtidos em uma região
+valem para as demais.
 
 \begin{table}[H]
 \centering
@@ -333,7 +334,7 @@ Trabalho & Recorte & Método & Fatores & Compara regiões? \\
 \cite{soliani2024} & PRF, caminhões, uma década & XGBoost, LightGBM & Descritiva & Não \\
 \cite{malta2023} & Óbitos, municípios, 2000 a 2018 & Análise espacial & Descritiva & Sim \\
 \cite{man2022} & Rodovias do Reino Unido, 2017 e 2018 & Rede neural, transferência & Não se aplica & Sim \\
-Este trabalho & PRF, Brasil, 2017 a 2025 & 5 classificadores & SHAP & Sim, $5\times5$ \\
+Este trabalho & PRF, Brasil, 2017 a 2025 & 4 classificadores & SHAP & Sim, $5\times5$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -341,10 +342,10 @@ Este trabalho & PRF, Brasil, 2017 a 2025 & 5 classificadores & SHAP & Sim, $5\ti
 
 \section{Resultados Preliminares}
 
-Esta seção apresenta a análise exploratória da base analítica, feita
-antes do treino de qualquer modelo. Os números e figuras foram gerados
-em Python com pandas e matplotlib \cite{hunter2007}, e o código está no
-repositório do trabalho.
+A análise exploratória da base analítica foi feita antes do treino de
+qualquer modelo. Os números e figuras foram gerados em Python com pandas
+e matplotlib \cite{hunter2007}, e o código está no repositório do
+trabalho.
 
 \subsection{Composição regional}
 
@@ -397,18 +398,17 @@ macrorregião. A linha tracejada é a média nacional.}
 \subsection{Letalidade por fator e região}
 
 A Figura~\ref{fig:categorias} mostra a letalidade de categorias
-selecionadas em cada região. Há dois comportamentos. Pedestres e
-atropelamentos têm letalidade alta e parecida em todo o país, entre
-24,7\% e 29,3\% para o pedestre envolvido. Já motocicleta, colisão
-frontal, pista simples, área rural e acidentes à noite são muito mais
-letais no Norte e no Nordeste. Um motociclista envolvido em acidente
-morre em 8,2\% a 8,4\% dos casos nessas regiões, contra 3,1\% a 3,3\% no
-Sul e no Sudeste. A colisão frontal mata 14,2\% a 14,8\% dos envolvidos
-no Norte, no Nordeste e no Centro-Oeste e 9,5\% no Sul e no Sudeste. A
-pista dupla, ao contrário, tem letalidade próxima em todas as regiões
-(2,0\% a 2,7\%). Um mesmo fator, portanto, pode ter peso muito diferente
-conforme a região, e esse é o padrão que os valores SHAP devem
-confirmar ou refutar.
+selecionadas em cada região. Pedestres e atropelamentos têm letalidade
+alta e parecida em todo o país, entre 24,7\% e 29,3\% para o pedestre
+envolvido. Já motocicleta, colisão frontal, pista simples, área rural e
+acidentes à noite são muito mais letais no Norte e no Nordeste. Um
+motociclista envolvido em acidente morre em 8,2\% a 8,4\% dos casos
+nessas regiões, contra 3,1\% a 3,3\% no Sul e no Sudeste. A colisão
+frontal mata 14,2\% a 14,8\% dos envolvidos no Norte, no Nordeste e no
+Centro-Oeste e 9,5\% no Sul e no Sudeste. A pista dupla, ao contrário,
+tem letalidade próxima em todas as regiões (2,0\% a 2,7\%). Os valores
+SHAP devem confirmar ou refutar essa separação entre fatores de peso
+uniforme e fatores de peso regional.
 
 \begin{figure}[H]
 \centering
@@ -438,9 +438,8 @@ solo, 0,11 no Norte e 0,05 no Sudeste; a condição meteorológica, 0,06 no
 Norte e 0,01 no Sul. O tau de Kendall entre os ordenamentos das regiões
 varia de 0,70 (Nordeste e Sul; Centro-Oeste e Sul) a 0,85 (Nordeste e
 Sudeste). Entre os cinco atributos mais associados, pares de regiões
-compartilham de três a cinco. O Sul é a região cujo ordenamento mais
-difere dos demais, o que é relevante porque é a região estudada por
-\cite{gabardo2025}.
+compartilham de três a cinco. O ordenamento que mais difere dos demais
+é o do Sul, região do estudo de referência \cite{gabardo2025}.
 
 \begin{figure}[H]
 \centering
@@ -467,44 +466,44 @@ causas em categorias mais amplas.
 
 O segundo são mudanças pontuais no tipo de acidente na transição de
 2020 para 2021. A ``colisão lateral'' foi dividida por sentido, e a
-``colisão com objeto estático'' e a ``em movimento'' foram unidas. Essas mudanças têm
-correspondência direta, e a harmonização reduz os tipos de 21 para 17.
-Sem ela, o mesmo fator apareceria dividido em dois no ordenamento SHAP.
+``colisão com objeto estático'' e a ``em movimento'' foram unidas. Essas
+mudanças têm correspondência direta, e a harmonização reduz os tipos de
+21 para 17. Sem ela, o mesmo fator apareceria dividido em dois no
+ordenamento SHAP.
 
 O terceiro é o traçado da via, com 1.310 valores distintos. O campo
 concatena vários descritores (reta, curva, aclive, declive, ponte etc.)
 em ordem arbitrária. Ordenar os descritores reduz o campo a 379
 combinações, e 85\% dos registros têm um único descritor. Para os
-modelos, o campo será convertido em um indicador por descritor. Os
-valores ausentes são poucos: idade (3,6\%), ano de fabricação e tipo do
-veículo (2,2\%), rodovia e quilômetro (0,2\%). Há ainda 2.092 registros
-com idade acima de 120 anos, tratados como ausentes.
+modelos, o campo será convertido em um indicador por descritor.
+
+Os valores ausentes são poucos: idade (3,6\%), ano de fabricação e tipo
+do veículo (2,2\%), rodovia e quilômetro (0,2\%). Há ainda 2.092
+registros com idade acima de 120 anos, tratados como ausentes.
 
 
 \section{Discussão e Conclusão}
 
 A análise exploratória mostra que a letalidade nas rodovias federais é
-desigual entre as macrorregiões e que a desigualdade é estável ao longo
-de nove anos. Norte e Nordeste têm cerca do dobro da letalidade do Sul,
-e o Norte é a única região com aumento contínuo desde 2021. Os fatores
-se dividem em dois grupos. Pedestres e atropelamentos são letais em
-qualquer região e apontam para medidas de alcance nacional. Motocicleta,
-colisão frontal, pista simples e área rural têm letalidade muito maior
-no Norte e no Nordeste, o que sugere que duplicação de pistas e
-fiscalização de motociclistas teriam retorno maior nessas regiões. Esses
-resultados são descritivos: comparam taxas, sem controlar os demais
-atributos, e não permitem atribuir causa.
+desigual entre as macrorregiões, que a desigualdade é estável ao longo
+de nove anos e que o Norte é a única região com aumento contínuo desde
+2021. Pedestres e atropelamentos são letais em qualquer região e apontam
+para medidas de alcance nacional. Já motocicleta, colisão frontal, pista
+simples e área rural têm letalidade muito maior no Norte e no Nordeste,
+o que sugere que duplicação de pistas e fiscalização de motociclistas
+teriam retorno maior nessas regiões. Esses resultados são descritivos:
+comparam taxas, sem controlar os demais atributos, e não permitem
+atribuir causa.
 
 A associação marginal indica que os três fatores principais coincidem
 entre regiões e que a divergência está nos intermediários. Se esse
-padrão se mantiver nos valores SHAP, a conclusão será que um núcleo de
-fatores vale para o país e que a política deve ser diferenciada a partir
-dele. Esse resultado também é informativo, pois indica que parte das
-recomendações do estudo do Sul \cite{gabardo2025} pode ser estendida às
-demais regiões e parte não.
+padrão se mantiver nos valores SHAP, um núcleo de fatores valerá para o
+país, e a política deverá ser diferenciada a partir dele. Nesse caso,
+parte das recomendações do estudo do Sul \cite{gabardo2025} poderá ser
+estendida às demais regiões, e parte não.
 
 As próximas etapas são harmonizar as causas para a série completa,
-treinar os cinco modelos por região sob o protocolo descrito, calcular
+treinar os quatro modelos por região sob o protocolo descrito, calcular
 os ordenamentos SHAP e comparar esses ordenamentos entre regiões, e
 construir a matriz de transferência $5\times5$ com subamostragem para o
 tamanho do Norte.
