@@ -1,56 +1,61 @@
 {
  "semente": 42,
  "dobras": 5,
- "n_subamostra_treino": 35432,
- "corte_interno": "GroupShuffleSplit 80/20 por id (parada antecipada e limiar)",
+ "n_subamostra_treino": 32693,
+ "corte_interno": "GroupShuffleSplit por id: 80% ajuste, 20% limiar",
+ "busca_registros_reservados": 60000,
  "codificacao_marca": "GroupTargetEncoder m=10, 5 dobras por id",
  "hiperparametros": {
-  "n_estimators": 500,
   "learning_rate": 0.1,
   "tree_method": "hist",
   "enable_categorical": true,
-  "early_stopping_rounds": 30,
-  "eval_metric": "aucpr",
   "n_jobs": -1,
   "max_depth": 4,
-  "min_child_weight": 1
+  "min_child_weight": 5,
+  "n_estimators": 74
  },
  "busca": [
   {
    "max_depth": 4,
    "min_child_weight": 1,
-   "auc_pr": 0.24654720444855519,
-   "dp": 0.009132349083827955
+   "auc_pr": 0.231631000351881,
+   "dp": 0.011567110182635907,
+   "arvores": 50
   },
   {
    "max_depth": 4,
    "min_child_weight": 5,
-   "auc_pr": 0.2451462488123294,
-   "dp": 0.010868880302773097
+   "auc_pr": 0.2331912762812179,
+   "dp": 0.01350026518534842,
+   "arvores": 74
   },
   {
    "max_depth": 6,
    "min_child_weight": 1,
-   "auc_pr": 0.24349874647840072,
-   "dp": 0.009139390488167455
+   "auc_pr": 0.22645718242557103,
+   "dp": 0.014794665639415934,
+   "arvores": 41
   },
   {
    "max_depth": 6,
    "min_child_weight": 5,
-   "auc_pr": 0.24328148860511323,
-   "dp": 0.009389744523573903
+   "auc_pr": 0.22933451611879155,
+   "dp": 0.010655173361929464,
+   "arvores": 31
   },
   {
    "max_depth": 8,
    "min_child_weight": 1,
-   "auc_pr": 0.23159434561780493,
-   "dp": 0.007631599809850929
+   "auc_pr": 0.20941881499106088,
+   "dp": 0.01227601511983139,
+   "arvores": 17
   },
   {
    "max_depth": 8,
    "min_child_weight": 5,
-   "auc_pr": 0.23444514729619803,
-   "dp": 0.00914013545527448
+   "auc_pr": 0.22449254494430337,
+   "dp": 0.011099481843321811,
+   "arvores": 14
   }
  ],
  "atributos_sem_lugar": [
@@ -103,5 +108,5 @@
   "ordem_tipo_acidente == 1": 911408,
   "com rótulo": 774920
  },
- "duracao_s": 352
+ "duracao_s": 486
 }

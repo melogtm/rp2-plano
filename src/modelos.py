@@ -39,6 +39,7 @@ RAIZ = Path(__file__).resolve().parent.parent
 RES = RAIZ / "results"
 SEED = 42
 K = 5
+N_BUSCA = 60_000  # registros (acidentes inteiros) reservados à busca de hiperparâmetros
 
 CATEG = ["tipo_envolvido", "tipo_acidente_h", "causa_acidente", "tipo_veiculo",
          "tipo_pista", "uso_solo", "fase_dia", "sexo", "condicao_metereologica",
@@ -52,11 +53,10 @@ ROTULO = {**{c: ATRIBUTOS[c] for c in CATEG}, "idade_n": "Idade",
 # Rótulo do modelo -> rótulo equivalente no V de Cramér da exploratória.
 EQUIV_CRAMER = {"Idade": "Faixa etária", "Hora": "Faixa horária"}
 
-# Busca única, numa amostra nacional; o escolhido vale para todas as regiões.
+# Busca única, em acidentes separados do experimento; o escolhido (inclusive o
+# número de árvores, pela parada antecipada da busca) vale para todas as regiões.
 GRADE = [dict(max_depth=d, min_child_weight=w) for d in (4, 6, 8) for w in (1, 5)]
-XGB_FIXO = dict(n_estimators=500, learning_rate=0.1, tree_method="hist",
-                enable_categorical=True, early_stopping_rounds=30,
-                eval_metric="aucpr", n_jobs=-1)
+XGB_FIXO = dict(learning_rate=0.1, tree_method="hist", enable_categorical=True, n_jobs=-1)
 
 
 # ------------------------------------------------------------------ atributos
@@ -139,15 +139,15 @@ def melhor_limiar(y, p):
 
 
 def ajustar(nome, X, y, cols, hp, seed):
-    """Codificação de `marca` e ajuste num corte interno (80/20 por acidente);
-    os 20% servem à parada antecipada e à escolha do limiar."""
+    """Codificação de `marca` e ajuste num corte interno por acidente: 80% para
+    o ajuste e 20% só para escolher o limiar (o número de árvores vem da busca)."""
     fit, val = next(GroupShuffleSplit(1, test_size=0.2, random_state=seed)
                     .split(X, y, X["id"]))
     enc = GroupTargetEncoder(["marca"])
     A_fit = enc.fit_transform(X.iloc[fit][cols + ["id"]], y.iloc[fit])
     A_val = enc.transform(X.iloc[val][cols + ["id"]])
     clf = MODELOS[nome](hp, seed)
-    clf.fit(A_fit, y.iloc[fit], eval_set=[(A_val, y.iloc[val])], verbose=False)
+    clf.fit(A_fit, y.iloc[fit], verbose=False)
     limiar = melhor_limiar(y.iloc[val], clf.predict_proba(A_val)[:, 1])
     return clf, enc, limiar
 
@@ -168,9 +168,13 @@ def shap_medio(clf, enc, X, cols):
     """|SHAP| médio por atributo (TreeSHAP exato do próprio xgboost).
     Os indicadores de traçado são somados por linha num único atributo."""
     A = enc.transform(X[cols + ["id"]])
+    # Sem parada antecipada no ajuste, o booster inteiro é o modelo avaliado;
+    # o assert garante que o SHAP soma à mesma margem que predict_proba usa.
     contrib = clf.get_booster().predict(xgb.DMatrix(A, enable_categorical=True),
-                                        pred_contribs=True)[:, :-1]
-    C = pd.DataFrame(contrib, columns=A.columns)
+                                        pred_contribs=True)
+    margem = clf.predict(A, output_margin=True)
+    assert np.allclose(contrib.sum(axis=1), margem, atol=1e-3), "SHAP fora do modelo avaliado"
+    C = pd.DataFrame(contrib[:, :-1], columns=A.columns)
     trac = [c for c in C if c.startswith("tracado_")]
     C["tracado"] = C[trac].sum(axis=1)
     C = C.drop(columns=trac)
@@ -188,21 +192,37 @@ def subamostrar(y, n, seed):
 
 
 # ------------------------------------------------------------------ execução
+def separar_busca(X, y, n):
+    """Acidentes sorteados para a busca de hiperparâmetros (~n registros),
+    retirados do experimento para que a escolha não veja nenhum teste."""
+    ids = X["id"].drop_duplicates().sample(frac=1, random_state=SEED)
+    tam = X.groupby("id").size().loc[ids].cumsum()
+    busca = X["id"].isin(tam.index[tam <= n]).to_numpy()
+    return np.flatnonzero(busca), np.flatnonzero(~busca)
+
+
 def buscar_hp(nome, X, y, cols, rapido):
-    """Busca única em amostra nacional, CV agrupada de 3 dobras, AUC-PR."""
-    idx = subamostrar(y, 20_000 if rapido else 150_000, SEED)
-    Xs, ys = X.iloc[idx].reset_index(drop=True), y.iloc[idx].reset_index(drop=True)
+    """Busca única em amostra nacional separada, CV agrupada de 3 dobras, AUC-PR.
+    A parada antecipada na dobra de validação da busca fixa o número de árvores."""
+    Xs, ys = X.reset_index(drop=True), y.reset_index(drop=True)
     notas = []
     for hp in (GRADE[:1] if rapido else GRADE):
-        s = []
+        s, arv = [], []
         for tr, te in GroupKFold(3).split(Xs, ys, Xs["id"]):
-            clf, enc, _ = ajustar(nome, Xs.iloc[tr], ys.iloc[tr], cols, hp, SEED)
-            p = clf.predict_proba(enc.transform(Xs.iloc[te][cols + ["id"]]))[:, 1]
-            s.append(average_precision_score(ys.iloc[te], p))
-        notas.append({**hp, "auc_pr": float(np.mean(s)), "dp": float(np.std(s))})
+            enc = GroupTargetEncoder(["marca"])
+            A_tr = enc.fit_transform(Xs.iloc[tr][cols + ["id"]], ys.iloc[tr])
+            A_te = enc.transform(Xs.iloc[te][cols + ["id"]])
+            clf = xgb.XGBClassifier(**XGB_FIXO, **hp, n_estimators=500,
+                                    early_stopping_rounds=30, eval_metric="aucpr",
+                                    random_state=SEED)
+            clf.fit(A_tr, ys.iloc[tr], eval_set=[(A_te, ys.iloc[te])], verbose=False)
+            s.append(average_precision_score(ys.iloc[te], clf.predict_proba(A_te)[:, 1]))
+            arv.append(clf.best_iteration + 1)
+        notas.append({**hp, "auc_pr": float(np.mean(s)), "dp": float(np.std(s)),
+                      "arvores": int(round(np.mean(arv)))})
         print("  busca", notas[-1], flush=True)
     melhor = max(notas, key=lambda d: d["auc_pr"])
-    return {k: melhor[k] for k in GRADE[0]}, notas
+    return {**{k: melhor[k] for k in GRADE[0]}, "n_estimators": melhor["arvores"]}, notas
 
 
 def rodar(rapido=False, nome="XGBoost"):
@@ -213,8 +233,11 @@ def rodar(rapido=False, nome="XGBoost"):
     lugar_fora = [c for c in X if c not in LUGAR + ["id"]]
     cols = {"sem_lugar": lugar_fora, "com_lugar": lugar_fora + LUGAR}
 
-    hp, notas = buscar_hp(nome, X, y, cols["sem_lugar"], rapido)
+    i_busca, i_exp = separar_busca(X, y, 10_000 if rapido else N_BUSCA)
+    hp, notas = buscar_hp(nome, X.iloc[i_busca], y.iloc[i_busca], cols["sem_lugar"], rapido)
     print("hiperparâmetros:", hp, flush=True)
+    X, y, reg = (X.iloc[i_exp].reset_index(drop=True), y.iloc[i_exp].reset_index(drop=True),
+                 reg.iloc[i_exp].reset_index(drop=True))
 
     por = {r: np.flatnonzero(reg.to_numpy() == r) for r in REGIOES}
     dobras = {r: list(StratifiedGroupKFold(K, shuffle=True, random_state=SEED)
@@ -226,6 +249,8 @@ def rodar(rapido=False, nome="XGBoost"):
     linhas, shap = [], []
     for k in range(1 if rapido else K):
         teste = {r: por[r][dobras[r][k][1]] for r in REGIOES}
+        Xte = {r: X.iloc[teste[r]] for r in REGIOES}
+        yte = {r: y.iloc[teste[r]] for r in REGIOES}
         for i in REGIOES:
             tr = por[i][dobras[i][k][0]]
             assert not set(X["id"].iloc[tr]) & set(X["id"].iloc[teste[i]]), "id em treino e teste"
@@ -235,12 +260,12 @@ def rodar(rapido=False, nome="XGBoost"):
                 clf, enc, lim = ajustar(nome, Xi, yi, c, hp, SEED + k)
                 destinos = REGIOES if var == "sem_lugar" else [i]
                 for j in destinos:
-                    m = avaliar(clf, enc, lim, X.iloc[teste[j]], y.iloc[teste[j]], c)
+                    m = avaliar(clf, enc, lim, Xte[j], yte[j], c)
                     linhas.append({"modelo": nome, "variante": var, "origem": i,
                                    "destino": j, "dobra": k, "limiar": lim,
-                                   "arvores": clf.best_iteration + 1, **m})
+                                   **m})
                 if var == "sem_lugar":
-                    s = shap_medio(clf, enc, X.iloc[teste[i]], c)
+                    s = shap_medio(clf, enc, Xte[i], c)
                     shap += [{"modelo": nome, "regiao": i, "dobra": k, "atributo": a,
                               "shap_abs_medio": v} for a, v in s.items()]
             d = next(l for l in reversed(linhas)
@@ -252,9 +277,10 @@ def rodar(rapido=False, nome="XGBoost"):
     met.to_csv(RES / f"metricas{sufixo}.csv", index=False)
     pd.DataFrame(shap).to_csv(RES / f"shap{sufixo}.csv", index=False)
     cfg = {"semente": SEED, "dobras": K, "n_subamostra_treino": int(n_sub),
-           "corte_interno": "GroupShuffleSplit 80/20 por id (parada antecipada e limiar)",
+           "corte_interno": "GroupShuffleSplit por id: 80% ajuste, 20% limiar",
+           "busca_registros_reservados": int(len(i_busca)),
            "codificacao_marca": "GroupTargetEncoder m=10, 5 dobras por id",
-           "hiperparametros": {**{k: v for k, v in XGB_FIXO.items()}, **hp},
+           "hiperparametros": {**XGB_FIXO, **hp},
            "busca": notas, "atributos_sem_lugar": cols["sem_lugar"], "lugar": LUGAR,
            "versoes": {"python": platform.python_version(), "xgboost": xgb.__version__,
                        "scikit-learn": sklearn.__version__, "pandas": pd.__version__},
@@ -305,16 +331,18 @@ def resumir(sufixo=""):
             taus.append(kendalltau(va, vb)[0])
             t10.append(len(set(va.nlargest(10).index) & set(vb.nlargest(10).index)))
             t5.append(len(set(va.nlargest(5).index) & set(vb.nlargest(5).index)))
-        pares[f"{a} x {b}"] = {"tau": [round(np.mean(taus), 3), round(np.std(taus, ddof=1) if len(taus) > 1 else 0, 3)],
-                               "top10": float(np.mean(t10)), "top5": float(np.mean(t5))}
+        pares[f"{a} x {b}"] = {n: [round(np.mean(v), 3), round(np.std(v, ddof=1), 3)]
+                               for n, v in [("tau", taus), ("top10", t10), ("top5", t5)]}
     out["shap_pares"] = pares
 
     # SHAP (condicional) vs. V de Cramér (marginal), nos atributos comuns.
     V = pd.DataFrame(json.loads((RES / "exploratoria.json").read_text())["cramer_v"]).T
     m = media.rename(index=EQUIV_CRAMER)
     comum = [a for a in m.index if a in V.index]
-    out["shap_vs_cramer"] = {r: {"tau": round(kendalltau(m.loc[comum, r], V.loc[comum, r])[0], 3),
-                                 "n_atributos": len(comum)} for r in REGIOES}
+    porc = {r: [kendalltau(tab.loc[(r, k)].rename(EQUIV_CRAMER)[comum], V.loc[comum, r])[0]
+                for k in tab.index.get_level_values("dobra").unique()] for r in REGIOES}
+    out["shap_vs_cramer"] = {r: {"tau": [round(np.mean(v), 3), round(np.std(v, ddof=1), 3)],
+                                 "n_atributos": len(comum)} for r, v in porc.items()}
     (RES / f"modelos_resumo{sufixo}.json").write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps({k: out[k] for k in ["matriz_f1", "shap_pares", "shap_vs_cramer"]},
                      ensure_ascii=False, indent=1))

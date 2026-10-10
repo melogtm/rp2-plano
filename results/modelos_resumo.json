@@ -2,336 +2,336 @@
  "matriz_f1": {
   "Norte": {
    "Norte": [
-    0.358,
-    0.026
-   ],
-   "Nordeste": [
-    0.342,
+    0.345,
     0.011
    ],
+   "Nordeste": [
+    0.341,
+    0.004
+   ],
    "Centro-Oeste": [
-    0.273,
-    0.012
+    0.262,
+    0.017
    ],
    "Sudeste": [
-    0.242,
-    0.006
+    0.231,
+    0.015
    ],
    "Sul": [
-    0.248,
-    0.007
+    0.243,
+    0.013
    ]
   },
   "Nordeste": {
    "Norte": [
-    0.346,
-    0.029
+    0.332,
+    0.028
    ],
    "Nordeste": [
-    0.357,
-    0.007
+    0.351,
+    0.011
    ],
    "Centro-Oeste": [
+    0.265,
+    0.022
+   ],
+   "Sudeste": [
     0.257,
     0.007
    ],
-   "Sudeste": [
-    0.259,
-    0.011
-   ],
    "Sul": [
-    0.251,
-    0.017
+    0.243,
+    0.019
    ]
   },
   "Centro-Oeste": {
    "Norte": [
-    0.316,
-    0.013
+    0.313,
+    0.016
    ],
    "Nordeste": [
-    0.322,
-    0.008
+    0.317,
+    0.01
    ],
    "Centro-Oeste": [
-    0.299,
-    0.011
+    0.302,
+    0.015
    ],
    "Sudeste": [
-    0.257,
-    0.013
+    0.239,
+    0.015
    ],
    "Sul": [
-    0.264,
-    0.018
+    0.255,
+    0.022
    ]
   },
   "Sudeste": {
    "Norte": [
     0.278,
-    0.039
+    0.029
    ],
    "Nordeste": [
-    0.297,
-    0.022
+    0.298,
+    0.021
    ],
    "Centro-Oeste": [
-    0.241,
-    0.037
+    0.244,
+    0.044
    ],
    "Sudeste": [
     0.262,
-    0.012
+    0.01
    ],
    "Sul": [
-    0.243,
-    0.026
+    0.247,
+    0.023
    ]
   },
   "Sul": {
    "Norte": [
-    0.277,
-    0.045
+    0.294,
+    0.021
    ],
    "Nordeste": [
-    0.293,
-    0.014
+    0.31,
+    0.017
    ],
    "Centro-Oeste": [
-    0.257,
-    0.022
+    0.263,
+    0.018
    ],
    "Sudeste": [
-    0.261,
-    0.016
+    0.258,
+    0.01
    ],
    "Sul": [
-    0.27,
-    0.011
+    0.275,
+    0.014
    ]
   }
  },
  "matriz_auc_pr": {
   "Norte": {
    "Norte": [
-    0.311,
-    0.016
+    0.296,
+    0.008
    ],
    "Nordeste": [
-    0.299,
-    0.006
+    0.296,
+    0.015
    ],
    "Centro-Oeste": [
-    0.211,
-    0.014
+    0.208,
+    0.012
    ],
    "Sudeste": [
-    0.176,
-    0.007
+    0.166,
+    0.012
    ],
    "Sul": [
-    0.17,
-    0.008
+    0.165,
+    0.013
    ]
   },
   "Nordeste": {
    "Norte": [
-    0.299,
-    0.024
+    0.294,
+    0.019
    ],
    "Nordeste": [
-    0.318,
+    0.311,
     0.012
    ],
    "Centro-Oeste": [
-    0.211,
-    0.01
+    0.213,
+    0.015
    ],
    "Sudeste": [
-    0.185,
-    0.009
+    0.191,
+    0.013
    ],
    "Sul": [
-    0.181,
-    0.015
+    0.178,
+    0.019
    ]
   },
   "Centro-Oeste": {
    "Norte": [
-    0.273,
-    0.008
+    0.282,
+    0.02
    ],
    "Nordeste": [
-    0.278,
-    0.011
+    0.273,
+    0.015
    ],
    "Centro-Oeste": [
-    0.227,
-    0.009
+    0.233,
+    0.02
    ],
    "Sudeste": [
     0.183,
-    0.01
+    0.009
    ],
    "Sul": [
-    0.18,
-    0.013
+    0.178,
+    0.017
    ]
   },
   "Sudeste": {
    "Norte": [
-    0.264,
-    0.02
+    0.255,
+    0.016
    ],
    "Nordeste": [
-    0.271,
-    0.01
+    0.269,
+    0.018
    ],
    "Centro-Oeste": [
-    0.215,
-    0.017
+    0.21,
+    0.02
    ],
    "Sudeste": [
-    0.203,
-    0.01
+    0.195,
+    0.014
    ],
    "Sul": [
-    0.188,
-    0.015
+    0.186,
+    0.016
    ]
   },
   "Sul": {
    "Norte": [
-    0.242,
-    0.022
+    0.253,
+    0.017
    ],
    "Nordeste": [
-    0.252,
-    0.007
+    0.262,
+    0.014
    ],
    "Centro-Oeste": [
-    0.203,
-    0.013
+    0.204,
+    0.021
    ],
    "Sudeste": [
     0.182,
-    0.012
+    0.007
    ],
    "Sul": [
-    0.191,
-    0.01
+    0.195,
+    0.021
    ]
   }
  },
  "matriz_auc_roc": {
   "Norte": {
    "Norte": [
-    0.836,
+    0.827,
     0.013
    ],
    "Nordeste": [
     0.834,
-    0.004
+    0.005
    ],
    "Centro-Oeste": [
-    0.8,
-    0.016
+    0.801,
+    0.007
    ],
    "Sudeste": [
-    0.8,
-    0.01
+    0.799,
+    0.007
    ],
    "Sul": [
-    0.812,
-    0.013
+    0.808,
+    0.007
    ]
   },
   "Nordeste": {
    "Norte": [
-    0.835,
-    0.014
+    0.83,
+    0.012
    ],
    "Nordeste": [
-    0.844,
-    0.005
+    0.841,
+    0.003
    ],
    "Centro-Oeste": [
-    0.802,
-    0.009
+    0.801,
+    0.005
    ],
    "Sudeste": [
-    0.81,
-    0.01
+    0.809,
+    0.003
    ],
    "Sul": [
-    0.821,
+    0.817,
     0.008
    ]
   },
   "Centro-Oeste": {
    "Norte": [
-    0.818,
-    0.009
-   ],
-   "Nordeste": [
-    0.825,
-    0.004
-   ],
-   "Centro-Oeste": [
-    0.812,
-    0.015
-   ],
-   "Sudeste": [
-    0.805,
+    0.817,
     0.01
    ],
+   "Nordeste": [
+    0.818,
+    0.005
+   ],
+   "Centro-Oeste": [
+    0.804,
+    0.01
+   ],
+   "Sudeste": [
+    0.8,
+    0.004
+   ],
    "Sul": [
-    0.821,
-    0.007
+    0.812,
+    0.01
    ]
   },
   "Sudeste": {
    "Norte": [
-    0.807,
-    0.013
+    0.812,
+    0.007
    ],
    "Nordeste": [
-    0.813,
+    0.821,
     0.006
    ],
    "Centro-Oeste": [
-    0.788,
-    0.012
+    0.794,
+    0.007
    ],
    "Sudeste": [
-    0.806,
-    0.01
+    0.807,
+    0.009
    ],
    "Sul": [
-    0.815,
-    0.009
+    0.816,
+    0.012
    ]
   },
   "Sul": {
    "Norte": [
-    0.808,
-    0.008
+    0.801,
+    0.01
    ],
    "Nordeste": [
-    0.811,
-    0.011
+    0.808,
+    0.002
    ],
    "Centro-Oeste": [
-    0.794,
-    0.016
+    0.787,
+    0.008
    ],
    "Sudeste": [
-    0.801,
-    0.008
+    0.796,
+    0.005
    ],
    "Sul": [
-    0.819,
-    0.008
+    0.821,
+    0.004
    ]
   }
  },
@@ -342,104 +342,104 @@
     0.0
    ],
    "Nordeste": [
-    0.039,
-    0.103
+    0.011,
+    0.04
    ],
    "Centro-Oeste": [
-    0.234,
-    0.057
+    0.238,
+    0.07
    ],
    "Sudeste": [
-    0.32,
-    0.056
+    0.33,
+    0.061
    ],
    "Sul": [
-    0.303,
-    0.075
+    0.294,
+    0.036
    ]
   },
   "Nordeste": {
    "Norte": [
-    0.032,
-    0.073
+    0.056,
+    0.058
    ],
    "Nordeste": [
     0.0,
     0.0
    ],
    "Centro-Oeste": [
-    0.28,
-    0.011
+    0.246,
+    0.071
    ],
    "Sudeste": [
-    0.273,
-    0.035
+    0.268,
+    0.027
    ],
    "Sul": [
-    0.296,
-    0.04
+    0.309,
+    0.051
    ]
   },
   "Centro-Oeste": {
    "Norte": [
-    -0.057,
-    0.044
+    -0.039,
+    0.079
    ],
    "Nordeste": [
-    -0.077,
-    0.045
+    -0.05,
+    0.052
    ],
    "Centro-Oeste": [
     0.0,
     0.0
    ],
    "Sudeste": [
-    0.14,
-    0.07
+    0.206,
+    0.081
    ],
    "Sul": [
-    0.117,
-    0.091
+    0.154,
+    0.088
    ]
   },
   "Sudeste": {
    "Norte": [
-    -0.06,
-    0.105
+    -0.065,
+    0.114
    ],
    "Nordeste": [
-    -0.137,
-    0.074
+    -0.139,
+    0.082
    ],
    "Centro-Oeste": [
-    0.081,
-    0.134
+    0.069,
+    0.151
    ],
    "Sudeste": [
     0.0,
     0.0
    ],
    "Sul": [
-    0.072,
-    0.078
+    0.057,
+    0.087
    ]
   },
   "Sul": {
    "Norte": [
-    -0.027,
-    0.188
+    -0.069,
+    0.042
    ],
    "Nordeste": [
-    -0.087,
-    0.051
+    -0.13,
+    0.073
    ],
    "Centro-Oeste": [
-    0.045,
-    0.103
+    0.044,
+    0.071
    ],
    "Sudeste": [
-    0.034,
-    0.032
+    0.061,
+    0.055
    ],
    "Sul": [
     0.0,
@@ -454,104 +454,104 @@
     0.0
    ],
    "Nordeste": [
-    0.042,
+    0.029,
     0.035
    ],
    "Centro-Oeste": [
-    0.087,
-    0.045
+    0.132,
+    0.046
    ],
    "Sudeste": [
-    0.073,
-    0.045
+    0.118,
+    0.056
    ],
    "Sul": [
-    0.082,
-    0.033
+    0.114,
+    0.031
    ]
   },
   "Nordeste": {
    "Norte": [
-    0.034,
-    0.04
+    0.039,
+    0.055
    ],
    "Nordeste": [
     0.0,
     0.0
    ],
    "Centro-Oeste": [
-    0.141,
-    0.036
+    0.125,
+    0.035
    ],
    "Sudeste": [
-    0.008,
-    0.058
+    0.017,
+    0.052
    ],
    "Sul": [
-    0.07,
-    0.033
+    0.118,
+    0.036
    ]
   },
   "Centro-Oeste": {
    "Norte": [
-    0.114,
-    0.044
+    0.092,
+    0.025
    ],
    "Nordeste": [
-    0.097,
-    0.012
+    0.098,
+    0.038
    ],
    "Centro-Oeste": [
     0.0,
     0.0
    ],
    "Sudeste": [
-    0.017,
-    0.057
+    0.084,
+    0.085
    ],
    "Sul": [
-    0.025,
-    0.044
+    0.072,
+    0.07
    ]
   },
   "Sudeste": {
    "Norte": [
-    0.222,
-    0.091
+    0.193,
+    0.076
    ],
    "Nordeste": [
-    0.166,
-    0.06
+    0.152,
+    0.059
    ],
    "Centro-Oeste": [
-    0.197,
-    0.111
+    0.194,
+    0.125
    ],
    "Sudeste": [
     0.0,
     0.0
    ],
    "Sul": [
-    0.1,
-    0.103
+    0.104,
+    0.039
    ]
   },
   "Sul": {
    "Norte": [
-    0.226,
-    0.119
+    0.148,
+    0.051
    ],
    "Nordeste": [
-    0.177,
-    0.043
+    0.116,
+    0.058
    ],
    "Centro-Oeste": [
-    0.139,
-    0.079
+    0.131,
+    0.038
    ],
    "Sudeste": [
-    0.001,
-    0.061
+    0.014,
+    0.054
    ],
    "Sul": [
     0.0,
@@ -566,104 +566,104 @@
     0.0
    ],
    "Nordeste": [
-    0.06,
-    0.029
+    0.048,
+    0.027
    ],
    "Centro-Oeste": [
-    0.073,
-    0.046
+    0.102,
+    0.054
    ],
    "Sudeste": [
-    0.131,
-    0.067
+    0.147,
+    0.052
    ],
    "Sul": [
-    0.112,
-    0.009
+    0.152,
+    0.036
    ]
   },
   "Nordeste": {
    "Norte": [
-    0.039,
-    0.036
+    0.007,
+    0.058
    ],
    "Nordeste": [
     0.0,
     0.0
    ],
    "Centro-Oeste": [
-    0.069,
-    0.045
+    0.082,
+    0.029
    ],
    "Sudeste": [
-    0.085,
-    0.034
+    0.019,
+    0.044
    ],
    "Sul": [
-    0.052,
-    0.041
+    0.085,
+    0.036
    ]
   },
   "Centro-Oeste": {
    "Norte": [
-    0.122,
-    0.038
+    0.049,
+    0.059
    ],
    "Nordeste": [
-    0.126,
-    0.014
+    0.121,
+    0.044
    ],
    "Centro-Oeste": [
     0.0,
     0.0
    ],
    "Sudeste": [
-    0.096,
-    0.06
+    0.058,
+    0.071
    ],
    "Sul": [
-    0.057,
-    0.029
+    0.082,
+    0.047
    ]
   },
   "Sudeste": {
    "Norte": [
-    0.151,
-    0.037
+    0.141,
+    0.047
    ],
    "Nordeste": [
-    0.146,
-    0.052
+    0.136,
+    0.039
    ],
    "Centro-Oeste": [
-    0.053,
-    0.06
+    0.095,
+    0.052
    ],
    "Sudeste": [
     0.0,
     0.0
    ],
    "Sul": [
-    0.018,
-    0.053
+    0.043,
+    0.036
    ]
   },
   "Sul": {
    "Norte": [
-    0.222,
-    0.057
+    0.146,
+    0.052
    ],
    "Nordeste": [
-    0.208,
-    0.03
+    0.157,
+    0.041
    ],
    "Centro-Oeste": [
-    0.105,
-    0.046
+    0.122,
+    0.039
    ],
    "Sudeste": [
-    0.101,
-    0.033
+    0.06,
+    0.08
    ],
    "Sul": [
     0.0,
@@ -674,28 +674,28 @@
  "diagonal_sem_lugar": {
   "Norte": {
    "f1": [
-    0.358,
-    0.026
+    0.345,
+    0.011
    ],
    "precisao": [
-    0.323,
-    0.024
+    0.315,
+    0.017
    ],
    "revocacao": [
-    0.401,
+    0.384,
     0.036
    ],
    "auc_pr": [
-    0.311,
-    0.016
+    0.296,
+    0.008
    ],
    "auc_roc": [
-    0.836,
+    0.827,
     0.013
    ],
    "taxa_predita_positiva": [
     0.066,
-    0.005
+    0.009
    ],
    "prevalencia": [
     0.053,
@@ -704,28 +704,28 @@
   },
   "Nordeste": {
    "f1": [
-    0.357,
-    0.007
+    0.351,
+    0.011
    ],
    "precisao": [
-    0.341,
-    0.042
+    0.335,
+    0.033
    ],
    "revocacao": [
-    0.39,
-    0.076
+    0.377,
+    0.051
    ],
    "auc_pr": [
-    0.318,
+    0.311,
     0.012
    ],
    "auc_roc": [
-    0.844,
-    0.005
+    0.841,
+    0.003
    ],
    "taxa_predita_positiva": [
-    0.064,
-    0.022
+    0.062,
+    0.014
    ],
    "prevalencia": [
     0.054,
@@ -734,28 +734,28 @@
   },
   "Centro-Oeste": {
    "f1": [
-    0.299,
-    0.011
-   ],
-   "precisao": [
-    0.276,
-    0.029
-   ],
-   "revocacao": [
-    0.339,
-    0.064
-   ],
-   "auc_pr": [
-    0.227,
-    0.009
-   ],
-   "auc_roc": [
-    0.812,
+    0.302,
     0.015
    ],
+   "precisao": [
+    0.259,
+    0.03
+   ],
+   "revocacao": [
+    0.375,
+    0.066
+   ],
+   "auc_pr": [
+    0.233,
+    0.02
+   ],
+   "auc_roc": [
+    0.804,
+    0.01
+   ],
    "taxa_predita_positiva": [
-    0.05,
-    0.014
+    0.059,
+    0.016
    ],
    "prevalencia": [
     0.04,
@@ -765,27 +765,27 @@
   "Sudeste": {
    "f1": [
     0.262,
-    0.012
+    0.01
    ],
    "precisao": [
-    0.288,
-    0.052
+    0.289,
+    0.042
    ],
    "revocacao": [
-    0.254,
-    0.057
+    0.246,
+    0.036
    ],
    "auc_pr": [
-    0.203,
-    0.01
+    0.195,
+    0.014
    ],
    "auc_roc": [
-    0.806,
-    0.01
+    0.807,
+    0.009
    ],
    "taxa_predita_positiva": [
-    0.028,
-    0.012
+    0.026,
+    0.008
    ],
    "prevalencia": [
     0.03,
@@ -794,28 +794,28 @@
   },
   "Sul": {
    "f1": [
-    0.27,
-    0.011
+    0.275,
+    0.014
    ],
    "precisao": [
-    0.257,
-    0.031
+    0.254,
+    0.043
    ],
    "revocacao": [
-    0.292,
+    0.31,
     0.035
    ],
    "auc_pr": [
-    0.191,
-    0.01
+    0.195,
+    0.021
    ],
    "auc_roc": [
-    0.819,
-    0.008
+    0.821,
+    0.004
    ],
    "taxa_predita_positiva": [
-    0.033,
-    0.007
+    0.035,
+    0.01
    ],
    "prevalencia": [
     0.028,
@@ -826,28 +826,28 @@
  "diagonal_com_lugar": {
   "Norte": {
    "f1": [
-    0.358,
-    0.012
+    0.344,
+    0.007
    ],
    "precisao": [
-    0.331,
-    0.028
+    0.322,
+    0.027
    ],
    "revocacao": [
-    0.399,
-    0.062
+    0.375,
+    0.029
    ],
    "auc_pr": [
-    0.3,
-    0.015
+    0.28,
+    0.014
    ],
    "auc_roc": [
-    0.836,
-    0.013
+    0.826,
+    0.012
    ],
    "taxa_predita_positiva": [
-    0.065,
-    0.015
+    0.063,
+    0.009
    ],
    "prevalencia": [
     0.053,
@@ -856,28 +856,28 @@
   },
   "Nordeste": {
    "f1": [
-    0.3,
-    0.006
+    0.301,
+    0.015
    ],
    "precisao": [
-    0.261,
-    0.026
+    0.281,
+    0.041
    ],
    "revocacao": [
-    0.364,
-    0.071
+    0.334,
+    0.046
    ],
    "auc_pr": [
-    0.234,
-    0.017
+    0.237,
+    0.01
    ],
    "auc_roc": [
-    0.806,
-    0.002
+    0.797,
+    0.008
    ],
    "taxa_predita_positiva": [
-    0.077,
-    0.023
+    0.066,
+    0.017
    ],
    "prevalencia": [
     0.054,
@@ -886,28 +886,28 @@
   },
   "Centro-Oeste": {
    "f1": [
-    0.254,
-    0.017
+    0.253,
+    0.012
    ],
    "precisao": [
-    0.235,
-    0.027
+    0.21,
+    0.03
    ],
    "revocacao": [
-    0.29,
-    0.061
+    0.329,
+    0.048
    ],
    "auc_pr": [
-    0.174,
-    0.011
+    0.183,
+    0.015
    ],
    "auc_roc": [
     0.77,
-    0.008
+    0.004
    ],
    "taxa_predita_positiva": [
-    0.051,
-    0.015
+    0.064,
+    0.018
    ],
    "prevalencia": [
     0.04,
@@ -916,28 +916,28 @@
   },
   "Sudeste": {
    "f1": [
-    0.186,
-    0.017
+    0.192,
+    0.011
    ],
    "precisao": [
-    0.194,
-    0.037
+    0.19,
+    0.028
    ],
    "revocacao": [
-    0.191,
-    0.048
+    0.203,
+    0.037
    ],
    "auc_pr": [
-    0.129,
+    0.122,
     0.008
    ],
    "auc_roc": [
-    0.739,
-    0.007
+    0.731,
+    0.011
    ],
    "taxa_predita_positiva": [
-    0.031,
-    0.013
+    0.033,
+    0.01
    ],
    "prevalencia": [
     0.03,
@@ -946,28 +946,28 @@
   },
   "Sul": {
    "f1": [
-    0.179,
-    0.004
+    0.188,
+    0.008
    ],
    "precisao": [
-    0.164,
-    0.029
+    0.175,
+    0.008
    ],
    "revocacao": [
-    0.213,
-    0.058
+    0.204,
+    0.021
    ],
    "auc_pr": [
-    0.114,
-    0.011
+    0.118,
+    0.007
    ],
    "auc_roc": [
-    0.756,
-    0.01
+    0.747,
+    0.007
    ],
    "taxa_predita_positiva": [
-    0.039,
-    0.019
+    0.033,
+    0.004
    ],
    "prevalencia": [
     0.028,
@@ -977,118 +977,118 @@
  },
  "shap_medio": {
   "Norte": {
-   "Ano": 0.015,
-   "Causa do acidente": 0.4989,
-   "Condição meteorológica": 0.0506,
-   "Dia da semana": 0.0631,
-   "Fase do dia": 0.113,
-   "Hora": 0.1388,
-   "Idade": 0.1346,
-   "Idade do veículo": 0.0946,
-   "Marca do veículo": 0.109,
-   "Sentido da via": 0.0091,
-   "Sexo": 0.037,
-   "Tipo de acidente": 0.4455,
-   "Tipo de envolvido": 0.041,
-   "Tipo de pista": 0.1441,
-   "Tipo de veículo": 0.7635,
-   "Traçado da via": 0.1235,
-   "Uso do solo": 0.4575
+   "Ano": 0.0117,
+   "Causa do acidente": 0.4621,
+   "Condição meteorológica": 0.0341,
+   "Dia da semana": 0.0545,
+   "Fase do dia": 0.0967,
+   "Hora": 0.1247,
+   "Idade": 0.1103,
+   "Idade do veículo": 0.087,
+   "Marca do veículo": 0.0587,
+   "Sentido da via": 0.0046,
+   "Sexo": 0.0406,
+   "Tipo de acidente": 0.4464,
+   "Tipo de envolvido": 0.0444,
+   "Tipo de pista": 0.1534,
+   "Tipo de veículo": 0.7169,
+   "Traçado da via": 0.0939,
+   "Uso do solo": 0.4336
   },
   "Nordeste": {
-   "Ano": 0.0284,
-   "Causa do acidente": 0.4431,
-   "Condição meteorológica": 0.023,
-   "Dia da semana": 0.0503,
-   "Fase do dia": 0.0955,
-   "Hora": 0.1253,
-   "Idade": 0.164,
-   "Idade do veículo": 0.1333,
-   "Marca do veículo": 0.1103,
-   "Sentido da via": 0.0256,
-   "Sexo": 0.0451,
-   "Tipo de acidente": 0.5197,
-   "Tipo de envolvido": 0.0454,
-   "Tipo de pista": 0.2851,
-   "Tipo de veículo": 0.7524,
-   "Traçado da via": 0.0496,
-   "Uso do solo": 0.3411
+   "Ano": 0.0222,
+   "Causa do acidente": 0.4413,
+   "Condição meteorológica": 0.024,
+   "Dia da semana": 0.0437,
+   "Fase do dia": 0.1045,
+   "Hora": 0.1155,
+   "Idade": 0.1499,
+   "Idade do veículo": 0.1187,
+   "Marca do veículo": 0.1154,
+   "Sentido da via": 0.0094,
+   "Sexo": 0.0342,
+   "Tipo de acidente": 0.4749,
+   "Tipo de envolvido": 0.0305,
+   "Tipo de pista": 0.2367,
+   "Tipo de veículo": 0.7413,
+   "Traçado da via": 0.0443,
+   "Uso do solo": 0.3374
   },
   "Centro-Oeste": {
-   "Ano": 0.0298,
-   "Causa do acidente": 0.4463,
-   "Condição meteorológica": 0.0319,
-   "Dia da semana": 0.059,
-   "Fase do dia": 0.0493,
-   "Hora": 0.0973,
-   "Idade": 0.1653,
-   "Idade do veículo": 0.1098,
-   "Marca do veículo": 0.0814,
-   "Sentido da via": 0.015,
-   "Sexo": 0.0104,
-   "Tipo de acidente": 0.5084,
-   "Tipo de envolvido": 0.0301,
-   "Tipo de pista": 0.1346,
-   "Tipo de veículo": 0.5339,
-   "Traçado da via": 0.0809,
-   "Uso do solo": 0.3024
+   "Ano": 0.0222,
+   "Causa do acidente": 0.4086,
+   "Condição meteorológica": 0.0315,
+   "Dia da semana": 0.0588,
+   "Fase do dia": 0.0496,
+   "Hora": 0.0686,
+   "Idade": 0.1462,
+   "Idade do veículo": 0.1047,
+   "Marca do veículo": 0.0815,
+   "Sentido da via": 0.0182,
+   "Sexo": 0.0285,
+   "Tipo de acidente": 0.4806,
+   "Tipo de envolvido": 0.0274,
+   "Tipo de pista": 0.1519,
+   "Tipo de veículo": 0.4743,
+   "Traçado da via": 0.058,
+   "Uso do solo": 0.2621
   },
   "Sudeste": {
-   "Ano": 0.0324,
-   "Causa do acidente": 0.4881,
-   "Condição meteorológica": 0.0397,
-   "Dia da semana": 0.0566,
-   "Fase do dia": 0.0931,
-   "Hora": 0.1143,
-   "Idade": 0.1215,
-   "Idade do veículo": 0.126,
-   "Marca do veículo": 0.0937,
-   "Sentido da via": 0.0124,
-   "Sexo": 0.0383,
-   "Tipo de acidente": 0.4848,
-   "Tipo de envolvido": 0.0256,
-   "Tipo de pista": 0.0641,
-   "Tipo de veículo": 0.5059,
-   "Traçado da via": 0.0839,
-   "Uso do solo": 0.1916
+   "Ano": 0.0426,
+   "Causa do acidente": 0.4838,
+   "Condição meteorológica": 0.0738,
+   "Dia da semana": 0.053,
+   "Fase do dia": 0.0829,
+   "Hora": 0.1176,
+   "Idade": 0.1332,
+   "Idade do veículo": 0.1228,
+   "Marca do veículo": 0.077,
+   "Sentido da via": 0.0051,
+   "Sexo": 0.0505,
+   "Tipo de acidente": 0.4874,
+   "Tipo de envolvido": 0.0379,
+   "Tipo de pista": 0.0823,
+   "Tipo de veículo": 0.5256,
+   "Traçado da via": 0.0738,
+   "Uso do solo": 0.2297
   },
   "Sul": {
-   "Ano": 0.0362,
-   "Causa do acidente": 0.5291,
-   "Condição meteorológica": 0.043,
-   "Dia da semana": 0.0418,
-   "Fase do dia": 0.0856,
-   "Hora": 0.0977,
-   "Idade": 0.1532,
-   "Idade do veículo": 0.1386,
-   "Marca do veículo": 0.0587,
-   "Sentido da via": 0.0068,
-   "Sexo": 0.0589,
-   "Tipo de acidente": 0.5482,
-   "Tipo de envolvido": 0.0276,
-   "Tipo de pista": 0.0692,
-   "Tipo de veículo": 0.4067,
-   "Traçado da via": 0.1287,
-   "Uso do solo": 0.1813
+   "Ano": 0.0237,
+   "Causa do acidente": 0.5132,
+   "Condição meteorológica": 0.0278,
+   "Dia da semana": 0.0473,
+   "Fase do dia": 0.1265,
+   "Hora": 0.098,
+   "Idade": 0.149,
+   "Idade do veículo": 0.1504,
+   "Marca do veículo": 0.0533,
+   "Sentido da via": 0.0135,
+   "Sexo": 0.033,
+   "Tipo de acidente": 0.5656,
+   "Tipo de envolvido": 0.0245,
+   "Tipo de pista": 0.0407,
+   "Tipo de veículo": 0.4088,
+   "Traçado da via": 0.1189,
+   "Uso do solo": 0.213
   }
  },
  "shap_ordenamento": {
   "Norte": [
    "Tipo de veículo",
    "Causa do acidente",
-   "Uso do solo",
    "Tipo de acidente",
+   "Uso do solo",
    "Tipo de pista",
    "Hora",
    "Idade",
-   "Traçado da via",
    "Fase do dia",
-   "Marca do veículo",
+   "Traçado da via",
    "Idade do veículo",
+   "Marca do veículo",
    "Dia da semana",
-   "Condição meteorológica",
    "Tipo de envolvido",
    "Sexo",
+   "Condição meteorológica",
    "Ano",
    "Sentido da via"
   ],
@@ -1103,47 +1103,47 @@
    "Hora",
    "Marca do veículo",
    "Fase do dia",
-   "Dia da semana",
    "Traçado da via",
-   "Tipo de envolvido",
+   "Dia da semana",
    "Sexo",
+   "Tipo de envolvido",
+   "Condição meteorológica",
    "Ano",
-   "Sentido da via",
-   "Condição meteorológica"
+   "Sentido da via"
   ],
   "Centro-Oeste": [
-   "Tipo de veículo",
    "Tipo de acidente",
+   "Tipo de veículo",
    "Causa do acidente",
    "Uso do solo",
-   "Idade",
    "Tipo de pista",
+   "Idade",
    "Idade do veículo",
-   "Hora",
    "Marca do veículo",
-   "Traçado da via",
+   "Hora",
    "Dia da semana",
+   "Traçado da via",
    "Fase do dia",
    "Condição meteorológica",
+   "Sexo",
    "Tipo de envolvido",
    "Ano",
-   "Sentido da via",
-   "Sexo"
+   "Sentido da via"
   ],
   "Sudeste": [
    "Tipo de veículo",
-   "Causa do acidente",
    "Tipo de acidente",
+   "Causa do acidente",
    "Uso do solo",
-   "Idade do veículo",
    "Idade",
+   "Idade do veículo",
    "Hora",
-   "Marca do veículo",
    "Fase do dia",
-   "Traçado da via",
    "Tipo de pista",
-   "Dia da semana",
+   "Marca do veículo",
    "Condição meteorológica",
+   "Traçado da via",
+   "Dia da semana",
    "Sexo",
    "Ano",
    "Tipo de envolvido",
@@ -1154,122 +1154,197 @@
    "Causa do acidente",
    "Tipo de veículo",
    "Uso do solo",
-   "Idade",
    "Idade do veículo",
+   "Idade",
+   "Fase do dia",
    "Traçado da via",
    "Hora",
-   "Fase do dia",
+   "Marca do veículo",
+   "Dia da semana",
    "Tipo de pista",
    "Sexo",
-   "Marca do veículo",
    "Condição meteorológica",
-   "Dia da semana",
-   "Ano",
    "Tipo de envolvido",
+   "Ano",
    "Sentido da via"
   ]
  },
  "shap_pares": {
   "Norte x Nordeste": {
    "tau": [
-    0.715,
-    0.04
+    0.753,
+    0.028
    ],
-   "top10": 8.6,
-   "top5": 4.4
+   "top10": [
+    9.0,
+    0.0
+   ],
+   "top5": [
+    4.8,
+    0.447
+   ]
   },
   "Norte x Centro-Oeste": {
    "tau": [
-    0.744,
+    0.685,
     0.047
    ],
-   "top10": 9.0,
-   "top5": 4.0
+   "top10": [
+    8.6,
+    0.894
+   ],
+   "top5": [
+    4.6,
+    0.548
+   ]
   },
   "Norte x Sudeste": {
    "tau": [
-    0.694,
-    0.106
+    0.671,
+    0.103
    ],
-   "top10": 8.8,
-   "top5": 4.0
+   "top10": [
+    8.2,
+    0.447
+   ],
+   "top5": [
+    4.2,
+    0.447
+   ]
   },
   "Norte x Sul": {
    "tau": [
-    0.676,
-    0.075
+    0.624,
+    0.086
    ],
-   "top10": 8.8,
-   "top5": 4.2
+   "top10": [
+    8.6,
+    1.14
+   ],
+   "top5": [
+    4.0,
+    0.0
+   ]
   },
   "Nordeste x Centro-Oeste": {
    "tau": [
-    0.771,
-    0.025
+    0.797,
+    0.087
    ],
-   "top10": 9.0,
-   "top5": 4.2
+   "top10": [
+    8.8,
+    0.447
+   ],
+   "top5": [
+    4.6,
+    0.548
+   ]
   },
   "Nordeste x Sudeste": {
    "tau": [
-    0.638,
-    0.056
+    0.671,
+    0.099
    ],
-   "top10": 8.2,
-   "top5": 4.0
+   "top10": [
+    8.6,
+    0.894
+   ],
+   "top5": [
+    4.0,
+    0.0
+   ]
   },
   "Nordeste x Sul": {
    "tau": [
-    0.638,
-    0.085
+    0.653,
+    0.081
    ],
-   "top10": 8.4,
-   "top5": 4.0
+   "top10": [
+    8.6,
+    0.548
+   ],
+   "top5": [
+    4.0,
+    0.0
+   ]
   },
   "Centro-Oeste x Sudeste": {
    "tau": [
-    0.685,
-    0.096
+    0.662,
+    0.087
    ],
-   "top10": 8.8,
-   "top5": 4.0
+   "top10": [
+    8.2,
+    0.837
+   ],
+   "top5": [
+    4.0,
+    0.0
+   ]
   },
   "Centro-Oeste x Sul": {
    "tau": [
-    0.703,
-    0.076
+    0.656,
+    0.078
    ],
-   "top10": 9.0,
-   "top5": 4.4
+   "top10": [
+    8.4,
+    1.14
+   ],
+   "top5": [
+    4.2,
+    0.447
+   ]
   },
   "Sudeste x Sul": {
    "tau": [
-    0.7,
-    0.056
+    0.694,
+    0.071
    ],
-   "top10": 8.4,
-   "top5": 4.0
+   "top10": [
+    8.6,
+    0.548
+   ],
+   "top5": [
+    4.4,
+    0.548
+   ]
   }
  },
  "shap_vs_cramer": {
   "Norte": {
-   "tau": 0.517,
+   "tau": [
+    0.544,
+    0.044
+   ],
    "n_atributos": 15
   },
   "Nordeste": {
-   "tau": 0.562,
+   "tau": [
+    0.554,
+    0.029
+   ],
    "n_atributos": 15
   },
   "Centro-Oeste": {
-   "tau": 0.536,
+   "tau": [
+    0.501,
+    0.075
+   ],
    "n_atributos": 15
   },
   "Sudeste": {
-   "tau": 0.448,
+   "tau": [
+    0.406,
+    0.058
+   ],
    "n_atributos": 15
   },
   "Sul": {
-   "tau": 0.467,
+   "tau": [
+    0.432,
+    0.049
+   ],
    "n_atributos": 15
   }
  }
