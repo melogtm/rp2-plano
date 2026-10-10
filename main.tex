@@ -65,8 +65,8 @@ entre pessoas de 5 a 29 anos \cite{oms2023}. O Brasil é signatário da
 Agenda 2030, cuja meta 3.6 prevê reduzir pela metade as mortes e lesões
 no trânsito \cite{onu2015}.
 
-O custo não se limita às mortes. \cite{carvalho2020} estima que os
-acidentes de trânsito custam à sociedade brasileira cerca de R\$ 50
+Além das mortes, há o custo econômico. \cite{carvalho2020} estima que
+os acidentes de trânsito custam à sociedade brasileira cerca de R\$ 50
 bilhões por ano, em sua maior parte por perda de produção das vítimas e
 por custos hospitalares. Os sobreviventes carregam lesões que podem gerar
 incapacidade permanente, e a meta-análise de \cite{craig2016} mostra que
@@ -103,8 +103,8 @@ próximos, perceptron multicamadas e florestas aleatórias sobre dados da
 PRF de 2021 a 2024, usaram SHAP para ordenar os fatores de risco e
 derivaram recomendações de segurança viária. Os autores publicaram o
 código \cite{gabardo2025codigo}, o que torna o estudo reprodutível, e
-apontam a extensão a outras regiões como trabalho futuro. Este trabalho
-segue essa direção.
+apontam a extensão a outras regiões como trabalho futuro, que é a
+direção seguida aqui.
 
 \textbf{Objetivo.} Identificar, por meio de algoritmos de aprendizado de
 máquina, os principais fatores associados à gravidade de acidentes em
@@ -132,17 +132,18 @@ vítima fatal, com kNN, MLP e florestas aleatórias, balanceamento por
 SMOTE \cite{chawla2002} e codificação por alvo do par rodovia e
 quilômetro. O objetivo foi identificar, com SHAP, os fatores de risco e
 traduzi-los em recomendações. Localização na rodovia, tipo de acidente
-e tipo de pista lideraram o ordenamento. Este trabalho usa os mesmos
-três algoritmos, mas estende a análise às cinco macrorregiões e ao
-período de 2021 a 2025, prevê o óbito de cada envolvido em vez da
-classificação do acidente e compara os ordenamentos entre regiões.
+e tipo de pista lideraram o ordenamento. Os mesmos três algoritmos
+estão previstos aqui, ao lado de outros dois, mas a análise cobre as
+cinco macrorregiões e o período de 2021 a 2025, prevê o óbito de cada
+envolvido em vez da classificação do acidente e compara os ordenamentos
+entre regiões.
 
 \cite{mafort2025} compararam sete classificadores para prever a
 gravidade de acidentes nas rodovias federais do Rio de Janeiro entre
 2020 e 2023. A regressão logística obteve a maior acurácia (73,85\%), e
 os fatores foram interpretados com LIME. O recorte é um único estado, e
-o objetivo foi selecionar o melhor classificador. Aqui a comparação
-central é entre regiões, e não entre algoritmos.
+o objetivo foi selecionar o melhor classificador, enquanto aqui a
+comparação central é entre regiões.
 
 \cite{franceschi2022} ajustaram uma regressão logística multinomial aos
 acidentes das rodovias federais de todo o país entre 2017 e 2019, com a
@@ -150,21 +151,19 @@ gravidade em três níveis (sem vítimas, com feridos e com mortos). O
 objetivo foi estimar os fatores associados à gravidade para orientar
 políticas de segurança. O envolvimento de pedestres foi o fator de maior
 efeito, e condições que favorecem velocidades altas, como tempo bom e
-horários de pouco tráfego, também aumentaram a gravidade. O modelo
-estima um efeito para o país inteiro. Este trabalho estima os fatores
-separadamente por região, com modelos capazes de representar
-interações, e testa se o efeito observado em uma região se repete nas
-outras.
+horários de pouco tráfego, também aumentaram a gravidade. Como o modelo
+estima um único efeito para o país inteiro, ele não informa se esse
+efeito muda de uma região para outra, que é o que se testa aqui, com
+modelos por região capazes de representar interações.
 
 \cite{soliani2024} estudaram uma década de acidentes com caminhões nas
 rodovias federais, combinando análise descritiva das causas com
 classificadores como XGBoost e LightGBM, que atingiram 73\% de acurácia.
 O objetivo foi apontar as causas dos acidentes graves com caminhoneiros.
 Identificaram pistas simples como mais propensas a acidentes e um
-aumento das mortes a partir de 2017. O escopo é restrito a um tipo de
-veículo, enquanto este trabalho inclui todos os envolvidos e trata o
-tipo de veículo como um dos fatores cuja relevância pode variar entre
-regiões.
+aumento das mortes a partir de 2017. O escopo se restringe a um tipo
+de veículo; aqui entram todos os envolvidos, e o tipo de veículo é um
+dos fatores cuja relevância pode variar entre regiões.
 
 \subsection{Diferenças regionais na mortalidade no trânsito}
 
@@ -176,10 +175,10 @@ As tendências diferiram entre regiões ao longo do período.
 brasileiros de 2000 a 2018, para relacionar os padrões com porte e renda dos municípios.
 Encontraram queda maior no Sul e no Sudeste, aumento das mortes de
 motociclistas e aglomerados de alta mortalidade no Nordeste, no Norte e
-no Centro-Oeste. Os dois estudos descrevem taxas agregadas e não
-modelam os fatores de cada acidente. Este trabalho parte da mesma
-constatação de heterogeneidade e pergunta se ela aparece também nos
-fatores que um modelo preditivo considera relevantes.
+no Centro-Oeste. Os dois estudos descrevem taxas agregadas, sem modelar
+os fatores de cada acidente. A pergunta que se acrescenta aqui é se a
+mesma heterogeneidade aparece nos fatores que um modelo preditivo
+considera relevantes.
 
 \subsection{Interpretação e transferência de modelos}
 
@@ -199,10 +198,10 @@ bayesiana para melhorar o desempenho no local de destino.
 \cite{man2022} treinaram uma rede neural com dados da rodovia M1, no
 Reino Unido, e a aplicaram a outras rodovias e anos. A aplicação direta
 não funcionou, e o desempenho só foi recuperado com aprendizado por
-transferência. Nesses estudos o
-objetivo é reduzir a perda de desempenho. Neste trabalho a perda é o
-objeto de medida: sua magnitude entre macrorregiões indica se fatores e
-recomendações obtidos em uma região valem para as demais.
+transferência. Esses estudos buscam reduzir a perda de desempenho. Aqui
+a perda é medida e usada como indicador: sua magnitude entre
+macrorregiões mostra se fatores e recomendações obtidos em uma região
+valem para as demais.
 
 \begin{table}[H]
 \centering
