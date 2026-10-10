@@ -319,11 +319,11 @@ valores ausentes diretamente e permite calcular valores SHAP exatos. Os
 hiperparâmetros foram escolhidos uma única vez, numa amostra nacional de
 60 mil registros de acidentes sorteados e retirados do experimento, com
 validação cruzada de três dobras agrupada por acidente e área sob a
-curva precisão-revocação como critério. Os valores escolhidos valem para
-todas as regiões, para que diferenças entre regiões não decorram de
-ajustes diferentes: profundidade máxima 4, peso mínimo por folha 5 e
-taxa de aprendizado de 0,1, entre profundidades de 4 a 8, com 74
-árvores, número fixado pela parada antecipada dentro da própria busca.
+curva precisão-revocação como critério. Entre profundidades de 4 a 8, a
+busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
+de aprendizado de 0,1 e 74 árvores, número fixado pela parada antecipada
+dentro da própria busca. Esses valores valem para todas as regiões, para
+que diferenças entre regiões não decorram de ajustes diferentes.
 
 \subsection{Protocolo de avaliação}
 
@@ -470,10 +470,10 @@ Sul          & 0,275 (0,014) & 0,254 (0,043) & 0,310 (0,035) & 0,195 (0,021) & 0
 \end{table}
 
 Incluir os identificadores de lugar não melhorou o F1 em nenhuma região
-e o reduziu em quatro; no Sul, ele caiu de 0,275 para 0,188. Com cerca
+e o reduziu em quatro; no Sul, ele caiu de 0,275 para 0,188. Em cerca
 de 26 mil registros de ajuste, milhares de municípios e trechos de
 rodovia viram categorias com poucos casos cada, e o modelo ajusta ruído.
-Com esse volume de treino e essa codificação, a exclusão não custou
+Nesse volume de treino e com essa codificação, a exclusão não custou
 desempenho.
 
 \subsection{Transferência entre regiões}
@@ -487,17 +487,15 @@ modelos do Sul e do Sudeste perdem de 12\% a 19\% do F1 no Norte e no
 Nordeste, e os do Norte perdem de 11\% a 12\% no Sul e no Sudeste. A
 exceção é o modelo do Nordeste, que perde 2\% no Sudeste e 12\% no Sul.
 Em média, a perda no sentido do Sul e do Sudeste para o Norte e o
-Nordeste é de 15\%, e no sentido contrário, de 9\%. A área sob a curva
-precisão-revocação, que não depende do limiar, mostra o mesmo padrão,
-com médias de 15\% e 10\%, de modo que a diferença vem de algo além de
-um limiar calibrado para outra prevalência.
+Nordeste é de 15\%, e no sentido contrário, de 9\%. Na área sob a curva
+precisão-revocação, as médias são de 15\% e 10\%. Como essa medida não
+depende do limiar, a perda não vem apenas de um limiar calibrado para
+outra prevalência.
 
-Norte e Nordeste formam, portanto, um par cujos modelos se trocam bem,
-e a perda aparece entre esse par e o Sul e o Sudeste, um pouco maior
-quando o modelo vem das regiões menos letais. O Centro-Oeste fica no
-meio: seu modelo perde de 7\% a 10\% nas demais regiões. Um modelo, ou uma lista de
-fatores, derivado do Sul tende a subestimar o risco no Norte e no
-Nordeste, onde mais se morre.
+O Centro-Oeste fica no meio: seu modelo perde de 7\% a 10\% nas demais
+regiões. O modelo do Sul perde de 12\% a 15\% do F1 no Norte e no
+Nordeste, onde mais se morre, o que limita a extensão de recomendações
+derivadas do Sul a essas regiões.
 
 \begin{figure}[H]
 \centering
