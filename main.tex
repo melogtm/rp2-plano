@@ -47,7 +47,7 @@ acidente e treinos de mesmo tamanho, e avaliado em todas as regiões. O
 F1 da classe óbito vai de 0,26 a 0,36. Tipo de veículo, tipo e causa do
 acidente e uso do solo são os fatores mais relevantes em todas as
 regiões, mas motocicleta, área rural e pista simples pesam de duas a
-quatro vezes mais no Norte e no Nordeste. Por isso a transferência é
+quatro vezes mais no Norte e no Nordeste. A transferência é
 assimétrica: modelos do Sul e do Sudeste perdem até 23\% do F1 no Norte
 e no Nordeste, e o inverso perde no máximo 8\%.
 \end{resumo}
@@ -287,7 +287,7 @@ desfecho ao modelo. Ficam fora também os identificadores de lugar
 operacional e coordenadas). Seus valores não se repetem entre regiões:
 um modelo do Sul aplicado ao Norte encontraria apenas municípios e
 trechos desconhecidos, e a perda medida misturaria a diferença entre
-fatores com a perda de um mapa decorado. Esses atributos também não
+fatores com a perda de uma informação que só vale na região de origem. Esses atributos também não
 geram recomendações transferíveis. O aspecto do lugar que se repete no
 país todo permanece, pelo uso do solo, tipo de pista e traçado. Uma
 consequência é que o par rodovia e quilômetro, fator mais relevante em
@@ -346,9 +346,9 @@ dobra em cada região $j$, o que forma uma matriz de transferência
 $5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. A diagonal mede
 o desempenho dentro da própria região. Como o F1 depende da prevalência,
 que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
-medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$, e não
-contra o desempenho da origem, que compararia regiões com prevalências
-diferentes.
+medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$.
+Medi-la contra o desempenho na origem misturaria a perda com a diferença
+de prevalência entre as regiões.
 Reportam-se também precisão, revocação, área sob a curva
 precisão-revocação \cite{saito2015} e área sob a curva ROC, esta
 insensível à prevalência, que varia entre as regiões. Todas as medidas
@@ -371,12 +371,9 @@ de Cramér com correção de viés \cite{bergsma2013}.
 
 \section{Resultados Parciais}
 
-Esta seção apresenta primeiro a caracterização da base por região e
-depois os resultados do XGBoost: desempenho dentro de cada região,
-transferência entre regiões e relevância dos fatores. Os números e
-figuras foram gerados em Python com pandas, scikit-learn, XGBoost e
-matplotlib \cite{hunter2007}, e o código e os dados estão no repositório
-do trabalho.
+Os números e figuras desta seção foram gerados em Python com pandas,
+scikit-learn, XGBoost e matplotlib \cite{hunter2007}. O código e os
+dados estão no repositório do trabalho.
 
 \subsection{Composição regional}
 
@@ -417,9 +414,9 @@ Brasil       & 774.920 & 335.062 & 28.668 & 3,70 & 20,7 & 51,2 \\
 
 \subsection{Letalidade por fator e região}
 
-A Figura~\ref{fig:categorias} mostra a letalidade de categorias
-selecionadas em cada região. Há dois comportamentos. Pedestres e
-atropelamentos têm letalidade alta e parecida em todo o país, entre
+Na Figura~\ref{fig:categorias}, que traz a letalidade de categorias
+selecionadas em cada região, pedestres e atropelamentos têm letalidade
+alta e parecida em todo o país, entre
 25,4\% e 30,0\% para o pedestre envolvido. Já motocicleta, colisão
 frontal, pista simples, área rural e acidentes à noite são muito mais
 letais no Norte e no Nordeste. Um motociclista envolvido em acidente
@@ -427,8 +424,7 @@ morre em 8,2\% a 9,4\% dos casos nessas regiões, contra 3,1\% a 3,4\% no
 Sul e no Sudeste. A colisão frontal mata de 14,3\% a 15,8\% dos
 envolvidos no Norte, no Nordeste e no Centro-Oeste e de 9,4\% a
 10,0\% no Sul e no Sudeste. A pista dupla, ao contrário, tem letalidade
-próxima em todas as regiões (2,1\% a 2,8\%). Um mesmo fator, portanto,
-pode ter peso muito diferente conforme a região.
+próxima em todas as regiões (2,1\% a 2,8\%).
 
 \begin{figure}[H]
 \centering
@@ -473,32 +469,30 @@ Sul          & 0,270 (0,011) & 0,257 (0,031) & 0,292 (0,035) & 0,191 (0,010) & 0
 \end{tabular}
 \end{table}
 
-Incluir os identificadores de lugar não melhorou o desempenho em nenhuma
-região e o piorou em quatro, com queda de 0,270 para 0,179 no F1 do Sul.
-Com cerca de 35 mil registros de treino, milhares de municípios e
-trechos de rodovia são categorias com poucos casos cada, e o modelo
-ajusta ruído. Nesta escala de dados, portanto, o lugar não acrescenta
-informação além dos fatores, e a exclusão não custa desempenho.
+Incluir os identificadores de lugar não melhorou o F1 em nenhuma região
+e o reduziu em quatro; no Sul, ele caiu de 0,270 para 0,179. Com cerca
+de 35 mil registros de treino, milhares de municípios e trechos de
+rodovia viram categorias com poucos casos cada, e o modelo ajusta ruído.
+Com esse volume de treino e essa codificação, a exclusão não custou
+desempenho.
 
 \subsection{Transferência entre regiões}
 
-A Figura~\ref{fig:matriz} mostra a matriz de transferência. À esquerda
-está o F1 de cada modelo em cada região. À direita está quanto o modelo
-importado perde para o modelo treinado no próprio destino. A perda é
-assimétrica. Modelos treinados no Sudeste e no Sul perdem de 14\% a 23\%
+Na matriz de transferência da Figura~\ref{fig:matriz}, o painel da
+esquerda traz o F1 de cada modelo em cada região, e o da direita, quanto
+o modelo importado perde para o modelo treinado no próprio destino.
+Modelos treinados no Sudeste e no Sul perdem de 14\% a 23\%
 do F1 quando aplicados ao Norte, ao Nordeste e ao Centro-Oeste. Na
 direção contrária, modelos do Norte e do Nordeste perdem de 1\% a 8\% no
 Sudeste e no Sul, e o do Nordeste praticamente iguala o modelo local do
 Sudeste (perda de 0,8\%). A área sob a curva precisão-revocação, que não
-depende do limiar, confirma o padrão: o modelo do Sul perde 22\% dessa
-área no Norte e 21\% no Nordeste. A assimetria não decorre, portanto,
-apenas de um limiar calibrado para outra prevalência.
+depende do limiar, mostra o mesmo padrão: o modelo do Sul perde 22\%
+dessa área no Norte e 21\% no Nordeste. A assimetria vem, portanto, de
+algo além de um limiar calibrado para outra prevalência.
 
-Esse resultado distingue os dois cenários previstos no método. Não é que
-nenhuma região exporte: os modelos das regiões mais letais funcionam
-razoavelmente em todo o país. O que não exporta são os modelos das
-regiões menos letais, e justamente para as regiões onde mais se morre.
-Um modelo, ou uma lista de fatores, derivado do Sul tende a subestimar
+A perda depende da direção. Os modelos das regiões mais letais
+funcionam razoavelmente em todo o país, e os das regiões menos letais
+perdem desempenho justamente onde mais se morre. Um modelo, ou uma lista de fatores, derivado do Sul tende a subestimar
 o risco no Norte e no Nordeste.
 
 \begin{figure}[H]
@@ -512,8 +506,8 @@ $(M_{jj}-M_{ij})/M_{jj}$ em \%.}
 
 \subsection{Relevância dos fatores}
 
-A Figura~\ref{fig:shap} mostra o valor SHAP absoluto médio de cada
-atributo por região. Os quatro atributos mais relevantes são os mesmos
+Pelo valor SHAP absoluto médio de cada atributo
+(Figura~\ref{fig:shap}), os quatro atributos mais relevantes são os mesmos
 em todas as regiões: tipo de veículo, tipo de acidente, causa do
 acidente e uso do solo. O tau de Kendall entre os ordenamentos completos
 vai de 0,64 (Nordeste e Sudeste; Nordeste e Sul) a 0,77 (Nordeste e
@@ -521,14 +515,16 @@ Centro-Oeste), e, entre os dez atributos mais relevantes, pares de
 regiões compartilham em média de 8,2 a 9,0. Os ordenamentos variam pouco
 entre dobras (desvio-padrão do tau de 0,03 a 0,11).
 
-A ordem é estável, mas o peso não. O SHAP do tipo de veículo é 0,76 no
+O peso dos atributos, porém, muda entre regiões. O SHAP do tipo de
+veículo é 0,76 no
 Norte e no Nordeste e 0,41 no Sul; o do uso do solo, 0,46 no Norte e
 0,18 no Sul; o do tipo de pista, 0,29 no Nordeste e 0,06 no Sudeste, o
-que o leva do quinto para o décimo primeiro lugar. São os mesmos fatores
-cuja letalidade mais difere entre regiões na
-Figura~\ref{fig:categorias}: motocicleta, área rural e pista simples.
-Isso explica a assimetria da transferência. Um modelo do Sul aprende que
-esses atributos pesam pouco e erra onde eles pesam muito.
+que o leva do quinto para o décimo primeiro lugar. São os atributos das
+categorias cuja letalidade mais difere entre regiões na
+Figura~\ref{fig:categorias}: motocicleta, área rural e pista simples. A
+diferença de peso é coerente com a assimetria da transferência: um
+modelo treinado no Sul dá pouco peso a esses atributos e tende a errar
+onde eles pesam mais.
 
 \begin{figure}[H]
 \centering
@@ -539,37 +535,37 @@ entre as regiões.}
 \label{fig:shap}
 \end{figure}
 
-Dois cuidados na leitura. O tipo de veículo é vazio exatamente para
-pedestres e cavaleiros, de modo que esse atributo carrega também a
-identidade do pedestre; por isso o tipo de envolvido, terceiro na
-associação marginal, fica entre os últimos no SHAP, que divide o
-crédito entre atributos redundantes. Pela mesma razão, a concordância
+O tipo de veículo é vazio exatamente para pedestres e cavaleiros, de
+modo que esse atributo também carrega a identidade do pedestre. Por isso
+o tipo de envolvido, terceiro na associação marginal, fica entre os
+últimos no SHAP, que divide o crédito entre atributos redundantes. A
+mesma redundância faz com que a concordância
 entre o ordenamento SHAP e o do V de Cramér com correção de viés
 \cite{bergsma2013} é apenas moderada (tau de 0,45 a 0,56): a associação
 marginal não considera o que os demais atributos já informam.
 
 \section{Discussão e Conclusão}
 
-Os resultados permitem três afirmações. Primeiro, com os atributos do
-boletim da PRF, o óbito é previsível apenas em parte: o F1 da classe
-óbito fica entre 0,26 e 0,36, e a maioria dos óbitos não é identificada.
-Segundo, os fatores mais relevantes são comuns ao país. Tipo de veículo,
-tipo e causa do acidente e uso do solo lideram o ordenamento em todas as
-regiões, o que sustenta medidas de alcance nacional, como as voltadas a
-pedestres e a colisões graves. Terceiro, o peso desses fatores não é
-comum. Motocicleta, área rural e pista simples contam de duas a quatro
+Com os atributos do boletim da PRF, o óbito é previsível apenas em
+parte: o F1 da classe óbito fica entre 0,26 e 0,36, e a maioria dos
+óbitos não é identificada. Os fatores mais relevantes são comuns ao
+país. Tipo de veículo, tipo e causa do acidente e uso do solo lideram o
+ordenamento em todas as regiões, o que sustenta medidas de alcance
+nacional, como as voltadas a pedestres e a colisões graves. O peso
+desses fatores, por outro lado, muda. Motocicleta, área rural e pista simples contam de duas a quatro
 vezes mais no Norte e no Nordeste, e modelos treinados no Sul e no
 Sudeste perdem até 23\% do F1 nessas regiões. Recomendações derivadas de
 um recorte regional, como as de \cite{gabardo2025} para o Sul, devem ser
-aplicadas ao resto do país com cautela, principalmente onde a letalidade
-é maior. Duplicação de pistas e fiscalização de motociclistas tendem a
-ter retorno maior no Norte e no Nordeste.
+estendidas ao resto do país com cautela, principalmente onde a
+letalidade é maior. Os resultados sugerem que duplicação de pistas e
+fiscalização de motociclistas teriam retorno maior no Norte e no
+Nordeste.
 
-Há limitações. Os resultados são associações e não permitem atribuir
-causa. A exclusão dos identificadores de lugar impede comparar o
-ordenamento com o do estudo do Sul, cujo fator principal é o trecho da
-rodovia. O registro da PRF pode diferir entre regiões em cobertura e
-preenchimento. E apenas um modelo foi implementado. Até o relatório
+Os resultados são associações e não permitem atribuir causa. Sem os
+identificadores de lugar, o ordenamento não pode ser comparado com o do
+estudo do Sul, cujo fator principal é o trecho da rodovia. O registro da
+PRF pode diferir entre regiões em cobertura e preenchimento, e apenas um
+modelo foi implementado. Até o relatório
 final serão acrescentados os outros quatro classificadores previstos,
 com o mesmo protocolo, para verificar se a estabilidade dos fatores e a
 assimetria da transferência dependem do modelo.
