@@ -37,27 +37,27 @@
 \begin{resumo}
 As rodovias federais brasileiras registraram 6.160 mortes em 2024, e o
 risco de morrer em um acidente não é o mesmo em todo o país. Este
-trabalho usa aprendizado de máquina para identificar os fatores mais
-relevantes para o óbito de envolvidos em acidentes nas rodovias federais
-e verificar se esses fatores e a capacidade de predição se mantêm entre
-as cinco macrorregiões do IBGE. A base reúne os microdados abertos da
-Polícia Rodoviária Federal de 2017 a 2025, com 1.415.582 envolvidos e
-50.822 óbitos. Este relatório apresenta a análise exploratória. A
-letalidade por envolvido varia de 2,70\% no Sul a 5,31\% no Nordeste, e
-no Norte subiu de 3,83\% em 2017 para 5,58\% em 2025. Motocicleta, pista
-simples e acidente em área rural são quase duas vezes mais letais no
-Norte e no Nordeste do que no Sul e no Sudeste, enquanto o atropelamento
-tem letalidade parecida em todas as regiões. O ordenamento dos atributos
-por associação com o óbito coincide nos três primeiros e diverge nos
-intermediários, o que antecipa a pergunta central do trabalho.
+trabalho identifica os fatores mais relevantes para o óbito de
+envolvidos em acidentes nas rodovias federais e verifica se esses
+fatores e a capacidade de predição se mantêm entre as cinco
+macrorregiões do IBGE. A base reúne os microdados da Polícia Rodoviária
+Federal de 2021 a 2025, com 774.920 envolvidos e 28.668 óbitos. Um
+XGBoost foi treinado em cada região, com validação agrupada por
+acidente e treinos de mesmo tamanho, e avaliado em todas as regiões. O
+F1 da classe óbito vai de 0,26 a 0,36. Tipo de veículo, tipo e causa do
+acidente e uso do solo são os fatores mais relevantes em todas as
+regiões, mas motocicleta, área rural e pista simples pesam de duas a
+quatro vezes mais no Norte e no Nordeste. Por isso a transferência é
+assimétrica: modelos do Sul e do Sudeste perdem até 23\% do F1 no Norte
+e no Nordeste, e o inverso perde no máximo 8\%.
 \end{resumo}
 
 
 \section{Introdução}
 
 Em 2024, as rodovias federais brasileiras registraram 6.160 mortes, o
-maior número em cinco anos \cite{prf2024}. Entre 2017 e 2025, os
-microdados abertos da Polícia Rodoviária Federal (PRF) somam 50.822
+maior número em cinco anos \cite{prf2024}. Entre 2021 e 2025, os
+microdados abertos da Polícia Rodoviária Federal (PRF) somam 28.668
 óbitos de envolvidos em acidentes nessas rodovias \cite{prfdados}. O
 problema é global: a Organização Mundial da Saúde estima 1,19 milhão de
 mortes no trânsito em 2021, e o trânsito é a principal causa de morte
@@ -116,119 +116,6 @@ sobreposição entre os $k$ fatores mais relevantes, o que torna o
 objetivo verificável ao final do trabalho \cite{wazlawick2009}.
 
 
-\section{Método}
-
-\subsection{Dados}
-
-A fonte são os microdados abertos da PRF na variante agrupada por pessoa
-com todas as causas e tipos de acidente \cite{prfdados}, em nove
-arquivos anuais de 2017 a 2025 com esquema idêntico de 37 atributos. Cada
-linha descreve um envolvido em um acidente: dados da ocorrência (data,
-horário, rodovia, quilômetro, município, causa, tipo, condição
-meteorológica, tipo de pista, traçado, uso do solo), do veículo (tipo,
-marca, ano de fabricação) e da pessoa (tipo de envolvido, idade, sexo e
-estado físico). A variável resposta é binária e vale 1 quando o estado
-físico do envolvido é óbito.
-
-Essa variante repete o mesmo envolvido uma vez para cada causa e cada
-tipo de acidente registrados. Sem tratamento, ocorrências com registro
-mais detalhado pesariam mais no ajuste. A Tabela~\ref{tab:funil} mostra
-as reduções aplicadas. Mantêm-se apenas a causa principal e o tipo
-primário, o que deixa uma linha por envolvido por acidente, e
-excluem-se os registros sem estado físico informado, que se somariam
-indevidamente à classe negativa. Nenhum óbito é perdido: a base
-analítica contém os 50.822 óbitos da base bruta, e o total de 2024
-(6.160) coincide com o anuário da PRF \cite{prf2024}. A classe positiva
-representa 3,59\% dos registros, razão de aproximadamente 1 para 27.
-
-\begin{table}[H]
-\centering
-\caption{Redução da base bruta à base analítica (2017 a 2025)}
-\label{tab:funil}
-\small
-\begin{tabular}{lrr}
-\toprule
-Etapa & Registros & \% da bruta \\
-\midrule
-Base bruta (632.670 acidentes) & 4.069.971 & 100,0 \\
-Apenas a causa principal & 2.626.579 & 64,5 \\
-Apenas o tipo primário de acidente & 1.654.055 & 40,6 \\
-Com estado físico informado (base analítica) & 1.415.582 & 34,8 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Cada registro é atribuído a uma macrorregião pela unidade federativa,
-segundo a divisão do IBGE \cite{ibge2017}. Ficam fora dos preditores os
-identificadores (acidente, pessoa e veículo), as contagens de ilesos,
-feridos e mortos, que repetem o estado físico e portanto o alvo, e a
-classificação do acidente. Esta última descreve a ocorrência inteira: a
-probabilidade de óbito é de 39,9\% entre envolvidos em acidentes
-classificados como fatais e nula nos demais (V de Cramér de 0,61), de
-modo que usá-la equivaleria a informar o desfecho ao modelo.
-
-\subsection{Modelos de aprendizagem}
-
-São usados cinco classificadores. Os três empregados por
-\cite{gabardo2025} permitem comparar os resultados com os do Sul:
-k-vizinhos mais próximos (kNN), que classifica pela classe dos vizinhos
-no espaço de atributos \cite{cover1967}; perceptron multicamadas (MLP),
-rede neural ajustada por retropropagação \cite{rumelhart1986}; e
-florestas aleatórias, conjunto de árvores de decisão treinadas em
-amostras e subconjuntos de atributos distintos \cite{breiman2001}.
-Acrescentam-se o XGBoost, que constrói árvores rasas em sequência, cada
-uma corrigindo o erro das anteriores \cite{chen2016}, e uma máquina de
-vetores de suporte com kernel linear \cite{cortes1995}, referência de
-fronteira de decisão simples. O kernel linear é escolhido porque kernels
-não lineares têm custo de treino superquadrático no número de amostras,
-inviável para 1,4 milhão de registros. Os hiperparâmetros são definidos
-uma única vez e mantidos em todas as regiões, para que diferenças entre
-regiões não decorram de ajustes diferentes.
-
-\subsection{Protocolo de avaliação}
-
-Envolvidos do mesmo acidente compartilham todos os atributos da
-ocorrência. Se ficassem em lados opostos da separação entre treino e
-teste, o modelo reconheceria no teste um acidente já visto, e o
-desempenho medido seria maior que o real \cite{kaufman2012,kapoor2023}.
-Por isso a validação cruzada de cinco dobras é estratificada e agrupada
-pelo identificador do acidente. Atributos de alta cardinalidade, como
-marca do veículo (17.778 valores) e município (2.156), recebem
-codificação por alvo \cite{micci2001} com suavização, ajustada apenas
-sobre o treino de cada dobra. O balanceamento de classes, quando usado
-\cite{chawla2002}, também se restringe ao treino, e a avaliação preserva
-a proporção original de óbitos. A implementação usa scikit-learn
-\cite{pedregosa2011} e imbalanced-learn \cite{lemaitre2017}, com todas
-as etapas dependentes do alvo dentro de um mesmo \emph{pipeline} por
-dobra.
-
-A métrica primária é o F1 da classe óbito. Precisão, revocação e área
-sob a curva precisão-revocação, mais informativa que a curva ROC em
-classes desbalanceadas \cite{saito2015}, são reportadas como média e
-desvio-padrão entre as dobras.
-
-\subsection{Relevância dos fatores e comparação entre regiões}
-
-Para cada macrorregião treina-se um modelo apenas com seus registros e
-calculam-se os valores SHAP \cite{lundberg2017} sobre as partições de
-validação. A média do valor absoluto do SHAP de cada atributo define um
-ordenamento de relevância por região. Os ordenamentos são comparados par
-a par pelo tau de Kendall \cite{kendall1938} e pela sobreposição entre
-os dez atributos mais relevantes, com $k=5$ como verificação. Tau alto
-indica fatores comuns ao país; tau baixo indica fatores específicos de
-região, que pedem políticas diferenciadas.
-
-A capacidade de predição entre regiões é medida por uma matriz de
-transferência $5\times5$. O modelo treinado na região $i$ é avaliado na
-região $j$, e o elemento $M_{ij}$ é o F1 obtido. A diagonal mede o
-desempenho dentro da própria região, e a degradação relativa
-$(M_{ii}-M_{ij})/M_{ii}$ mede quanto se perde ao exportar o modelo. Como
-o Sudeste tem 5,2 vezes mais registros que o Norte, todos os treinos são
-subamostrados para o tamanho do Norte, preservando a proporção de
-classes, com repetições independentes. Sem esse controle, a diferença de
-volume seria confundida com diferença regional.
-
-
 \section{Trabalhos Correlatos}
 
 Os trabalhos mais próximos deste se dividem em três grupos: predição de
@@ -247,7 +134,7 @@ quilômetro. O objetivo foi identificar, com SHAP, os fatores de risco e
 traduzi-los em recomendações. Localização na rodovia, tipo de acidente
 e tipo de pista lideraram o ordenamento. Este trabalho usa os mesmos
 três algoritmos, mas estende a análise às cinco macrorregiões e ao
-período de 2017 a 2025, prevê o óbito de cada envolvido em vez da
+período de 2021 a 2025, prevê o óbito de cada envolvido em vez da
 classificação do acidente e compara os ordenamentos entre regiões.
 
 \cite{mafort2025} compararam sete classificadores para prever a
@@ -333,32 +220,182 @@ Trabalho & Recorte & Método & Fatores & Compara regiões? \\
 \cite{soliani2024} & PRF, caminhões, uma década & XGBoost, LightGBM & Descritiva & Não \\
 \cite{malta2023} & Óbitos, municípios, 2000 a 2018 & Análise espacial & Descritiva & Sim \\
 \cite{man2022} & Rodovias do Reino Unido, 2017 e 2018 & Rede neural, transferência & Não se aplica & Sim \\
-Este trabalho & PRF, Brasil, 2017 a 2025 & 5 classificadores & SHAP & Sim, $5\times5$ \\
+Este trabalho & PRF, Brasil, 2021 a 2025 & XGBoost (5 previstos) & SHAP & Sim, $5\times5$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
-\section{Resultados Preliminares}
+\section{Método}
 
-Esta seção apresenta a análise exploratória da base analítica, feita
-antes do treino de qualquer modelo. Os números e figuras foram gerados
-em Python com pandas e matplotlib \cite{hunter2007}, e o código está no
-repositório do trabalho.
+\subsection{Dados}
+
+A fonte são os microdados abertos da PRF na variante agrupada por pessoa
+com todas as causas e tipos de acidente \cite{prfdados}, em cinco
+arquivos anuais de 2021 a 2025 com esquema idêntico de 37 atributos. Cada
+linha descreve um envolvido em um acidente: dados da ocorrência (data,
+horário, rodovia, quilômetro, município, causa, tipo, condição
+meteorológica, tipo de pista, traçado, uso do solo), do veículo (tipo,
+marca, ano de fabricação) e da pessoa (tipo de envolvido, idade, sexo e
+estado físico). A variável resposta vale 1 quando o estado físico do
+envolvido é óbito. O período começa em 2021 porque nesse ano a PRF
+substituiu a classificação de causas: eram 24 causas distintas em 2017 e
+passaram a ser cerca de 70, com causas antigas divididas em várias novas
+sem correspondência um para um. A causa é um dos atributos mais
+associados ao óbito, e o recorte garante que ela tenha o mesmo
+significado em todos os anos. Dentro do período restam apenas variações
+de grafia e de redação, que foram unificadas (de 77 para 73 causas e de
+18 para 16 tipos de acidente).
+
+Essa variante repete o mesmo envolvido uma vez para cada causa e cada
+tipo de acidente registrados. Sem tratamento, ocorrências com registro
+mais detalhado pesariam mais no ajuste. A Tabela~\ref{tab:funil} mostra
+as reduções aplicadas. Mantêm-se apenas a causa principal e o tipo
+primário, o que deixa uma linha por envolvido por acidente, e
+excluem-se os registros sem estado físico informado, que se somariam
+indevidamente à classe negativa. Nenhum óbito é perdido: a base
+analítica contém os 28.668 óbitos da base bruta, e o total de 2024
+(6.160) coincide com o anuário da PRF \cite{prf2024}. A classe positiva
+representa 3,70\% dos registros, razão de aproximadamente 1 para 26.
+
+\begin{table}[H]
+\centering
+\caption{Redução da base bruta à base analítica (2021 a 2025)}
+\label{tab:funil}
+\small
+\begin{tabular}{lrr}
+\toprule
+Etapa & Registros & \% da bruta \\
+\midrule
+Base bruta (342.626 acidentes) & 2.702.004 & 100,0 \\
+Apenas a causa principal & 1.574.976 & 58,3 \\
+Apenas o tipo primário de acidente & 911.408 & 33,7 \\
+Com estado físico informado (base analítica) & 774.920 & 28,7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Cada registro é atribuído a uma macrorregião pela unidade federativa,
+segundo a divisão do IBGE \cite{ibge2017}. Ficam fora dos preditores os
+identificadores (acidente, pessoa e veículo), as contagens de ilesos,
+feridos e mortos, que repetem o estado físico, e a classificação do
+acidente, que descreve a ocorrência inteira: a probabilidade de óbito é
+de 39,6\% entre envolvidos em acidentes classificados como fatais e nula
+nos demais (V de Cramér de 0,61), o que equivaleria a informar o
+desfecho ao modelo. Ficam fora também os identificadores de lugar
+(unidade federativa, município, rodovia, quilômetro, delegacia, unidade
+operacional e coordenadas). Seus valores não se repetem entre regiões:
+um modelo do Sul aplicado ao Norte encontraria apenas municípios e
+trechos desconhecidos, e a perda medida misturaria a diferença entre
+fatores com a perda de um mapa decorado. Esses atributos também não
+geram recomendações transferíveis. O aspecto do lugar que se repete no
+país todo permanece, pelo uso do solo, tipo de pista e traçado. Uma
+consequência é que o par rodovia e quilômetro, fator mais relevante em
+\cite{gabardo2025}, não entra no ordenamento. Para medir quanto do
+desempenho vem da localização, uma rodada de controle os inclui.
+
+\subsection{Atributos e modelo}
+
+Restam 17 atributos: tipo de envolvido, tipo e causa do acidente, tipo de
+veículo, tipo de pista, uso do solo, fase do dia, sexo, condição
+meteorológica, sentido da via e dia da semana, categóricos; idade, idade
+do veículo, hora e ano, numéricos, o ano como controle da variação
+temporal; o traçado da via, que concatena descritores em ordem
+arbitrária e vira um indicador por descritor; e a marca e modelo do
+veículo (14.449 valores), que recebe codificação por alvo com suavização
+\cite{micci2001}. Como envolvidos do mesmo acidente compartilham o
+rótulo, a codificação no treino é calculada fora da dobra e por
+acidente: cada linha recebe a média do alvo estimada sem o seu próprio
+acidente.
+
+O plano prevê cinco classificadores: k-vizinhos mais próximos
+\cite{cover1967}, perceptron multicamadas \cite{rumelhart1986} e
+florestas aleatórias \cite{breiman2001}, os três usados por
+\cite{gabardo2025}, mais o XGBoost \cite{chen2016} e uma máquina de
+vetores de suporte linear \cite{cortes1995}. Nesta etapa foi
+implementado o XGBoost, que constrói árvores rasas em sequência, cada
+uma corrigindo o erro das anteriores, trata atributos categóricos e
+valores ausentes diretamente e permite calcular valores SHAP exatos. Os
+hiperparâmetros foram escolhidos uma única vez, numa amostra nacional de
+150 mil registros com validação cruzada de três dobras agrupada por
+acidente e área sob a curva precisão-revocação como critério, e mantidos
+em todas as regiões, para que diferenças entre regiões não decorram de
+ajustes diferentes. A busca escolheu profundidade máxima 4 e peso mínimo
+por folha 1, entre profundidades de 4 a 8, com taxa de aprendizado de
+0,1 e até 500 árvores, interrompidas após 30 rodadas sem melhora.
+
+\subsection{Protocolo de avaliação}
+
+Envolvidos do mesmo acidente compartilham todos os atributos da
+ocorrência. Se ficassem em lados opostos da separação entre treino e
+teste, o modelo reconheceria no teste um acidente já visto, e o
+desempenho medido seria maior que o real \cite{kaufman2012,kapoor2023}.
+Por isso cada região é dividida em cinco dobras estratificadas e
+agrupadas pelo acidente. Em cada dobra, o treino da região é subamostrado
+para o tamanho do treino do Norte, a menor região (35.432 registros),
+preservando a proporção de óbitos. Sem esse controle, a diferença de
+volume seria confundida com diferença regional. Dentro do treino, 20\%
+dos acidentes são separados para a parada antecipada e para escolher o
+limiar de decisão que maximiza o F1. O mesmo limiar é usado em todas as
+regiões de destino, e a avaliação preserva a proporção original de
+óbitos. A implementação usa scikit-learn \cite{pedregosa2011} e a
+biblioteca do XGBoost.
+
+O modelo treinado na região $i$ é avaliado na partição de teste da mesma
+dobra em cada região $j$, o que forma uma matriz de transferência
+$5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. A diagonal mede
+o desempenho dentro da própria região. Como o F1 depende da prevalência,
+que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
+medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$, e não
+contra o desempenho da origem, que compararia regiões com prevalências
+diferentes.
+Reportam-se também precisão, revocação, área sob a curva
+precisão-revocação \cite{saito2015} e área sob a curva ROC, esta
+insensível à prevalência, que varia entre as regiões. Todas as medidas
+são média e desvio-padrão entre as cinco dobras.
+
+\subsection{Relevância dos fatores e comparação entre regiões}
+
+Os valores SHAP \cite{lundberg2017} são calculados de forma exata pelo
+algoritmo para árvores do próprio XGBoost, sobre a partição de teste da
+região. A média do valor absoluto do SHAP de cada atributo define um
+ordenamento de relevância por região, e os indicadores de traçado são
+somados em um único atributo. Os ordenamentos são comparados par a par
+pelo tau de Kendall \cite{kendall1938} e pela sobreposição entre os dez
+e os cinco atributos mais relevantes, em cada dobra. Tau alto indica
+fatores comuns ao país; tau baixo indica fatores específicos de região,
+que pedem políticas diferenciadas. Os ordenamentos também são comparados
+com a associação marginal de cada atributo com o óbito, medida pelo V
+de Cramér com correção de viés \cite{bergsma2013}.
+
+
+\section{Resultados Parciais}
+
+Esta seção apresenta primeiro a caracterização da base por região e
+depois os resultados do XGBoost: desempenho dentro de cada região,
+transferência entre regiões e relevância dos fatores. Os números e
+figuras foram gerados em Python com pandas, scikit-learn, XGBoost e
+matplotlib \cite{hunter2007}, e o código e os dados estão no repositório
+do trabalho.
 
 \subsection{Composição regional}
 
 A Tabela~\ref{tab:regioes} resume a base por macrorregião. O volume é
-assimétrico: Sudeste e Sul somam 60\% dos registros, e o Norte tem 5,9\%.
-A letalidade por envolvido segue ordem quase inversa. O Nordeste (5,31\%)
-e o Norte (4,73\%) têm cerca do dobro da letalidade do Sul (2,70\%). As
-duas regiões mais letais também têm a maior participação de motocicletas
-entre os veículos envolvidos, e o Norte tem a maior proporção de
-registros em pista simples (68,9\%, contra 43,2\% no Sudeste).
+assimétrico: Sudeste e Sul somam 60,6\% dos registros, e o Norte tem
+5,7\%. A letalidade por envolvido segue ordem quase inversa. O Nordeste
+(5,39\%) e o Norte (5,30\%) têm quase o dobro da letalidade do Sul
+(2,82\%). Essas duas regiões também têm a maior participação de
+motocicletas entre os veículos envolvidos, e o Norte tem a maior
+proporção de registros em pista simples (71,2\%, contra 42,7\% no
+Sudeste). A diferença é estável no período: em todos os anos, Norte e
+Nordeste ficam acima da média nacional e Sul e Sudeste abaixo. O Norte é
+a única região com aumento contínuo, de 4,89\% em 2021 para 5,58\% em
+2025, e passa o Nordeste a partir de 2023. A letalidade nacional varia
+pouco, de 3,84\% em 2021 para 3,64\% em 2025.
 
 \begin{table}[H]
 \centering
-\caption{Base analítica por macrorregião (2017 a 2025). Letalidade,
+\caption{Base analítica por macrorregião (2021 a 2025). Letalidade,
 motocicletas entre os veículos e registros em pista simples, em \%}
 \label{tab:regioes}
 \small
@@ -367,147 +404,175 @@ motocicletas entre os veículos e registros em pista simples, em \%}
 \toprule
 Região & Registros & Acidentes & Óbitos & Letalidade & Moto & Pista simples \\
 \midrule
-Norte        &    83.512 &  34.655 &  3.954 & 4,73 & 22,3 & 68,9 \\
-Nordeste     &   302.635 & 133.250 & 16.082 & 5,31 & 24,3 & 60,5 \\
-Centro-Oeste &   173.294 &  74.875 &  6.534 & 3,77 & 15,4 & 54,7 \\
-Sudeste      &   435.386 & 192.666 & 12.881 & 2,96 & 19,6 & 43,2 \\
-Sul          &   420.755 & 185.353 & 11.371 & 2,70 & 17,0 & 51,3 \\
+Norte        &  44.291 &  18.111 &  2.349 & 5,30 & 22,3 & 71,2 \\
+Nordeste     & 166.280 &  72.617 &  8.959 & 5,39 & 26,2 & 58,6 \\
+Centro-Oeste &  94.479 &  40.067 &  3.768 & 3,99 & 15,7 & 54,6 \\
+Sudeste      & 241.328 & 105.517 &  7.151 & 2,96 & 21,5 & 42,7 \\
+Sul          & 228.542 &  98.750 &  6.441 & 2,82 & 17,7 & 49,5 \\
 \midrule
-Brasil       & 1.415.582 & 620.799 & 50.822 & 3,59 & 19,5 & 52,2 \\
+Brasil       & 774.920 & 335.062 & 28.668 & 3,70 & 20,7 & 51,2 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-A Figura~\ref{fig:ano} mostra a letalidade por ano. A diferença entre
-regiões é persistente: em todos os nove anos, Norte e Nordeste ficam
-acima da média nacional e Sul e Sudeste abaixo. O Norte tem a tendência
-mais forte, de 3,83\% em 2017 para 5,58\% em 2025, e passa o Nordeste a
-partir de 2023. A letalidade nacional sobe de 3,22\% em 2017 para 3,84\%
-em 2020 e 2021 e recua para 3,64\% em 2025. Essa variação temporal
-justifica incluir o ano como variável de controle.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=\textwidth]{letalidade_ano.pdf}
-\caption{Letalidade por envolvido (óbitos sobre envolvidos) por ano e
-macrorregião. A linha tracejada é a média nacional.}
-\label{fig:ano}
-\end{figure}
 
 \subsection{Letalidade por fator e região}
 
 A Figura~\ref{fig:categorias} mostra a letalidade de categorias
 selecionadas em cada região. Há dois comportamentos. Pedestres e
 atropelamentos têm letalidade alta e parecida em todo o país, entre
-24,7\% e 29,3\% para o pedestre envolvido. Já motocicleta, colisão
+25,4\% e 30,0\% para o pedestre envolvido. Já motocicleta, colisão
 frontal, pista simples, área rural e acidentes à noite são muito mais
 letais no Norte e no Nordeste. Um motociclista envolvido em acidente
-morre em 8,2\% a 8,4\% dos casos nessas regiões, contra 3,1\% a 3,3\% no
-Sul e no Sudeste. A colisão frontal mata 14,2\% a 14,8\% dos envolvidos
-no Norte, no Nordeste e no Centro-Oeste e 9,5\% no Sul e no Sudeste. A
-pista dupla, ao contrário, tem letalidade próxima em todas as regiões
-(2,0\% a 2,7\%). Um mesmo fator, portanto, pode ter peso muito diferente
-conforme a região, e esse é o padrão que os valores SHAP devem
-confirmar ou refutar.
+morre em 8,2\% a 9,4\% dos casos nessas regiões, contra 3,1\% a 3,4\% no
+Sul e no Sudeste. A colisão frontal mata de 14,3\% a 15,8\% dos
+envolvidos no Norte, no Nordeste e no Centro-Oeste e de 9,4\% a
+10,0\% no Sul e no Sudeste. A pista dupla, ao contrário, tem letalidade
+próxima em todas as regiões (2,1\% a 2,8\%). Um mesmo fator, portanto,
+pode ter peso muito diferente conforme a região.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{letalidade_categorias.pdf}
 \caption{Letalidade por envolvido (\%) em categorias selecionadas, por
-macrorregião (2017 a 2025). A última linha é a letalidade geral da
+macrorregião (2021 a 2025). A última linha é a letalidade geral da
 região.}
 \label{fig:categorias}
 \end{figure}
 
-\subsection{Associação dos atributos com o óbito}
+\subsection{Desempenho dentro de cada região}
 
-Para antecipar a comparação de ordenamentos, mediu-se a associação de
-cada atributo com o óbito pelo V de Cramér com correção de viés
-\cite{bergsma2013}, separadamente em cada região. Idade, idade do
-veículo e horário foram agrupados em faixas. A medida usa o período de
-2021 a 2025, por razão explicada na próxima subseção. É uma medida
-marginal, que não considera interações nem o efeito conjunto dos
-atributos, e serve apenas como primeira aproximação do ordenamento que
-o SHAP produzirá.
+A Tabela~\ref{tab:diagonal} mostra o desempenho do XGBoost treinado e
+avaliado na mesma região. O F1 da classe óbito vai de 0,26 no Sudeste a
+0,36 no Norte e no Nordeste, e a área sob a curva ROC fica entre 0,81 e
+0,84. A diferença no F1 acompanha a prevalência: as regiões com mais
+óbitos têm mais positivos a encontrar e atingem F1 maior, enquanto a
+área sob a curva ROC, que não depende da prevalência, varia pouco. O
+desvio-padrão entre dobras é pequeno, de 0,007 a 0,026 no F1. O
+desempenho é modesto em termos absolutos: a revocação de 0,25 a 0,40
+significa que a maioria dos óbitos não é identificada com os atributos
+registrados no boletim.
 
-A Figura~\ref{fig:associacao} mostra o resultado. Tipo de acidente,
-causa e tipo de envolvido são os três atributos mais associados ao óbito
-em todas as regiões. Abaixo deles, os ordenamentos se separam. O tipo de
-veículo tem V de 0,13 no Norte e no Nordeste e de 0,05 no Sul; o uso do
-solo, 0,11 no Norte e 0,05 no Sudeste; a condição meteorológica, 0,06 no
-Norte e 0,01 no Sul. O tau de Kendall entre os ordenamentos das regiões
-varia de 0,70 (Nordeste e Sul; Centro-Oeste e Sul) a 0,85 (Nordeste e
-Sudeste). Entre os cinco atributos mais associados, pares de regiões
-compartilham de três a cinco. O Sul é a região cujo ordenamento mais
-difere dos demais, o que é relevante porque é a região estudada por
-\cite{gabardo2025}.
+\begin{table}[H]
+\centering
+\caption{XGBoost avaliado na própria região, média (desvio-padrão) entre
+as cinco dobras. A última coluna repete o F1 com os identificadores de
+lugar incluídos}
+\label{tab:diagonal}
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{lcccccc}
+\toprule
+Região & F1 & Precisão & Revocação & AUC-PR & AUC-ROC & F1 com lugar \\
+\midrule
+Norte        & 0,358 (0,026) & 0,323 (0,024) & 0,401 (0,036) & 0,311 (0,016) & 0,836 (0,013) & 0,358 (0,012) \\
+Nordeste     & 0,357 (0,007) & 0,341 (0,042) & 0,390 (0,076) & 0,318 (0,012) & 0,844 (0,005) & 0,300 (0,006) \\
+Centro-Oeste & 0,299 (0,011) & 0,276 (0,029) & 0,339 (0,064) & 0,227 (0,009) & 0,812 (0,015) & 0,254 (0,017) \\
+Sudeste      & 0,262 (0,012) & 0,288 (0,052) & 0,254 (0,057) & 0,203 (0,010) & 0,806 (0,010) & 0,186 (0,017) \\
+Sul          & 0,270 (0,011) & 0,257 (0,031) & 0,292 (0,035) & 0,191 (0,010) & 0,819 (0,008) & 0,179 (0,004) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Incluir os identificadores de lugar não melhorou o desempenho em nenhuma
+região e o piorou em quatro, com queda de 0,270 para 0,179 no F1 do Sul.
+Com cerca de 35 mil registros de treino, milhares de municípios e
+trechos de rodovia são categorias com poucos casos cada, e o modelo
+ajusta ruído. Nesta escala de dados, portanto, o lugar não acrescenta
+informação além dos fatores, e a exclusão não custa desempenho.
+
+\subsection{Transferência entre regiões}
+
+A Figura~\ref{fig:matriz} mostra a matriz de transferência. À esquerda
+está o F1 de cada modelo em cada região. À direita está quanto o modelo
+importado perde para o modelo treinado no próprio destino. A perda é
+assimétrica. Modelos treinados no Sudeste e no Sul perdem de 14\% a 23\%
+do F1 quando aplicados ao Norte, ao Nordeste e ao Centro-Oeste. Na
+direção contrária, modelos do Norte e do Nordeste perdem de 1\% a 8\% no
+Sudeste e no Sul, e o do Nordeste praticamente iguala o modelo local do
+Sudeste (perda de 0,8\%). A área sob a curva precisão-revocação, que não
+depende do limiar, confirma o padrão: o modelo do Sul perde 22\% dessa
+área no Norte e 21\% no Nordeste. A assimetria não decorre, portanto,
+apenas de um limiar calibrado para outra prevalência.
+
+Esse resultado distingue os dois cenários previstos no método. Não é que
+nenhuma região exporte: os modelos das regiões mais letais funcionam
+razoavelmente em todo o país. O que não exporta são os modelos das
+regiões menos letais, e justamente para as regiões onde mais se morre.
+Um modelo, ou uma lista de fatores, derivado do Sul tende a subestimar
+o risco no Norte e no Nordeste.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{associacao_regioes.pdf}
-\caption{V de Cramér corrigido entre cada atributo e o óbito, por
-macrorregião (2021 a 2025). A linha cinza liga o menor e o maior valor
-entre as regiões.}
-\label{fig:associacao}
+\includegraphics[width=\textwidth]{matriz_transferencia.pdf}
+\caption{Matriz de transferência do XGBoost, média das cinco dobras.
+Linhas: região de treino; colunas: região de avaliação. À direita,
+$(M_{jj}-M_{ij})/M_{jj}$ em \%.}
+\label{fig:matriz}
 \end{figure}
 
-\subsection{Consistência dos dados ao longo do tempo}
+\subsection{Relevância dos fatores}
 
-A análise encontrou três problemas que afetam a etapa de modelagem. O
-primeiro é a mudança na taxonomia de causas em 2021. A PRF registrava 24
-causas distintas em 2017 e passou a registrar cerca de 70 a partir de
-2021. Quinze causas deixam de existir depois de 2020, entre elas
-``falta de atenção à condução'', a mais frequente até então, e 27
-aparecem só a partir de 2021, como ``reação tardia ou ineficiente do
-condutor'' e ``ausência de reação do condutor''. Como a causa antiga foi
-dividida em várias novas, não há correspondência um para um. Por isso a
-causa só é comparável a partir de 2021, e a Figura~\ref{fig:associacao}
-usa esse período. Para a série completa, será necessário agrupar as
-causas em categorias mais amplas.
+A Figura~\ref{fig:shap} mostra o valor SHAP absoluto médio de cada
+atributo por região. Os quatro atributos mais relevantes são os mesmos
+em todas as regiões: tipo de veículo, tipo de acidente, causa do
+acidente e uso do solo. O tau de Kendall entre os ordenamentos completos
+vai de 0,64 (Nordeste e Sudeste; Nordeste e Sul) a 0,77 (Nordeste e
+Centro-Oeste), e, entre os dez atributos mais relevantes, pares de
+regiões compartilham em média de 8,2 a 9,0. Os ordenamentos variam pouco
+entre dobras (desvio-padrão do tau de 0,03 a 0,11).
 
-O segundo são mudanças pontuais no tipo de acidente na transição de
-2020 para 2021. A ``colisão lateral'' foi dividida por sentido, e a
-``colisão com objeto estático'' e a ``em movimento'' foram unidas. Essas mudanças têm
-correspondência direta, e a harmonização reduz os tipos de 21 para 17.
-Sem ela, o mesmo fator apareceria dividido em dois no ordenamento SHAP.
+A ordem é estável, mas o peso não. O SHAP do tipo de veículo é 0,76 no
+Norte e no Nordeste e 0,41 no Sul; o do uso do solo, 0,46 no Norte e
+0,18 no Sul; o do tipo de pista, 0,29 no Nordeste e 0,06 no Sudeste, o
+que o leva do quinto para o décimo primeiro lugar. São os mesmos fatores
+cuja letalidade mais difere entre regiões na
+Figura~\ref{fig:categorias}: motocicleta, área rural e pista simples.
+Isso explica a assimetria da transferência. Um modelo do Sul aprende que
+esses atributos pesam pouco e erra onde eles pesam muito.
 
-O terceiro é o traçado da via, com 1.310 valores distintos. O campo
-concatena vários descritores (reta, curva, aclive, declive, ponte etc.)
-em ordem arbitrária. Ordenar os descritores reduz o campo a 379
-combinações, e 85\% dos registros têm um único descritor. Para os
-modelos, o campo será convertido em um indicador por descritor. Os
-valores ausentes são poucos: idade (3,6\%), ano de fabricação e tipo do
-veículo (2,2\%), rodovia e quilômetro (0,2\%). Há ainda 2.092 registros
-com idade acima de 120 anos, tratados como ausentes.
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{shap_regioes.pdf}
+\caption{Valor SHAP absoluto médio por atributo e macrorregião (XGBoost,
+média das cinco dobras). A linha cinza liga o menor e o maior valor
+entre as regiões.}
+\label{fig:shap}
+\end{figure}
 
+Dois cuidados na leitura. O tipo de veículo é vazio exatamente para
+pedestres e cavaleiros, de modo que esse atributo carrega também a
+identidade do pedestre; por isso o tipo de envolvido, terceiro na
+associação marginal, fica entre os últimos no SHAP, que divide o
+crédito entre atributos redundantes. Pela mesma razão, a concordância
+entre o ordenamento SHAP e o do V de Cramér com correção de viés
+\cite{bergsma2013} é apenas moderada (tau de 0,45 a 0,56): a associação
+marginal não considera o que os demais atributos já informam.
 
 \section{Discussão e Conclusão}
 
-A análise exploratória mostra que a letalidade nas rodovias federais é
-desigual entre as macrorregiões e que a desigualdade é estável ao longo
-de nove anos. Norte e Nordeste têm cerca do dobro da letalidade do Sul,
-e o Norte é a única região com aumento contínuo desde 2021. Os fatores
-se dividem em dois grupos. Pedestres e atropelamentos são letais em
-qualquer região e apontam para medidas de alcance nacional. Motocicleta,
-colisão frontal, pista simples e área rural têm letalidade muito maior
-no Norte e no Nordeste, o que sugere que duplicação de pistas e
-fiscalização de motociclistas teriam retorno maior nessas regiões. Esses
-resultados são descritivos: comparam taxas, sem controlar os demais
-atributos, e não permitem atribuir causa.
+Os resultados permitem três afirmações. Primeiro, com os atributos do
+boletim da PRF, o óbito é previsível apenas em parte: o F1 da classe
+óbito fica entre 0,26 e 0,36, e a maioria dos óbitos não é identificada.
+Segundo, os fatores mais relevantes são comuns ao país. Tipo de veículo,
+tipo e causa do acidente e uso do solo lideram o ordenamento em todas as
+regiões, o que sustenta medidas de alcance nacional, como as voltadas a
+pedestres e a colisões graves. Terceiro, o peso desses fatores não é
+comum. Motocicleta, área rural e pista simples contam de duas a quatro
+vezes mais no Norte e no Nordeste, e modelos treinados no Sul e no
+Sudeste perdem até 23\% do F1 nessas regiões. Recomendações derivadas de
+um recorte regional, como as de \cite{gabardo2025} para o Sul, devem ser
+aplicadas ao resto do país com cautela, principalmente onde a letalidade
+é maior. Duplicação de pistas e fiscalização de motociclistas tendem a
+ter retorno maior no Norte e no Nordeste.
 
-A associação marginal indica que os três fatores principais coincidem
-entre regiões e que a divergência está nos intermediários. Se esse
-padrão se mantiver nos valores SHAP, a conclusão será que um núcleo de
-fatores vale para o país e que a política deve ser diferenciada a partir
-dele. Esse resultado também é informativo, pois indica que parte das
-recomendações do estudo do Sul \cite{gabardo2025} pode ser estendida às
-demais regiões e parte não.
-
-As próximas etapas são harmonizar as causas para a série completa,
-treinar os cinco modelos por região sob o protocolo descrito, calcular
-os ordenamentos SHAP e comparar esses ordenamentos entre regiões, e
-construir a matriz de transferência $5\times5$ com subamostragem para o
-tamanho do Norte.
+Há limitações. Os resultados são associações e não permitem atribuir
+causa. A exclusão dos identificadores de lugar impede comparar o
+ordenamento com o do estudo do Sul, cujo fator principal é o trecho da
+rodovia. O registro da PRF pode diferir entre regiões em cobertura e
+preenchimento. E apenas um modelo foi implementado. Até o relatório
+final serão acrescentados os outros quatro classificadores previstos,
+com o mesmo protocolo, para verificar se a estabilidade dos fatores e a
+assimetria da transferência dependem do modelo.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
