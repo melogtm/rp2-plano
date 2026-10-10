@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import chi2_contingency, kendalltau
 
+import dados
 from dados import base_analitica
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -241,18 +242,15 @@ def main():
     out["letalidade_categorias"] = let.to_dict(orient="index")
     out["participacao_categorias"] = part.to_dict(orient="index")
 
-    # Associação: 2021–2025, período com taxonomia única de causa_acidente.
-    rec = df[df["ano"] >= 2021]
-    V, ranks, pares = associacao(rec)
-    out["associacao_periodo"] = {"anos": "2021-2025", "registros": len(rec)}
+    V, ranks, pares = associacao(df)
     out["cramer_v"] = V.to_dict(orient="index")
     out["kendall_tau_pares"] = pares
 
     cat = pd.crosstab(df["causa_acidente"], df["ano"]) > 0
     out["categorias_por_ano"] = {
         "causa_acidente": cat.sum().to_dict(),
-        "causa_so_ate_2020": int((cat.loc[:, 2021:].sum(axis=1) == 0).sum()),
-        "causa_so_desde_2021": int((cat.loc[:, :2020].sum(axis=1) == 0).sum()),
+        "causa_bruta": int(pd.read_parquet(dados.CACHE, columns=["causa_acidente"]).causa_acidente.nunique()),
+        "causa_harmonizada": int(df["causa_acidente"].nunique()),
         "tipo_acidente_bruto": int(df["tipo_acidente"].nunique()),
         "tipo_acidente_harmonizado": int(df["tipo_acidente_h"].nunique()),
         "tracado_via_bruto": int(df["tracado_via"].nunique()),

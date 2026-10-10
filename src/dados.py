@@ -1,7 +1,7 @@
 """Carregamento e preparação dos microdados da PRF.
 
 Variante "agrupados por pessoa — todas as causas e tipos de acidente",
-arquivos anuais 2017–2025. Todas as funções recebem/retornam DataFrames
+arquivos anuais 2021–2025. Todas as funções recebem/retornam DataFrames
 para serem reutilizadas pelos scripts de replicação e das análises.
 """
 from pathlib import Path
@@ -28,6 +28,14 @@ EXCLUIR_SEMPRE = [
     "estado_fisico",                                        # alvo
 ]
 
+# Renomeações de causa_acidente dentro de 2021–2025 (grafia e redação).
+HARMONIZA_CAUSA = {
+    "Transitar no Acostamento": "Transitar no acostamento",
+    "Ingestão de álcool e/ou substâncias psicoativas pelo pedestre": "Pedestre: ingestão de álcool ou substâncias",
+    "Ingestão de álcool ou de substâncias psicoativas pelo pedestre": "Pedestre: ingestão de álcool ou substâncias",
+    "Pedestre - Ingestão de álcool/ substâncias psicoativas": "Pedestre: ingestão de álcool ou substâncias",
+}
+
 DTYPES = {
     "id": "int64", "pesid": "float64", "id_veiculo": "float64",
     "br": "float64", "km": "float64", "ano_fabricacao_veiculo": "float64",
@@ -37,14 +45,14 @@ DTYPES = {
 }
 
 
-def carregar_bruta(anos=range(2017, 2026), usar_cache=True) -> pd.DataFrame:
+def carregar_bruta(anos=range(2021, 2026), usar_cache=True) -> pd.DataFrame:
     """Concatena os arquivos anuais. Mantém latitude/longitude como texto."""
     if usar_cache and CACHE.exists():
         df = pd.read_parquet(CACHE)
         return df[df["ano"].isin(list(anos))]
     partes = []
     for ano in anos:
-        f = DATA_DIR / f"acidentes{ano}_todas_causas_tipos.csv"
+        f = DATA_DIR / f"acidentes{ano}_todas_causas_tipos.csv.xz"
         d = pd.read_csv(f, sep=";", encoding="ISO-8859-1", decimal=",",
                         dtype=DTYPES, low_memory=False)
         d["ano"] = ano
@@ -70,8 +78,9 @@ def filtrar_analitica(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     return df, funil
 
 
-def base_analitica(anos=range(2017, 2026)) -> tuple[pd.DataFrame, dict]:
+def base_analitica(anos=range(2021, 2026)) -> tuple[pd.DataFrame, dict]:
     df, funil = filtrar_analitica(carregar_bruta(anos))
+    df["causa_acidente"] = df["causa_acidente"].astype(str).replace(HARMONIZA_CAUSA)
     df["y"] = (df["estado_fisico"] == "Óbito").astype("int8")
     df["macrorregiao"] = df["uf"].map(MACRORREGIAO)
     assert df["macrorregiao"].notna().all(), "UF sem macrorregião"
