@@ -291,15 +291,14 @@ de 39,6\% entre envolvidos em acidentes classificados como fatais e nula
 nos demais (V de Cramér de 0,61), o que equivaleria a informar o
 desfecho ao modelo. Ficam fora também os identificadores de lugar
 (unidade federativa, município, rodovia, quilômetro, delegacia, unidade
-operacional e coordenadas). Seus valores não se repetem entre regiões:
-um modelo do Sul aplicado ao Norte encontraria apenas municípios e
-trechos desconhecidos, e a perda medida misturaria a diferença entre
-fatores com a perda de uma informação que só vale na região de origem. Esses atributos também não
-geram recomendações transferíveis. O aspecto do lugar que se repete no
-país todo permanece, pelo uso do solo, tipo de pista e traçado. Uma
-consequência é que o par rodovia e quilômetro, fator mais relevante no
-estudo da região Sul \cite{gabardo2025}, não entra no ordenamento. Para medir quanto do
-desempenho vem da localização, uma rodada de controle os inclui.
+operacional e coordenadas). Seus valores não se repetem entre regiões
+nem geram recomendações transferíveis: um modelo do Sul aplicado ao
+Norte só encontraria municípios e trechos desconhecidos. O que o lugar
+tem de comum no país entra pelo uso do solo, pelo tipo de pista e pelo
+traçado. Assim, o par rodovia e quilômetro, fator mais relevante no
+estudo da região Sul \cite{gabardo2025}, fica fora do ordenamento, e uma
+rodada de controle o inclui para medir quanto do desempenho vem da
+localização.
 
 \subsection{Atributos e modelo}
 
@@ -311,22 +310,21 @@ temporal; o traçado da via, que concatena descritores em ordem
 arbitrária e vira um indicador por descritor; e a marca e modelo do
 veículo (14.449 valores), que recebe codificação por alvo com suavização
 \cite{micci2001}. Como envolvidos do mesmo acidente compartilham o
-rótulo, a codificação no treino é calculada fora da dobra e por
-acidente: cada linha recebe a média do alvo estimada sem o seu próprio
-acidente.
+rótulo, cada linha do treino recebe a média do alvo estimada sem o seu
+próprio acidente.
 
 O plano prevê quatro classificadores: k-vizinhos mais próximos
 \cite{cover1967} e perceptron multicamadas \cite{rumelhart1986},
 também usados no estudo da região Sul \cite{gabardo2025}, o XGBoost
 \cite{chen2016} e uma máquina de vetores de suporte com kernel linear
 \cite{cortes1995}. Nesta etapa foi
-implementado o XGBoost, que constrói árvores rasas em sequência, cada
-uma corrigindo o erro das anteriores, trata atributos categóricos e
-valores ausentes diretamente e permite calcular valores SHAP exatos. Os
+implementado o XGBoost, um conjunto de árvores rasas treinadas em
+sequência que aceita atributos categóricos e valores ausentes e permite
+calcular valores SHAP exatos. Os
 hiperparâmetros foram escolhidos uma única vez, numa amostra nacional de
 60 mil registros de acidentes sorteados e retirados do experimento, com
 validação cruzada de três dobras agrupada por acidente e área sob a
-curva precisão-revocação como critério. Entre profundidades de 4 a 8, a
+curva precisão-revocação como critério. A
 busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
 de aprendizado de 0,1 e 74 árvores, número fixado pela parada antecipada
 dentro da própria busca. Esses valores valem para todas as regiões, para
@@ -346,8 +344,7 @@ volume seria confundida com diferença regional. Dentro do treino, 20\%
 dos acidentes são separados para escolher o limiar de decisão que
 maximiza o F1. O mesmo limiar é usado em todas as
 regiões de destino, e a avaliação preserva a proporção original de
-óbitos. A implementação usa scikit-learn \cite{pedregosa2011} e a
-biblioteca do XGBoost.
+óbitos.
 
 O modelo treinado na região $i$ é avaliado na partição de teste da mesma
 dobra em cada região $j$, o que forma uma matriz de transferência
@@ -355,11 +352,9 @@ $5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. A diagonal mede
 o desempenho dentro da própria região. Como o F1 depende da prevalência,
 que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
 medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$.
-Medi-la contra o desempenho na origem misturaria a perda com a diferença
-de prevalência entre as regiões.
 Reportam-se também precisão, revocação, área sob a curva
 precisão-revocação \cite{saito2015} e área sob a curva ROC, esta
-insensível à prevalência, que varia entre as regiões. Todas as medidas
+insensível à prevalência. Todas as medidas
 são média e desvio-padrão entre as cinco dobras.
 
 \subsection{Relevância dos fatores e comparação entre regiões}
@@ -370,9 +365,7 @@ região. A média do valor absoluto do SHAP de cada atributo define um
 ordenamento de relevância por região, e os indicadores de traçado são
 somados em um único atributo. Os ordenamentos são comparados par a par
 pelo tau de Kendall \cite{kendall1938} e pela sobreposição entre os dez
-e os cinco atributos mais relevantes, em cada dobra. Tau alto indica
-fatores comuns ao país; tau baixo indica fatores específicos de região,
-que pedem políticas diferenciadas. Os ordenamentos também são comparados
+e os cinco atributos mais relevantes, em cada dobra. Os ordenamentos também são comparados
 com a associação marginal de cada atributo com o óbito, medida pelo V
 de Cramér com correção de viés \cite{bergsma2013}.
 
@@ -380,7 +373,7 @@ de Cramér com correção de viés \cite{bergsma2013}.
 \section{Resultados Parciais}
 
 Os números e figuras desta seção foram gerados em Python com pandas,
-scikit-learn, XGBoost e matplotlib \cite{hunter2007}. O código e os
+scikit-learn \cite{pedregosa2011}, XGBoost e matplotlib \cite{hunter2007}. O código e os
 dados estão no repositório do trabalho.
 
 \subsection{Composição regional}
@@ -550,7 +543,7 @@ o tipo de envolvido, terceiro na associação marginal, fica entre os
 últimos no SHAP, que divide o crédito entre atributos redundantes. A
 mesma redundância faz com que a concordância
 entre o ordenamento SHAP e o do V de Cramér com correção de viés
-\cite{bergsma2013} é apenas moderada (tau de 0,41 a 0,55): a associação
+\cite{bergsma2013} seja apenas moderada (tau de 0,41 a 0,55): a associação
 marginal não considera o que os demais atributos já informam.
 
 \section{Discussão e Conclusão}
