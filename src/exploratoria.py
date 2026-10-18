@@ -260,7 +260,8 @@ def main():
     cat = pd.crosstab(df["causa_acidente"], df["ano"]) > 0
     out["categorias_por_ano"] = {
         "causa_acidente": cat.sum().to_dict(),
-        "causa_bruta": int(pd.read_parquet(dados.CACHE, columns=["causa_acidente"]).causa_acidente.nunique()),
+        "causa_antes_harmonizar": int(
+            dados.filtrar_analitica(dados.carregar_bruta())[0]["causa_acidente"].nunique()),
         "causa_harmonizada": int(df["causa_acidente"].nunique()),
         "tipo_acidente_bruto": int(df["tipo_acidente"].nunique()),
         "tipo_acidente_harmonizado": int(df["tipo_acidente_h"].nunique()),
