@@ -87,8 +87,8 @@ def montar(df):
 class GroupTargetEncoder(BaseEstimator, TransformerMixin):
     """Codificação por alvo com suavização (m-estimate) e ajuste fora-da-dobra
     por grupo. No treino, cada linha é codificada com dobras que excluem todo
-    o seu acidente (GroupKFold por `id`); sem isso, pessoas do mesmo acidente
-    — mesmo br_km, mesmo rótulo — vazam o rótulo umas para as outras. No
+    o seu acidente (GroupKFold por `id`). Pessoas do mesmo acidente têm o
+    mesmo rótulo, e sem isso uma vazaria o rótulo para as outras. No
     teste, usa-se o mapa ajustado sobre todo o treino. `id` é consumido e
     não sai como atributo."""
 
@@ -133,6 +133,7 @@ MODELOS = {  # os demais classificadores entram aqui no relatório final
 
 
 def melhor_limiar(y, p):
+    """Limiar de probabilidade que maximiza o F1 da classe positiva."""
     prec, rev, lim = precision_recall_curve(y, p)
     f1 = 2 * prec * rev / np.maximum(prec + rev, 1e-12)
     return float(lim[np.argmax(f1[:-1])])
@@ -153,6 +154,7 @@ def ajustar(nome, X, y, cols, hp, seed):
 
 
 def avaliar(clf, enc, limiar, X, y, cols):
+    """Métricas do modelo ajustado em (X, y), com o limiar fixado no treino."""
     p = clf.predict_proba(enc.transform(X[cols + ["id"]]))[:, 1]
     pred = p >= limiar
     tp = int((pred & (y == 1)).sum())
@@ -226,6 +228,10 @@ def buscar_hp(nome, X, y, cols, rapido):
 
 
 def rodar(rapido=False, nome="XGBoost"):
+    """Experimento completo: busca de hiperparâmetros, 5 dobras x 5 regiões de
+    treino x 5 de teste e SHAP. Grava metricas.csv, shap.csv e modelos.json em
+    results/ e chama `resumir`. Com `rapido`, uma dobra e treinos de 5 mil
+    registros, para testar o código (saídas com sufixo _rapido)."""
     t0 = time.time()
     df, funil = base_analitica()
     X, y, reg = montar(df)
@@ -291,6 +297,9 @@ def rodar(rapido=False, nome="XGBoost"):
 
 # ------------------------------------------------------------------- resumo
 def resumir(sufixo=""):
+    """Agrega metricas.csv e shap.csv (médias e desvios entre dobras) em
+    modelos_resumo.json. Lê results/exploratoria.json para comparar o SHAP
+    com o V de Cramér, então a exploratória precisa ter rodado antes."""
     met = pd.read_csv(RES / f"metricas{sufixo}.csv")
     shap = pd.read_csv(RES / f"shap{sufixo}.csv")
     out = {}
@@ -351,6 +360,8 @@ def resumir(sufixo=""):
 
 # ------------------------------------------------------------------ figuras
 def _heatmap(ax, M, cmap, norm, fmt, escuro):
+    """Desenha a matriz 5x5 M com os valores escritos e a diagonal em negrito.
+    `escuro` recebe o valor normalizado e diz se o texto vai em branco."""
     v = M.to_numpy()
     ax.imshow(v, cmap=cmap, norm=norm, aspect="auto")
     for a in range(5):
@@ -368,6 +379,8 @@ def _heatmap(ax, M, cmap, norm, fmt, escuro):
 
 
 def figuras():
+    """Gera matriz_transferencia.pdf e shap_regioes.pdf a partir de
+    modelos_resumo.json, sem treinar nada."""
     r = json.loads((RES / "modelos_resumo.json").read_text())
     f1 = pd.DataFrame({o: {d: r["matriz_f1"][o][d][0] for d in REGIOES} for o in REGIOES}).T.loc[REGIOES, REGIOES]
     deg = pd.DataFrame({o: {d: r["degradacao_destino"][o][d][0] for d in REGIOES}
