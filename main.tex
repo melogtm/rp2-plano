@@ -239,33 +239,28 @@ Este trabalho & PRF, Brasil, 2021 a 2025 & XGBoost (4 previstos) & SHAP & Sim, $
 A fonte são os microdados abertos da PRF na variante agrupada por pessoa
 com todas as causas e tipos de acidente \cite{prfdados}, em cinco
 arquivos anuais de 2021 a 2025 com esquema idêntico de 37 atributos. Cada
-linha descreve um envolvido em um acidente: dados da ocorrência (data,
-horário, rodovia, quilômetro, município, causa, tipo, condição
-meteorológica, tipo de pista, traçado, uso do solo), do veículo (tipo,
-marca, ano de fabricação) e da pessoa (tipo de envolvido, idade, sexo e
-estado físico). A variável resposta vale 1 quando o estado físico do
+linha descreve um envolvido em um acidente, com dados da ocorrência, do
+veículo e da pessoa. A variável resposta vale 1 quando o estado físico do
 envolvido é óbito. O período começa em 2021 porque nesse ano a PRF
-substituiu a classificação de causas: eram 24 causas distintas em 2017 e
-passaram a ser cerca de 70, com causas antigas divididas em várias novas
-sem correspondência um para um. A causa é um dos atributos mais
-associados ao óbito, e o recorte garante que ela tenha o mesmo
-significado em todos os anos. Dentro do período restam variações de
-grafia e de redação nas causas, que foram unificadas (de 77 para 73), e
+trocou as 24 causas usadas desde 2017 por cerca de 70, dividindo causas
+antigas em várias novas sem correspondência um para um. Como a causa é
+um dos atributos mais associados ao óbito, o recorte garante que ela
+tenha o mesmo significado em todos os anos. Dentro do período restam variações de
+grafia e de redação nas causas, que foram unificadas (de 76 para 73), e
 a divisão da colisão lateral por sentido, que foi revertida (de 18 para
 16 tipos de acidente).
 
-Essa variante repete o mesmo envolvido uma vez para cada causa e cada
-tipo de acidente registrados. Sem tratamento, ocorrências com registro
-mais detalhado pesariam mais no ajuste. A Tabela~\ref{tab:funil} mostra
-as reduções aplicadas. Mantêm-se apenas a causa principal e o tipo
-primário, o que deixa uma linha por envolvido por acidente, e
+Essa variante repete o mesmo envolvido para cada causa e cada tipo de
+acidente registrados, o que daria mais peso às ocorrências com registro
+mais detalhado. Mantêm-se apenas a causa principal e o tipo primário
+(Tabela~\ref{tab:funil}), o que deixa uma linha por envolvido por acidente, e
 excluem-se os registros sem estado físico informado, que se somariam
 indevidamente à classe negativa. Nenhum óbito é perdido: a base
 analítica contém os 28.668 óbitos da base bruta, e o total de 2024
 (6.160) coincide com o anuário da PRF \cite{prf2024}. A classe positiva
-representa 3,70\% dos registros, razão de aproximadamente 1 para 26.
+representa 3,70\% dos registros.
 
-\begin{table}[H]
+\begin{table}[tb]
 \centering
 \caption{Redução da base bruta à base analítica (2021 a 2025)}
 \label{tab:funil}
@@ -291,15 +286,14 @@ de 39,6\% entre envolvidos em acidentes classificados como fatais e nula
 nos demais (V de Cramér de 0,61), o que equivaleria a informar o
 desfecho ao modelo. Ficam fora também os identificadores de lugar
 (unidade federativa, município, rodovia, quilômetro, delegacia, unidade
-operacional e coordenadas). Seus valores não se repetem entre regiões:
-um modelo do Sul aplicado ao Norte encontraria apenas municípios e
-trechos desconhecidos, e a perda medida misturaria a diferença entre
-fatores com a perda de uma informação que só vale na região de origem. Esses atributos também não
-geram recomendações transferíveis. O aspecto do lugar que se repete no
-país todo permanece, pelo uso do solo, tipo de pista e traçado. Uma
-consequência é que o par rodovia e quilômetro, fator mais relevante no
-estudo da região Sul \cite{gabardo2025}, não entra no ordenamento. Para medir quanto do
-desempenho vem da localização, uma rodada de controle os inclui.
+operacional e coordenadas). Seus valores não se repetem entre regiões
+nem geram recomendações transferíveis: um modelo do Sul aplicado ao
+Norte só encontraria municípios e trechos desconhecidos. O que o lugar
+tem de comum no país entra pelo uso do solo, pelo tipo de pista e pelo
+traçado. Assim, o par rodovia e quilômetro, fator mais relevante no
+estudo da região Sul \cite{gabardo2025}, fica fora do ordenamento, e uma
+rodada de controle o inclui para medir quanto do desempenho vem da
+localização.
 
 \subsection{Atributos e modelo}
 
@@ -311,76 +305,66 @@ temporal; o traçado da via, que concatena descritores em ordem
 arbitrária e vira um indicador por descritor; e a marca e modelo do
 veículo (14.449 valores), que recebe codificação por alvo com suavização
 \cite{micci2001}. Como envolvidos do mesmo acidente compartilham o
-rótulo, a codificação no treino é calculada fora da dobra e por
-acidente: cada linha recebe a média do alvo estimada sem o seu próprio
-acidente.
+rótulo, cada linha do treino recebe a média do alvo estimada sem o seu
+próprio acidente.
 
 O plano prevê quatro classificadores: k-vizinhos mais próximos
 \cite{cover1967} e perceptron multicamadas \cite{rumelhart1986},
 também usados no estudo da região Sul \cite{gabardo2025}, o XGBoost
 \cite{chen2016} e uma máquina de vetores de suporte com kernel linear
 \cite{cortes1995}. Nesta etapa foi
-implementado o XGBoost, que constrói árvores rasas em sequência, cada
-uma corrigindo o erro das anteriores, trata atributos categóricos e
-valores ausentes diretamente e permite calcular valores SHAP exatos. Os
+implementado o XGBoost, um conjunto de árvores rasas treinadas em
+sequência que aceita atributos categóricos e valores ausentes e permite
+calcular valores SHAP exatos. Os
 hiperparâmetros foram escolhidos uma única vez, numa amostra nacional de
-60 mil registros de acidentes sorteados e retirados do experimento, com
+60 mil registros sorteados por acidente e retirados do experimento, com
 validação cruzada de três dobras agrupada por acidente e área sob a
-curva precisão-revocação como critério. Entre profundidades de 4 a 8, a
+curva precisão-revocação como critério. A
 busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
-de aprendizado de 0,1 e 74 árvores, número fixado pela parada antecipada
-dentro da própria busca. Esses valores valem para todas as regiões, para
-que diferenças entre regiões não decorram de ajustes diferentes.
+de aprendizado de 0,1 e 74 árvores, número fixado por parada antecipada
+na busca. Os valores são os mesmos em todas as regiões.
 
 \subsection{Protocolo de avaliação}
 
-Envolvidos do mesmo acidente compartilham todos os atributos da
-ocorrência. Se ficassem em lados opostos da separação entre treino e
-teste, o modelo reconheceria no teste um acidente já visto, e o
-desempenho medido seria maior que o real \cite{kaufman2012,kapoor2023}.
+Envolvidos do mesmo acidente compartilham os atributos da ocorrência.
+Se fossem separados entre treino e teste, o modelo reconheceria no teste um
+acidente já visto e o desempenho medido seria inflado
+\cite{kaufman2012,kapoor2023}.
 Por isso cada região é dividida em cinco dobras estratificadas e
 agrupadas pelo acidente. Em cada dobra, o treino da região é subamostrado
 para o tamanho do treino do Norte, a menor região (32.693 registros),
-preservando a proporção de óbitos. Sem esse controle, a diferença de
-volume seria confundida com diferença regional. Dentro do treino, 20\%
+preservando a proporção de óbitos. Sem isso, a diferença de
+volume se confundiria com diferença regional. Dentro do treino, 20\%
 dos acidentes são separados para escolher o limiar de decisão que
 maximiza o F1. O mesmo limiar é usado em todas as
 regiões de destino, e a avaliação preserva a proporção original de
-óbitos. A implementação usa scikit-learn \cite{pedregosa2011} e a
-biblioteca do XGBoost.
+óbitos.
 
-O modelo treinado na região $i$ é avaliado na partição de teste da mesma
-dobra em cada região $j$, o que forma uma matriz de transferência
-$5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. A diagonal mede
-o desempenho dentro da própria região. Como o F1 depende da prevalência,
+O modelo da região $i$ é avaliado no teste da mesma dobra em cada
+região $j$, o que forma uma matriz de transferência
+$5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. Como o F1 depende da prevalência,
 que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
 medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$.
-Medi-la contra o desempenho na origem misturaria a perda com a diferença
-de prevalência entre as regiões.
 Reportam-se também precisão, revocação, área sob a curva
 precisão-revocação \cite{saito2015} e área sob a curva ROC, esta
-insensível à prevalência, que varia entre as regiões. Todas as medidas
-são média e desvio-padrão entre as cinco dobras.
+insensível à prevalência.
 
 \subsection{Relevância dos fatores e comparação entre regiões}
 
 Os valores SHAP \cite{lundberg2017} são calculados de forma exata pelo
-algoritmo para árvores do próprio XGBoost, sobre a partição de teste da
-região. A média do valor absoluto do SHAP de cada atributo define um
-ordenamento de relevância por região, e os indicadores de traçado são
-somados em um único atributo. Os ordenamentos são comparados par a par
-pelo tau de Kendall \cite{kendall1938} e pela sobreposição entre os dez
-e os cinco atributos mais relevantes, em cada dobra. Tau alto indica
-fatores comuns ao país; tau baixo indica fatores específicos de região,
-que pedem políticas diferenciadas. Os ordenamentos também são comparados
-com a associação marginal de cada atributo com o óbito, medida pelo V
-de Cramér com correção de viés \cite{bergsma2013}.
+XGBoost na partição de teste da região. A média do valor absoluto do
+SHAP de cada atributo define um ordenamento de relevância por região, e os indicadores de traçado são
+somados em um único atributo. Os ordenamentos são comparados entre si,
+em cada dobra, pelo tau de Kendall \cite{kendall1938} e pela
+sobreposição entre os dez e os cinco atributos mais relevantes, e com a
+associação marginal de cada atributo com o óbito, medida pelo V de
+Cramér com correção de viés \cite{bergsma2013}.
 
 
 \section{Resultados Parciais}
 
 Os números e figuras desta seção foram gerados em Python com pandas,
-scikit-learn, XGBoost e matplotlib \cite{hunter2007}. O código e os
+scikit-learn \cite{pedregosa2011}, XGBoost e matplotlib \cite{hunter2007}. O código e os
 dados estão no repositório do trabalho.
 
 \subsection{Composição regional}
@@ -550,7 +534,7 @@ o tipo de envolvido, terceiro na associação marginal, fica entre os
 últimos no SHAP, que divide o crédito entre atributos redundantes. A
 mesma redundância faz com que a concordância
 entre o ordenamento SHAP e o do V de Cramér com correção de viés
-\cite{bergsma2013} é apenas moderada (tau de 0,41 a 0,55): a associação
+\cite{bergsma2013} seja apenas moderada (tau de 0,41 a 0,55): a associação
 marginal não considera o que os demais atributos já informam.
 
 \section{Discussão e Conclusão}

@@ -1,4 +1,4 @@
-"""Análise exploratória da base analítica (2017–2025) por macrorregião.
+"""Análise exploratória da base analítica (2021–2025) por macrorregião.
 
 Gera as figuras do relatório em figuras/ e os números citados no texto em
 results/exploratoria.json. Uso: .venv/bin/python src/exploratoria.py
@@ -28,7 +28,7 @@ COR = dict(zip(REGIOES, ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7", "#e34948"])
 MARCA = dict(zip(REGIOES, ["o", "s", "^", "D", "v"]))
 AZUIS = ["#f4f8fd", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 
-# Renomeações de tipo_acidente em 2020–2021 (fusão/partição de categorias).
+# Categorias de tipo_acidente divididas dentro do período voltam a ser uma só.
 HARMONIZA_TIPO = {
     "Colisão lateral mesmo sentido": "Colisão lateral",
     "Colisão lateral sentido oposto": "Colisão lateral",
@@ -58,6 +58,9 @@ def afastar(valores, gap):
 
 
 def preparar(df):
+    """Acrescenta ao df as colunas derivadas usadas na exploratória e nos
+    modelos: tipo de acidente harmonizado, faixas de idade, idade do veículo
+    e hora, e o traçado em forma canônica."""
     df["tipo_acidente_h"] = df["tipo_acidente"].astype(str).replace(HARMONIZA_TIPO)
     idade = df["idade"].where(df["idade"].between(0, 120))
     df["faixa_etaria"] = pd.cut(idade, [-1, 17, 29, 44, 59, 120],
@@ -107,6 +110,8 @@ ATRIBUTOS = {  # coluna -> rótulo no gráfico
 
 
 def fig_letalidade_ano(df):
+    """Figura da letalidade anual por região e no Brasil. Retorna a tabela
+    ano x região, em %."""
     tab = df.pivot_table(index="ano", columns="macrorregiao", values="y",
                          aggfunc="mean", observed=True) * 100
     fig, ax = plt.subplots(figsize=(6.3, 2.4))
@@ -121,7 +126,7 @@ def fig_letalidade_ano(df):
                 color="#52514e" if r == "Brasil" else "#0b0b0b")
     ax.yaxis.set_major_formatter(VIRGULA)
     ax.set_xticks(tab.index)
-    ax.set_xlim(2016.7, 2026.4)
+    ax.set_xlim(2020.7, 2026.4)
     ax.set_ylabel("Letalidade por envolvido (%)")
     ax.grid(axis="y", color="#e4e3df", lw=0.5)
     ax.spines[["top", "right"]].set_visible(False)
@@ -148,6 +153,8 @@ LINHAS_HEATMAP = [  # (coluna, categoria, rótulo)
 
 
 def fig_letalidade_categorias(df):
+    """Mapa de calor da letalidade (%) das categorias de LINHAS_HEATMAP por
+    região. Retorna a letalidade e a participação de cada categoria."""
     let, part = {}, {}
     for col, cat, rot in LINHAS_HEATMAP:
         m = df[col].astype(str) == cat
@@ -181,6 +188,9 @@ def fig_letalidade_categorias(df):
 
 
 def associacao(df):
+    """V de Cramér de cada atributo com o óbito, por região, e a figura
+    correspondente. Retorna V, os postos e a concordância entre pares
+    (tau de Kendall e atributos em comum entre os 5 primeiros)."""
     V = pd.DataFrame({r: {rot: cramer_v(d[c].astype(str), d["y"])
                           for c, rot in ATRIBUTOS.items()}
                       for r, d in df.groupby("macrorregiao", observed=True)})[REGIOES]
@@ -215,6 +225,7 @@ def associacao(df):
 
 
 def main():
+    """Gera as figuras e grava results/exploratoria.json."""
     FIG.mkdir(exist_ok=True)
     RES.mkdir(exist_ok=True)
     df, funil = base_analitica()
@@ -249,7 +260,8 @@ def main():
     cat = pd.crosstab(df["causa_acidente"], df["ano"]) > 0
     out["categorias_por_ano"] = {
         "causa_acidente": cat.sum().to_dict(),
-        "causa_bruta": int(pd.read_parquet(dados.CACHE, columns=["causa_acidente"]).causa_acidente.nunique()),
+        "causa_antes_harmonizar": int(
+            dados.filtrar_analitica(dados.carregar_bruta())[0]["causa_acidente"].nunique()),
         "causa_harmonizada": int(df["causa_acidente"].nunique()),
         "tipo_acidente_bruto": int(df["tipo_acidente"].nunique()),
         "tipo_acidente_harmonizado": int(df["tipo_acidente_h"].nunique()),
