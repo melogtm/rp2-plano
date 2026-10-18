@@ -110,7 +110,7 @@ Microdados abertos da PRF, variante "agrupados por pessoa, todas as causas e tip
 
 ## Reproduzir os resultados
 
-Os scripts rodam com Python 3.13 ou mais novo. As versões usadas estão em `requirements.txt`.
+Os resultados foram gerados com Python 3.14 (`versoes` em `results/modelos.json`). As versões das bibliotecas estão em `requirements.txt`.
 
 ```bash
 python3 -m venv .venv
@@ -127,5 +127,7 @@ A ordem importa. `exploratoria.py` grava `results/exploratoria.json`, e o resumo
 | `exploratoria.py` | `results/exploratoria.json` (funil, tabela por região, letalidade por ano e por categoria, V de Cramér); `figuras/letalidade_categorias.pdf`, `letalidade_ano.pdf`, `associacao_regioes.pdf` |
 | `modelos.py` | `results/metricas.csv` (uma linha por dobra, origem e destino), `results/shap.csv` (SHAP médio por dobra, região e atributo), `results/modelos.json` (configuração, hiperparâmetros e versões) e `results/modelos_resumo.json` (médias e desvios, matriz de transferência, ordenamentos e tau de Kendall) |
 | `modelos.py --figuras` | `figuras/matriz_transferencia.pdf` e `figuras/shap_regioes.pdf`, a partir de `modelos_resumo.json`, sem treinar de novo |
+
+`.venv/bin/python src/test_encoder.py` testa se a codificação de `marca` exclui o próprio acidente, para que pessoas do mesmo acidente não passem o rótulo umas para as outras.
 
 O experimento completo levou cerca de 8 minutos na última execução (`duracao_s` em `results/modelos.json`). Para testar uma mudança no código antes disso, `src/modelos.py --rapido` roda uma dobra só, com treinos de 5 mil registros, e grava as saídas com o sufixo `_rapido`, sem sobrescrever as do artigo.
