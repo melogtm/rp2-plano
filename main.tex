@@ -317,12 +317,12 @@ implementado o XGBoost, um conjunto de árvores rasas treinadas em
 sequência que aceita atributos categóricos e valores ausentes e permite
 calcular valores SHAP exatos. Os
 hiperparâmetros foram escolhidos uma única vez, numa amostra nacional de
-60 mil registros de acidentes sorteados e retirados do experimento, com
+60 mil registros sorteados por acidente e retirados do experimento, com
 validação cruzada de três dobras agrupada por acidente e área sob a
 curva precisão-revocação como critério. A
 busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
-de aprendizado de 0,1 e 74 árvores, número fixado pela parada antecipada
-dentro da própria busca. Os valores são os mesmos em todas as regiões.
+de aprendizado de 0,1 e 74 árvores, número fixado por parada antecipada
+na busca. Os valores são os mesmos em todas as regiões.
 
 \subsection{Protocolo de avaliação}
 
@@ -347,8 +347,7 @@ que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
 medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$.
 Reportam-se também precisão, revocação, área sob a curva
 precisão-revocação \cite{saito2015} e área sob a curva ROC, esta
-insensível à prevalência. Todas as medidas
-são média e desvio-padrão entre as cinco dobras.
+insensível à prevalência.
 
 \subsection{Relevância dos fatores e comparação entre regiões}
 
