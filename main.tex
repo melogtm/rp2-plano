@@ -245,20 +245,18 @@ meteorológica, tipo de pista, traçado, uso do solo), do veículo (tipo,
 marca, ano de fabricação) e da pessoa (tipo de envolvido, idade, sexo e
 estado físico). A variável resposta vale 1 quando o estado físico do
 envolvido é óbito. O período começa em 2021 porque nesse ano a PRF
-substituiu a classificação de causas: eram 24 causas distintas em 2017 e
-passaram a ser cerca de 70, com causas antigas divididas em várias novas
-sem correspondência um para um. A causa é um dos atributos mais
-associados ao óbito, e o recorte garante que ela tenha o mesmo
-significado em todos os anos. Dentro do período restam variações de
+trocou as 24 causas usadas desde 2017 por cerca de 70, dividindo causas
+antigas em várias novas sem correspondência um para um. Como a causa é
+um dos atributos mais associados ao óbito, o recorte garante que ela
+tenha o mesmo significado em todos os anos. Dentro do período restam variações de
 grafia e de redação nas causas, que foram unificadas (de 77 para 73), e
 a divisão da colisão lateral por sentido, que foi revertida (de 18 para
 16 tipos de acidente).
 
-Essa variante repete o mesmo envolvido uma vez para cada causa e cada
-tipo de acidente registrados. Sem tratamento, ocorrências com registro
-mais detalhado pesariam mais no ajuste. A Tabela~\ref{tab:funil} mostra
-as reduções aplicadas. Mantêm-se apenas a causa principal e o tipo
-primário, o que deixa uma linha por envolvido por acidente, e
+Essa variante repete o mesmo envolvido para cada causa e cada tipo de
+acidente registrados, o que daria mais peso às ocorrências com registro
+mais detalhado. Mantêm-se apenas a causa principal e o tipo primário
+(Tabela~\ref{tab:funil}), o que deixa uma linha por envolvido por acidente, e
 excluem-se os registros sem estado físico informado, que se somariam
 indevidamente à classe negativa. Nenhum óbito é perdido: a base
 analítica contém os 28.668 óbitos da base bruta, e o total de 2024
@@ -327,15 +325,15 @@ validação cruzada de três dobras agrupada por acidente e área sob a
 curva precisão-revocação como critério. A
 busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
 de aprendizado de 0,1 e 74 árvores, número fixado pela parada antecipada
-dentro da própria busca. Esses valores valem para todas as regiões, para
-que diferenças entre regiões não decorram de ajustes diferentes.
+dentro da própria busca. Os valores são os mesmos em todas as regiões,
+para que a comparação não dependa do ajuste.
 
 \subsection{Protocolo de avaliação}
 
-Envolvidos do mesmo acidente compartilham todos os atributos da
-ocorrência. Se ficassem em lados opostos da separação entre treino e
-teste, o modelo reconheceria no teste um acidente já visto, e o
-desempenho medido seria maior que o real \cite{kaufman2012,kapoor2023}.
+Envolvidos do mesmo acidente compartilham os atributos da ocorrência.
+Se fossem separados entre treino e teste, o modelo reconheceria no teste um
+acidente já visto e o desempenho medido seria inflado
+\cite{kaufman2012,kapoor2023}.
 Por isso cada região é dividida em cinco dobras estratificadas e
 agrupadas pelo acidente. Em cada dobra, o treino da região é subamostrado
 para o tamanho do treino do Norte, a menor região (32.693 registros),
@@ -360,14 +358,13 @@ são média e desvio-padrão entre as cinco dobras.
 \subsection{Relevância dos fatores e comparação entre regiões}
 
 Os valores SHAP \cite{lundberg2017} são calculados de forma exata pelo
-algoritmo para árvores do próprio XGBoost, sobre a partição de teste da
-região. A média do valor absoluto do SHAP de cada atributo define um
-ordenamento de relevância por região, e os indicadores de traçado são
-somados em um único atributo. Os ordenamentos são comparados par a par
-pelo tau de Kendall \cite{kendall1938} e pela sobreposição entre os dez
-e os cinco atributos mais relevantes, em cada dobra. Os ordenamentos também são comparados
-com a associação marginal de cada atributo com o óbito, medida pelo V
-de Cramér com correção de viés \cite{bergsma2013}.
+XGBoost na partição de teste da região. A média do valor absoluto do
+SHAP de cada atributo define um ordenamento de relevância por região, e os indicadores de traçado são
+somados em um único atributo. Os ordenamentos são comparados entre si,
+em cada dobra, pelo tau de Kendall \cite{kendall1938} e pela
+sobreposição entre os dez e os cinco atributos mais relevantes, e com a
+associação marginal de cada atributo com o óbito, medida pelo V de
+Cramér com correção de viés \cite{bergsma2013}.
 
 
 \section{Resultados Parciais}
