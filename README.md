@@ -97,10 +97,6 @@ Só um integrante submete cada entrega. Todos apresentam no vídeo e na apresent
 
 P1 e P2 valem só 10% somados, mas entram na fórmula como multiplicador: não entregar zera a média final, independente do P3.
 
-## Pendências
-
-- [ ] Substituir o template placeholder pelo oficial do e-Disciplinas
-
 ## Dados
 
 Microdados abertos da PRF, variante "agrupados por pessoa, todas as causas e tipos de acidente", 2021 a 2025 (<https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf>). Os cinco CSV originais (ISO-8859-1, separador `;`) estão em `data/` comprimidos com xz. O pandas lê direto: `pd.read_csv("data/acidentes2025_todas_causas_tipos.csv.xz", sep=";", encoding="ISO-8859-1", decimal=",")`. `src/dados.py` monta a base analítica e grava um cache em `data/base_bruta.parquet`, que não vai para o git.
