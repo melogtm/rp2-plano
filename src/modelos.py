@@ -148,7 +148,7 @@ def ajustar(nome, X, y, cols, hp, seed):
     A_fit = enc.fit_transform(X.iloc[fit][cols + ["id"]], y.iloc[fit])
     A_val = enc.transform(X.iloc[val][cols + ["id"]])
     clf = MODELOS[nome](hp, seed)
-    clf.fit(A_fit, y.iloc[fit], verbose=False)
+    clf.fit(A_fit, y.iloc[fit])
     limiar = melhor_limiar(y.iloc[val], clf.predict_proba(A_val)[:, 1])
     return clf, enc, limiar
 
