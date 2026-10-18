@@ -310,13 +310,11 @@ def resumir(sufixo=""):
     for c in ["auc_pr", "auc_roc"]:
         out[f"matriz_{c}"] = {o: {d: [round(g[c].mean()[o, d], 3), round(g[c].std()[o, d], 3)]
                                   for d in REGIOES} for o in REGIOES}
-    # Degradação relativa por dobra, depois média. "origem": (M_ii - M_ij)/M_ii,
-    # como no plano; confunde-se com a prevalência do destino, que muda o F1.
-    # "destino": (M_jj - M_ij)/M_jj, perda do modelo importado frente ao local.
+    # Degradação relativa por dobra, depois média: (M_jj - M_ij)/M_jj, perda do
+    # modelo importado frente ao local, em F1 e em AUC-PR.
     diag = sem[sem.origem == sem.destino].set_index(["origem", "dobra"])
-    for nome, ref, c in [("origem", "origem", "f1"), ("destino", "destino", "f1"),
-                         ("destino_auc_pr", "destino", "auc_pr")]:
-        base = diag[c].loc[list(zip(sem[ref], sem.dobra))].to_numpy()
+    for nome, c in [("destino", "f1"), ("destino_auc_pr", "auc_pr")]:
+        base = diag[c].loc[list(zip(sem.destino, sem.dobra))].to_numpy()
         deg = (1 - sem[c] / base).groupby([sem.origem, sem.destino]).agg(["mean", "std"])
         out[f"degradacao_{nome}"] = {o: {d: [round(deg.loc[(o, d), "mean"], 3),
                                              round(deg.loc[(o, d), "std"], 3)]
