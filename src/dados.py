@@ -38,12 +38,14 @@ DTYPES = {
 
 def carregar_bruta(anos=range(2021, 2026), usar_cache=True) -> pd.DataFrame:
     """Concatena os arquivos anuais. Mantém latitude/longitude como texto."""
-    if usar_cache and CACHE.exists():
+    xz = {ano: DATA_DIR / f"acidentes{ano}_todas_causas_tipos.csv.xz" for ano in anos}
+    # Um .xz mais novo que o parquet (a PRF atualiza o ano corrente) refaz o cache.
+    if usar_cache and CACHE.exists() and max(
+            f.stat().st_mtime for f in xz.values()) <= CACHE.stat().st_mtime:
         df = pd.read_parquet(CACHE)
         return df[df["ano"].isin(list(anos))]
     partes = []
-    for ano in anos:
-        f = DATA_DIR / f"acidentes{ano}_todas_causas_tipos.csv.xz"
+    for ano, f in xz.items():
         d = pd.read_csv(f, sep=";", encoding="ISO-8859-1", decimal=",",
                         dtype=DTYPES, low_memory=False)
         d["ano"] = ano
