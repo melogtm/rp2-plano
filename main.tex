@@ -239,11 +239,8 @@ Este trabalho & PRF, Brasil, 2021 a 2025 & XGBoost (4 previstos) & SHAP & Sim, $
 A fonte são os microdados abertos da PRF na variante agrupada por pessoa
 com todas as causas e tipos de acidente \cite{prfdados}, em cinco
 arquivos anuais de 2021 a 2025 com esquema idêntico de 37 atributos. Cada
-linha descreve um envolvido em um acidente: dados da ocorrência (data,
-horário, rodovia, quilômetro, município, causa, tipo, condição
-meteorológica, tipo de pista, traçado, uso do solo), do veículo (tipo,
-marca, ano de fabricação) e da pessoa (tipo de envolvido, idade, sexo e
-estado físico). A variável resposta vale 1 quando o estado físico do
+linha descreve um envolvido em um acidente, com dados da ocorrência, do
+veículo e da pessoa. A variável resposta vale 1 quando o estado físico do
 envolvido é óbito. O período começa em 2021 porque nesse ano a PRF
 trocou as 24 causas usadas desde 2017 por cerca de 70, dividindo causas
 antigas em várias novas sem correspondência um para um. Como a causa é
@@ -261,7 +258,7 @@ excluem-se os registros sem estado físico informado, que se somariam
 indevidamente à classe negativa. Nenhum óbito é perdido: a base
 analítica contém os 28.668 óbitos da base bruta, e o total de 2024
 (6.160) coincide com o anuário da PRF \cite{prf2024}. A classe positiva
-representa 3,70\% dos registros, razão de aproximadamente 1 para 26.
+representa 3,70\% dos registros.
 
 \begin{table}[H]
 \centering
@@ -325,8 +322,7 @@ validação cruzada de três dobras agrupada por acidente e área sob a
 curva precisão-revocação como critério. A
 busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
 de aprendizado de 0,1 e 74 árvores, número fixado pela parada antecipada
-dentro da própria busca. Os valores são os mesmos em todas as regiões,
-para que a comparação não dependa do ajuste.
+dentro da própria busca. Os valores são os mesmos em todas as regiões.
 
 \subsection{Protocolo de avaliação}
 
@@ -346,8 +342,7 @@ regiões de destino, e a avaliação preserva a proporção original de
 
 O modelo treinado na região $i$ é avaliado na partição de teste da mesma
 dobra em cada região $j$, o que forma uma matriz de transferência
-$5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. A diagonal mede
-o desempenho dentro da própria região. Como o F1 depende da prevalência,
+$5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. Como o F1 depende da prevalência,
 que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
 medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$.
 Reportam-se também precisão, revocação, área sob a curva
