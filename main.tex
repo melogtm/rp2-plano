@@ -333,15 +333,15 @@ acidente já visto e o desempenho medido seria inflado
 Por isso cada região é dividida em cinco dobras estratificadas e
 agrupadas pelo acidente. Em cada dobra, o treino da região é subamostrado
 para o tamanho do treino do Norte, a menor região (32.693 registros),
-preservando a proporção de óbitos. Sem esse controle, a diferença de
-volume seria confundida com diferença regional. Dentro do treino, 20\%
+preservando a proporção de óbitos. Sem isso, a diferença de
+volume se confundiria com diferença regional. Dentro do treino, 20\%
 dos acidentes são separados para escolher o limiar de decisão que
 maximiza o F1. O mesmo limiar é usado em todas as
 regiões de destino, e a avaliação preserva a proporção original de
 óbitos.
 
-O modelo treinado na região $i$ é avaliado na partição de teste da mesma
-dobra em cada região $j$, o que forma uma matriz de transferência
+O modelo da região $i$ é avaliado no teste da mesma dobra em cada
+região $j$, o que forma uma matriz de transferência
 $5\times5$ cujo elemento $M_{ij}$ é o F1 da classe óbito. Como o F1 depende da prevalência,
 que vai de 2,8\% no Sul a 5,4\% no Nordeste, a perda de transferência é
 medida contra o modelo local do destino, $(M_{jj}-M_{ij})/M_{jj}$.
