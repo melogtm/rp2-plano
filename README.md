@@ -10,13 +10,20 @@ O artigo é escrito em LaTeX. Cada um edita localmente e commita; o GitHub Actio
 .
 ├── .github/workflows/build.yml   # CI: compila e publica o PDF
 ├── .vscode/settings.json         # config de build (versionada, não mexer)
-├── main.tex                      # o artigo — arquivo único, de propósito
+├── main.tex                      # o artigo, num arquivo só
 ├── referencias.bib               # bibliografia
-├── figuras/
+├── data/                         # CSV da PRF 2021 a 2025, comprimidos com xz
+├── src/
+│   ├── dados.py                  # leitura, filtros e base analítica
+│   ├── exploratoria.py           # análise por macrorregião e figuras da exploratória
+│   └── modelos.py                # XGBoost por região, transferência e SHAP
+├── results/                      # números citados no texto (JSON e CSV)
+├── figuras/                      # PDFs incluídos no artigo
+├── requirements.txt
 └── .gitignore
 ```
 
-Arquivo único em vez de um `.tex` por seção: com três pessoas commitando, fragmentar troca conflito de merge por conflito de merge **mais** erro de compilação em arquivo que ninguém abriu. Pra 4–6 páginas não compensa.
+O artigo fica num `.tex` só porque, com três pessoas commitando, dividir por seção troca conflito de merge por conflito de merge mais erro de compilação em arquivo que ninguém abriu.
 
 ## Instalação
 
@@ -100,3 +107,25 @@ P1 e P2 valem só 10% somados, mas entram na fórmula como multiplicador: não e
 ## Dados
 
 Microdados abertos da PRF, variante "agrupados por pessoa, todas as causas e tipos de acidente", 2021 a 2025 (<https://www.gov.br/prf/pt-br/acesso-a-informacao/dados-abertos/dados-abertos-da-prf>). Os cinco CSV originais (ISO-8859-1, separador `;`) estão em `data/` comprimidos com xz. O pandas lê direto: `pd.read_csv("data/acidentes2025_todas_causas_tipos.csv.xz", sep=";", encoding="ISO-8859-1", decimal=",")`. `src/dados.py` monta a base analítica e grava um cache em `data/base_bruta.parquet`, que não vai para o git.
+
+## Reproduzir os resultados
+
+Os scripts rodam com Python 3.13 ou mais novo. As versões usadas estão em `requirements.txt`.
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python src/exploratoria.py
+.venv/bin/python src/modelos.py
+.venv/bin/python src/modelos.py --figuras
+```
+
+A ordem importa. `exploratoria.py` grava `results/exploratoria.json`, e o resumo de `modelos.py` lê esse arquivo para comparar o SHAP com o V de Cramér. Na primeira execução, `dados.py` lê os `.xz` e cria o cache em parquet; das próximas vezes a leitura é direta.
+
+| Script | Gera |
+|---|---|
+| `exploratoria.py` | `results/exploratoria.json` (funil, tabela por região, letalidade por ano e por categoria, V de Cramér); `figuras/letalidade_categorias.pdf`, `letalidade_ano.pdf`, `associacao_regioes.pdf` |
+| `modelos.py` | `results/metricas.csv` (uma linha por dobra, origem e destino), `results/shap.csv` (SHAP médio por dobra, região e atributo), `results/modelos.json` (configuração, hiperparâmetros e versões) e `results/modelos_resumo.json` (médias e desvios, matriz de transferência, ordenamentos e tau de Kendall) |
+| `modelos.py --figuras` | `figuras/matriz_transferencia.pdf` e `figuras/shap_regioes.pdf`, a partir de `modelos_resumo.json`, sem treinar de novo |
+
+O experimento completo levou cerca de 8 minutos na última execução (`duracao_s` em `results/modelos.json`). Para testar uma mudança no código antes disso, `src/modelos.py --rapido` roda uma dobra só, com treinos de 5 mil registros, e grava as saídas com o sufixo `_rapido`, sem sobrescrever as do artigo.
