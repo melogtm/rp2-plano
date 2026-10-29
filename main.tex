@@ -589,7 +589,7 @@ o modelo local fraco e instável nessa região.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{transferencia_modelos.pdf}
+\includegraphics[width=0.8\textwidth]{transferencia_modelos.pdf}
 \caption{Perda do F1 frente ao modelo local do destino,
 $(M_{jj}-M_{ij})/M_{jj}$ em \%, nos quatro modelos (média das cinco
 dobras). Linhas: região de treino; colunas: região de avaliação. A
@@ -645,13 +645,13 @@ mil registros, a permutação é mais ruidosa, e a concordância entre
 regiões fica um pouco abaixo da do SHAP (tau médio de 0,61, contra
 0,69).
 
-Entre os modelos, a concordância depende do par
-(Tabela~\ref{tab:taumodelos}). XGBoost, SVM e MLP concordam entre si,
-com tau médio de 0,51 a 0,64, e os três põem tipo de veículo, tipo de
+Entre os modelos, a concordância depende do par. XGBoost, SVM e MLP
+concordam entre si, com tau médio entre as regiões de 0,64 (XGBoost e
+SVM), 0,55 (XGBoost e MLP) e 0,51 (MLP e SVM), e os três põem tipo de veículo, tipo de
 acidente e causa do acidente entre os cinco atributos mais relevantes
 em todas as regiões. O tipo de acidente está entre os cinco primeiros
-em todos os modelos e regiões. O kNN se afasta dos demais (tau de 0,25
-a 0,51) porque põe a marca do veículo em primeiro lugar nas cinco
+em todos os modelos e regiões. O kNN se afasta dos demais (tau de 0,33 com o
+XGBoost, 0,51 com o MLP e 0,25 com o SVM) porque põe a marca do veículo em primeiro lugar nas cinco
 regiões. A marca entra nos modelos como a taxa de óbito da marca, um
 número contínuo que pesa na distância entre registros, e embaralhá-la
 desfaz a vizinhança que o kNN usa para estimar a probabilidade. O
@@ -663,38 +663,19 @@ esse modelo é mais instável. Dentro de cada modelo, os ordenamentos das
 regiões se parecem: o tau médio entre pares de regiões é de 0,61 no
 XGBoost, 0,63 no SVM, 0,54 no kNN e 0,51 no MLP.
 
-\begin{table}[H]
-\centering
-\caption{Tau de Kendall entre os ordenamentos por permutação de dois
-modelos na mesma região, média das cinco dobras}
-\label{tab:taumodelos}
-\small
-\begin{tabular}{lcccccc}
-\toprule
-Par de modelos & Norte & Nordeste & Centro-Oeste & Sudeste & Sul & Média \\
-\midrule
-XGBoost e SVM & 0,69 & 0,64 & 0,64 & 0,59 & 0,63 & 0,64 \\
-XGBoost e MLP & 0,56 & 0,66 & 0,61 & 0,34 & 0,56 & 0,55 \\
-MLP e SVM     & 0,55 & 0,64 & 0,56 & 0,34 & 0,47 & 0,51 \\
-kNN e MLP     & 0,53 & 0,50 & 0,56 & 0,45 & 0,50 & 0,51 \\
-XGBoost e kNN & 0,34 & 0,36 & 0,38 & 0,26 & 0,30 & 0,33 \\
-kNN e SVM     & 0,32 & 0,34 & 0,24 & 0,13 & 0,23 & 0,25 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 A diferença de peso entre regiões que o SHAP do XGBoost mostrou se
 repete nos outros modelos (Tabela~\ref{tab:pesos}). Na permutação, o
 tipo de veículo vale de 1,8 a 1,9 vez mais no Norte e no Nordeste do que
-no Sul no XGBoost, de 4,1 a 4,2 vezes no MLP, de 4,8 a 5,3 vezes no SVM
-e de 7 a 8 vezes no kNN. O uso do solo vale de 1,7 a 5,2 vezes mais
-nessas duas regiões, conforme o modelo. No XGBoost, no MLP e no SVM, o
+no Sul no XGBoost, de 4,1 a 4,2 vezes no MLP e de 4,8 a 5,3 vezes no
+SVM. O uso do solo vale de 1,7 a 5,2 vezes mais nessas duas regiões,
+conforme o modelo. No kNN, que fica fora da tabela, o tipo de veículo
+vale de 7 a 8 vezes mais e o uso do solo de 3 a 5 vezes. No XGBoost, no MLP e no SVM, o
 tipo de pista tem queda de no máximo 3,9 no Sul e no Sudeste e de 9,1 a
 21,1 no Norte e no Nordeste, na escala da tabela; no kNN, esse padrão
 não aparece. Parte da
 diferença vem da AUC-PR de base, maior no Norte e no Nordeste (até 1,6
-vez a do Sul no XGBoost), mas as razões do MLP, do SVM e do kNN vão
-muito além disso. O tipo de envolvido faz o caminho inverso no XGBoost
+vez a do Sul no XGBoost), mas as razões dos outros modelos vão muito
+além disso. O tipo de envolvido faz o caminho inverso no XGBoost
 e no SVM e pesa mais no Sudeste e no Sul. Como ele divide com o tipo de
 veículo a identidade do pedestre, a inversão é coerente com o tipo de
 veículo pesar menos nessas regiões.
@@ -702,7 +683,8 @@ veículo pesar menos nessas regiões.
 \begin{table}[H]
 \centering
 \caption{Importância por permutação (queda de AUC-PR $\times 1000$) de
-três atributos, por modelo e região, média das cinco dobras}
+três atributos no XGBoost, no MLP e no SVM, por região, média das cinco
+dobras}
 \label{tab:pesos}
 \small
 \begin{tabular}{llrrrrr}
@@ -710,17 +692,14 @@ três atributos, por modelo e região, média das cinco dobras}
 Atributo & Modelo & Norte & Nordeste & Centro-Oeste & Sudeste & Sul \\
 \midrule
 Tipo de veículo & XGBoost & 158,2 & 169,1 & 129,3 & 103,3 & 90,2 \\
-                & kNN     & 19,7  & 17,0  & 7,5   & 2,4   & 2,4  \\
                 & MLP     & 130,8 & 128,6 & 79,7  & 28,0  & 31,0 \\
                 & SVM     & 127,2 & 115,4 & 67,8  & 39,9  & 24,2 \\
 \midrule
 Uso do solo     & XGBoost & 64,0  & 38,3  & 28,2  & 15,9  & 21,9 \\
-                & kNN     & 20,3  & 13,3  & 10,0  & 3,0   & 4,3  \\
                 & MLP     & 51,5  & 33,9  & 22,1  & 6,7   & 12,7 \\
                 & SVM     & 50,1  & 35,5  & 18,8  & 13,1  & 9,6  \\
 \midrule
 Tipo de pista   & XGBoost & 17,4  & 21,1  & 7,8   & 3,9   & 2,2  \\
-                & kNN     & 5,8   & 9,5   & 9,4   & 8,2   & 4,3  \\
                 & MLP     & 9,5   & 17,4  & 4,0   & 3,6   & 2,5  \\
                 & SVM     & 9,1   & 15,6  & 2,0   & $-0{,}6$ & 0,1 \\
 \bottomrule
@@ -729,17 +708,12 @@ Tipo de pista   & XGBoost & 17,4  & 21,1  & 7,8   & 3,9   & 2,2  \\
 
 \subsection{Discussão}
 
-Com os atributos do boletim da PRF, o óbito é previsível só em parte. O
-melhor F1 da classe óbito fica entre 0,26 e 0,35, a maioria dos óbitos
-não é identificada, e nenhum dos quatro modelos muda esse quadro. Os
-fatores principais são comuns ao país: tipo de veículo e tipo e causa do
-acidente lideram nos três modelos que concordam entre si, e o tipo de
-acidente fica entre os cinco primeiros em todos. O uso do solo fica
-entre os cinco primeiros no Norte e no Nordeste nesses três modelos. O
-peso desses fatores, por outro lado, muda entre regiões, e a mudança vai na
-mesma direção em todos os modelos. Tipo de veículo, uso do solo e tipo
-de pista pesam mais no Norte e no Nordeste, onde motocicleta, área rural
-e pista simples são mais letais (Figura~\ref{fig:categorias}).
+Com os atributos do boletim da PRF, o óbito é previsível só em parte,
+e nenhum dos quatro modelos muda esse quadro. Os fatores principais são
+comuns ao país, mas tipo de veículo, uso do solo e tipo de pista pesam
+mais no Norte e no Nordeste em todos os modelos, e essas são as regiões
+em que motocicleta, área rural e pista simples são mais letais
+(Figura~\ref{fig:categorias}).
 
 A transferência entre regiões tem a mesma forma nos quatro modelos. Os
 modelos do Sul e do Sudeste perdem mais no Norte e no Nordeste do que o
@@ -763,9 +737,7 @@ fatal e o deste é o óbito do envolvido, e os atributos e o
 balanceamento também diferem. Quanto à extensão a outras regiões, que o
 estudo aponta como trabalho futuro, os resultados indicam que o
 ordenamento do Sul se repete em boa parte do país, mas o peso de alguns
-fatores e o desempenho do modelo não se repetem. Um modelo treinado no
-Sul perde de 12\% a 15\% do F1 no Norte e no Nordeste com o XGBoost, e
-mais com os outros modelos.
+fatores e o desempenho do modelo não se repetem.
 
 Para a política pública, os fatores comuns sustentam medidas nacionais,
 como as voltadas a pedestres e a colisões frontais. Os fatores de peso
