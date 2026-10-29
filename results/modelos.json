@@ -5,59 +5,153 @@
  "corte_interno": "GroupShuffleSplit por id: 80% ajuste, 20% limiar",
  "busca_registros_reservados": 60000,
  "codificacao_marca": "GroupTargetEncoder m=10, 5 dobras por id",
- "hiperparametros": {
-  "learning_rate": 0.1,
-  "tree_method": "hist",
-  "enable_categorical": true,
-  "n_jobs": -1,
-  "max_depth": 4,
-  "min_child_weight": 5,
-  "n_estimators": 74
- },
- "busca": [
-  {
-   "max_depth": 4,
-   "min_child_weight": 1,
-   "auc_pr": 0.231631000351881,
-   "dp": 0.011567110182635907,
-   "arvores": 50
+ "importancia": "queda de AUC-PR, 3 permutações, até 10 mil linhas do teste da origem",
+ "modelos": {
+  "XGBoost": {
+   "hiperparametros": {
+    "learning_rate": 0.1,
+    "tree_method": "hist",
+    "enable_categorical": true,
+    "n_jobs": -1,
+    "max_depth": 4,
+    "min_child_weight": 5,
+    "n_estimators": 74
+   },
+   "busca": [
+    {
+     "max_depth": 4,
+     "min_child_weight": 1,
+     "auc_pr": 0.231631000351881,
+     "dp": 0.011567110182635907,
+     "arvores": 50
+    },
+    {
+     "max_depth": 4,
+     "min_child_weight": 5,
+     "auc_pr": 0.2331912762812179,
+     "dp": 0.01350026518534842,
+     "arvores": 74
+    },
+    {
+     "max_depth": 6,
+     "min_child_weight": 1,
+     "auc_pr": 0.22645718242557103,
+     "dp": 0.014794665639415934,
+     "arvores": 41
+    },
+    {
+     "max_depth": 6,
+     "min_child_weight": 5,
+     "auc_pr": 0.22933451611879155,
+     "dp": 0.010655173361929464,
+     "arvores": 31
+    },
+    {
+     "max_depth": 8,
+     "min_child_weight": 1,
+     "auc_pr": 0.20941881499106088,
+     "dp": 0.01227601511983139,
+     "arvores": 17
+    },
+    {
+     "max_depth": 8,
+     "min_child_weight": 5,
+     "auc_pr": 0.22449254494430337,
+     "dp": 0.011099481843321811,
+     "arvores": 14
+    }
+   ]
   },
-  {
-   "max_depth": 4,
-   "min_child_weight": 5,
-   "auc_pr": 0.2331912762812179,
-   "dp": 0.01350026518534842,
-   "arvores": 74
+  "kNN": {
+   "hiperparametros": {
+    "n_neighbors": 200
+   },
+   "busca": [
+    {
+     "n_neighbors": 25,
+     "auc_pr": 0.14859781574552094,
+     "dp": 0.0060257694401300065
+    },
+    {
+     "n_neighbors": 75,
+     "auc_pr": 0.16020121054502348,
+     "dp": 0.004380665843864142
+    },
+    {
+     "n_neighbors": 200,
+     "auc_pr": 0.16465121666042662,
+     "dp": 0.006259170382026798
+    }
+   ]
   },
-  {
-   "max_depth": 6,
-   "min_child_weight": 1,
-   "auc_pr": 0.22645718242557103,
-   "dp": 0.014794665639415934,
-   "arvores": 41
+  "MLP": {
+   "hiperparametros": {
+    "hidden_layer_sizes": [
+     64,
+     32
+    ],
+    "alpha": 0.0001
+   },
+   "busca": [
+    {
+     "hidden_layer_sizes": [
+      32
+     ],
+     "alpha": 0.0001,
+     "auc_pr": 0.18756261529387633,
+     "dp": 0.0368635716103215
+    },
+    {
+     "hidden_layer_sizes": [
+      32
+     ],
+     "alpha": 0.01,
+     "auc_pr": 0.18824576276290636,
+     "dp": 0.03716050250845408
+    },
+    {
+     "hidden_layer_sizes": [
+      64,
+      32
+     ],
+     "alpha": 0.0001,
+     "auc_pr": 0.21374211639347676,
+     "dp": 0.010785122923151964
+    },
+    {
+     "hidden_layer_sizes": [
+      64,
+      32
+     ],
+     "alpha": 0.01,
+     "auc_pr": 0.2094036895971394,
+     "dp": 0.010070584192781151
+    }
+   ]
   },
-  {
-   "max_depth": 6,
-   "min_child_weight": 5,
-   "auc_pr": 0.22933451611879155,
-   "dp": 0.010655173361929464,
-   "arvores": 31
-  },
-  {
-   "max_depth": 8,
-   "min_child_weight": 1,
-   "auc_pr": 0.20941881499106088,
-   "dp": 0.01227601511983139,
-   "arvores": 17
-  },
-  {
-   "max_depth": 8,
-   "min_child_weight": 5,
-   "auc_pr": 0.22449254494430337,
-   "dp": 0.011099481843321811,
-   "arvores": 14
+  "SVM": {
+   "hiperparametros": {
+    "C": 0.01
+   },
+   "busca": [
+    {
+     "C": 0.01,
+     "auc_pr": 0.21479520421100104,
+     "dp": 0.012259285521737422
+    },
+    {
+     "C": 0.1,
+     "auc_pr": 0.21454679695734735,
+     "dp": 0.012214482890169298
+    },
+    {
+     "C": 1.0,
+     "auc_pr": 0.21253953312841425,
+     "dp": 0.011769199442066256
+    }
+   ]
   }
- ],
+ },
  "atributos_sem_lugar": [
   "tipo_envolvido",
   "tipo_acidente_h",
@@ -97,7 +191,7 @@
   "longitude"
  ],
  "versoes": {
-  "python": "3.14.8",
+  "python": "3.13.5",
   "xgboost": "3.4.1",
   "scikit-learn": "1.9.1",
   "pandas": "3.0.6"
@@ -108,5 +202,5 @@
   "ordem_tipo_acidente == 1": 911408,
   "com rótulo": 774920
  },
- "duracao_s": 486
+ "duracao_s": 2179
 }
