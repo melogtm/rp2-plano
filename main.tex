@@ -461,7 +461,7 @@ próxima em todas as regiões (2,1\% a 2,8\%).
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{letalidade_categorias.pdf}
+\includegraphics[width=0.85\textwidth]{letalidade_categorias.pdf}
 \caption{Letalidade por envolvido (\%) em categorias selecionadas, por
 macrorregião (2021 a 2025). A última linha é a letalidade geral da
 região.}
@@ -470,9 +470,8 @@ região.}
 
 \subsection{Desempenho dentro de cada região}
 
-A Tabela~\ref{tab:diagonal} mostra o desempenho do XGBoost treinado e
-avaliado na mesma região. O F1 da classe óbito vai de 0,26 no Sudeste a
-0,35 no Nordeste, e a área sob a curva ROC fica entre 0,80 e 0,84. A
+Treinado e avaliado na mesma região, o XGBoost tem F1 da classe óbito
+de 0,26 no Sudeste a 0,35 no Nordeste (Tabela~\ref{tab:modelos}), e a área sob a curva ROC fica entre 0,80 e 0,84. A
 diferença no F1 acompanha a prevalência: as regiões com mais óbitos têm
 mais positivos a encontrar e atingem F1 maior, enquanto a área sob a
 curva ROC, que não depende da prevalência, varia pouco. O desvio-padrão
@@ -480,29 +479,10 @@ entre dobras é pequeno, de 0,010 a 0,015 no F1. O desempenho é modesto
 em termos absolutos: a revocação de 0,25 a 0,38 significa que a maioria
 dos óbitos não é identificada com os atributos registrados no boletim.
 
-\begin{table}[H]
-\centering
-\caption{XGBoost avaliado na própria região, média (desvio-padrão) entre
-as cinco dobras. A última coluna repete o F1 com os identificadores de
-lugar incluídos}
-\label{tab:diagonal}
-\footnotesize
-\setlength{\tabcolsep}{2.5pt}
-\begin{tabular}{lcccccc}
-\toprule
-Região & F1 & Precisão & Revocação & AUC-PR & AUC-ROC & F1 com lugar \\
-\midrule
-Norte        & 0,345 (0,011) & 0,315 (0,017) & 0,384 (0,036) & 0,296 (0,008) & 0,827 (0,013) & 0,344 (0,007) \\
-Nordeste     & 0,351 (0,011) & 0,335 (0,033) & 0,377 (0,051) & 0,311 (0,012) & 0,841 (0,003) & 0,301 (0,015) \\
-Centro-Oeste & 0,302 (0,015) & 0,259 (0,030) & 0,375 (0,066) & 0,233 (0,020) & 0,804 (0,010) & 0,253 (0,012) \\
-Sudeste      & 0,262 (0,010) & 0,289 (0,042) & 0,246 (0,036) & 0,195 (0,014) & 0,807 (0,009) & 0,192 (0,011) \\
-Sul          & 0,275 (0,014) & 0,254 (0,043) & 0,310 (0,035) & 0,195 (0,021) & 0,821 (0,004) & 0,188 (0,008) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 Incluir os identificadores de lugar não melhorou o F1 em nenhuma região
-e o reduziu em quatro; no Sul, ele caiu de 0,275 para 0,188. Em cerca
+e o reduziu em quatro. Com eles, o F1 ficou em 0,344 no Norte, 0,301 no
+Nordeste, 0,253 no Centro-Oeste, 0,192 no Sudeste e 0,188 no Sul, onde
+sem eles era de 0,275. Em cerca
 de 26 mil registros de ajuste, milhares de municípios e trechos de
 rodovia viram categorias com poucos casos cada, e o modelo ajusta ruído.
 Nesse volume de treino e com essa codificação, a exclusão não custou
