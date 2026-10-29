@@ -42,15 +42,18 @@ relevantes para o óbito de envolvidos em acidentes nas rodovias federais
 e verificar se esses fatores e a capacidade de predição se mantêm entre
 as cinco macrorregiões do IBGE. A base reúne os microdados abertos da
 Polícia Rodoviária Federal de 2021 a 2025, com 774.920 envolvidos e
-28.668 óbitos. Dos quatro algoritmos previstos (kNN, MLP, XGBoost e
-SVM), o XGBoost foi treinado nesta etapa em cada região, com validação
-agrupada por acidente e treinos de mesmo tamanho, e avaliado em todas as
-regiões. O F1 da classe óbito vai de 0,26 a 0,35. Tipo de veículo, tipo
-e causa do acidente e uso do solo são os fatores mais relevantes em
-todas as regiões, mas o peso do tipo de veículo, do uso do solo e do
-tipo de pista é de 1,8 a 5,8 vezes maior no Norte e no Nordeste. Aplicar um modelo do Sul
-ou do Sudeste ao Norte e ao Nordeste custa de 12\% a 19\% do F1, e a
-perda no sentido contrário é em geral menor.
+28.668 óbitos. Quatro algoritmos (kNN, MLP, XGBoost e SVM linear) foram
+treinados em cada região, com validação agrupada por acidente e treinos
+de mesmo tamanho, e avaliados em todas as regiões. O XGBoost e o SVM têm
+o melhor desempenho, com F1 da classe óbito de 0,25 a 0,35. Pelos
+valores SHAP do XGBoost, tipo de veículo, tipo e causa do acidente e uso
+do solo são os fatores mais relevantes em todas as regiões, e a
+importância por permutação confirma tipo de veículo e tipo e causa do
+acidente no topo também no MLP e no SVM. O peso do tipo de veículo, do
+uso do solo e do tipo de pista é maior no Norte e no Nordeste em todos
+os modelos. Aplicar um modelo do Sul ou do Sudeste ao Norte e ao
+Nordeste custa em média de 15\% a 32\% do F1, conforme o algoritmo, e a
+perda no sentido contrário é menor nos quatro modelos.
 \end{resumo}
 
 
@@ -114,8 +117,8 @@ futuro, direção que este trabalho segue.
 máquina, os principais fatores associados à gravidade de acidentes em
 rodovias federais brasileiras, comparando sua relevância e capacidade de
 predição entre as cinco macrorregiões do IBGE \cite{ibge2017}. A
-relevância é medida por valores SHAP, a capacidade de predição pelo F1
-da classe óbito e a comparação entre regiões pelo tau de Kendall e pela
+relevância é medida por valores SHAP e por importância por permutação,
+a capacidade de predição pelo F1 da classe óbito e a comparação entre regiões pelo tau de Kendall e pela
 sobreposição entre os $k$ fatores mais relevantes, o que torna o
 objetivo verificável ao final do trabalho \cite{wazlawick2009}.
 
@@ -136,7 +139,7 @@ florestas aleatórias, balanceamento por SMOTE \cite{chawla2002} e
 codificação por alvo do par rodovia e quilômetro \cite{gabardo2025}. O
 objetivo foi identificar, com SHAP, os fatores de risco e traduzi-los em
 recomendações. Localização na rodovia, tipo de acidente e tipo de pista
-lideraram o ordenamento. Dois desses algoritmos, kNN e MLP, estão previstos aqui,
+lideraram o ordenamento. Dois desses algoritmos, kNN e MLP, também são usados aqui,
 mas a análise se estende às cinco macrorregiões e ao período de 2021 a
 2025, o alvo passa a ser o óbito de cada envolvido em vez da
 classificação do acidente, e os ordenamentos são comparados entre
@@ -226,7 +229,7 @@ Trabalho & Recorte & Método & Fatores & Compara regiões? \\
 \cite{soliani2024} & PRF, caminhões, uma década & XGBoost, LightGBM & Descritiva & Não \\
 \cite{malta2023} & Óbitos, municípios, 2000 a 2018 & Análise espacial & Descritiva & Sim \\
 \cite{man2022} & Rodovias do Reino Unido, 2017 e 2018 & Rede neural, transferência & Não se aplica & Sim \\
-Este trabalho & PRF, Brasil, 2021 a 2025 & XGBoost (4 previstos) & SHAP & Sim, $5\times5$ \\
+Este trabalho & PRF, Brasil, 2021 a 2025 & kNN, MLP, XGBoost, SVM & SHAP, permutação & Sim, $5\times5$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -308,21 +311,47 @@ veículo (14.449 valores), que recebe codificação por alvo com suavização
 rótulo, cada linha do treino recebe a média do alvo estimada sem o seu
 próprio acidente.
 
-O plano prevê quatro classificadores: k-vizinhos mais próximos
-\cite{cover1967} e perceptron multicamadas \cite{rumelhart1986},
+São comparados quatro classificadores: k-vizinhos mais próximos (kNN)
+\cite{cover1967} e perceptron multicamadas (MLP) \cite{rumelhart1986},
 também usados no estudo da região Sul \cite{gabardo2025}, o XGBoost
-\cite{chen2016} e uma máquina de vetores de suporte com kernel linear
-\cite{cortes1995}. Nesta etapa foi
-implementado o XGBoost, um conjunto de árvores rasas treinadas em
-sequência que aceita atributos categóricos e valores ausentes e permite
-calcular valores SHAP exatos. Os
-hiperparâmetros foram escolhidos uma única vez, numa amostra nacional de
-60 mil registros sorteados por acidente e retirados do experimento, com
-validação cruzada de três dobras agrupada por acidente e área sob a
-curva precisão-revocação como critério. A
-busca escolheu profundidade máxima 4 e peso mínimo por folha 5, com taxa
-de aprendizado de 0,1 e 74 árvores, número fixado por parada antecipada
-na busca. Os valores são os mesmos em todas as regiões.
+\cite{chen2016} e uma máquina de vetores de suporte (SVM) com kernel
+linear \cite{cortes1995}. O XGBoost é um conjunto de árvores rasas
+treinadas em sequência. Ele aceita atributos categóricos e valores
+ausentes e permite calcular valores SHAP exatos. Os outros três recebem
+os categóricos em codificação one-hot e os demais atributos com os
+ausentes imputados pela mediana do treino, um indicador de ausência e
+padronização. O kNN estima a probabilidade de óbito pela fração de
+óbitos entre os $k$ vizinhos, e o MLP para de treinar quando a acurácia
+num corte interno do treino deixa de melhorar. O SVM linear não estima
+probabilidade. Como o limiar e as áreas sob as curvas dependem só da
+ordem dos escores, a distância ao hiperplano serve de escore.
+
+Os hiperparâmetros de cada modelo foram escolhidos uma única vez, numa
+amostra nacional de 60 mil registros sorteados por acidente e retirados
+do experimento, com validação cruzada de três dobras agrupada por
+acidente e área sob a curva precisão-revocação como critério. As grades
+e os valores escolhidos estão na Tabela~\ref{tab:hp} e valem para todas
+as regiões. No XGBoost, com taxa de aprendizado fixa de 0,1, o número de
+árvores foi fixado por parada antecipada na busca. O kNN escolheu o
+maior $k$ da grade.
+
+\begin{table}[H]
+\centering
+\caption{Grades da busca de hiperparâmetros, valores escolhidos e AUC-PR
+média do escolhido na validação cruzada da busca}
+\label{tab:hp}
+\small
+\begin{tabular}{l>{\raggedright\arraybackslash}p{5.6cm}>{\raggedright\arraybackslash}p{3.4cm}c}
+\toprule
+Modelo & Grade & Escolhido & AUC-PR \\
+\midrule
+XGBoost & profundidade máxima 4, 6 ou 8; peso mínimo por folha 1 ou 5 & profundidade 4, peso 5, 74 árvores & 0,233 \\
+kNN & $k$ = 25, 75 ou 200 & $k = 200$ & 0,165 \\
+MLP & camadas ocultas (32) ou (64, 32); $\alpha = 10^{-4}$ ou $10^{-2}$ & (64, 32), $\alpha = 10^{-4}$ & 0,214 \\
+SVM & $C$ = 0,01, 0,1 ou 1 & $C = 0{,}01$ & 0,215 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Protocolo de avaliação}
 
@@ -360,8 +389,20 @@ sobreposição entre os dez e os cinco atributos mais relevantes, e com a
 associação marginal de cada atributo com o óbito, medida pelo V de
 Cramér com correção de viés \cite{bergsma2013}.
 
+O SHAP exato só está disponível para modelos de árvores. Para comparar os
+quatro modelos, usa-se a importância por permutação \cite{breiman2001}:
+a queda da área sob a curva precisão-revocação quando os valores de um
+atributo são embaralhados entre os registros, o que desfaz sua relação
+com o óbito. Em cada modelo, região e dobra, cada atributo é embaralhado
+três vezes numa amostra de até 10 mil registros do teste da região, a
+mesma amostra para os quatro modelos, e os indicadores de traçado são
+embaralhados juntos. Os ordenamentos por permutação são comparados pelo
+tau de Kendall entre regiões, dentro de cada modelo, e entre modelos,
+dentro de cada região. No XGBoost, o tau entre o ordenamento SHAP e o
+de permutação serve de checagem das duas medidas.
 
-\section{Resultados Parciais}
+
+\section{Resultados e Discussão}
 
 Os números e figuras desta seção foram gerados em Python com pandas,
 scikit-learn \cite{pedregosa2011}, XGBoost e matplotlib \cite{hunter2007}. O código e os
@@ -467,6 +508,42 @@ rodovia viram categorias com poucos casos cada, e o modelo ajusta ruído.
 Nesse volume de treino e com essa codificação, a exclusão não custou
 desempenho.
 
+\subsection{Comparação entre os quatro modelos}
+
+A Tabela~\ref{tab:modelos} compara os quatro modelos na própria região.
+XGBoost e SVM linear ficam próximos em todas as regiões. O F1 do SVM
+fica no máximo 0,02 abaixo do F1 do XGBoost, e a AUC-PR, de 0,01 a 0,03
+abaixo. Um modelo linear tão perto do XGBoost sugere que a maior parte
+do que os atributos informam sobre o óbito é aditiva e que as
+interações capturadas pelas árvores acrescentam pouco. O MLP acompanha
+os dois no Norte e no Nordeste e cai no Sudeste e no Sul (F1 de 0,23 e
+0,22), onde varia mais entre dobras: no Sul, o desvio-padrão do F1 é de
+0,046. O kNN tem o pior desempenho em todas as regiões, com F1 de 0,22
+a 0,30 e AUC-ROC de 0,75 a 0,79. A ordem entre regiões se mantém nos
+quatro modelos: Norte e Nordeste têm o maior F1 e a maior AUC-PR.
+
+\begin{table}[H]
+\centering
+\caption{Os quatro modelos avaliados na própria região, média das cinco
+dobras}
+\label{tab:modelos}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{4}{c}{F1 da classe óbito} & \multicolumn{4}{c}{AUC-PR} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Região & XGBoost & kNN & MLP & SVM & XGBoost & kNN & MLP & SVM \\
+\midrule
+Norte        & 0,345 & 0,269 & 0,332 & 0,346 & 0,296 & 0,196 & 0,285 & 0,283 \\
+Nordeste     & 0,351 & 0,295 & 0,343 & 0,347 & 0,311 & 0,218 & 0,294 & 0,293 \\
+Centro-Oeste & 0,302 & 0,223 & 0,275 & 0,284 & 0,233 & 0,150 & 0,205 & 0,207 \\
+Sudeste      & 0,262 & 0,229 & 0,232 & 0,253 & 0,195 & 0,148 & 0,154 & 0,183 \\
+Sul          & 0,275 & 0,216 & 0,223 & 0,261 & 0,195 & 0,134 & 0,159 & 0,183 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Transferência entre regiões}
 
 Na matriz de transferência da Figura~\ref{fig:matriz}, o painel da
@@ -495,6 +572,29 @@ derivadas do Sul a essas regiões.
 Linhas: região de treino; colunas: região de avaliação. À direita,
 $(M_{jj}-M_{ij})/M_{jj}$ em \%.}
 \label{fig:matriz}
+\end{figure}
+
+A Figura~\ref{fig:modelos} repete o painel da direita para os quatro
+modelos, e a assimetria aparece em todos. A perda média dos modelos do
+Sul e do Sudeste no Norte e no Nordeste é de 15\% no XGBoost e no SVM,
+29\% no kNN e 32\% no MLP. No sentido contrário, é de 9\% no XGBoost,
+4\% no SVM, 10\% no kNN e menos de 1\% no MLP. Na AUC-PR, que não
+depende do limiar, a perda vai de 15\% a 30\% no sentido do Norte e do
+Nordeste e de $-1$\% a 10\% no sentido contrário. Norte e Nordeste
+continuam trocando modelos com perda de 1\% a 5\% nos quatro modelos.
+Os modelos mais fracos perdem mais: o modelo do Sudeste perde 44\% do
+F1 no Norte com o MLP e 38\% com o kNN. Os valores negativos do MLP, com
+o modelo do Norte acima do modelo do Sul na própria região Sul, refletem
+o modelo local fraco e instável nessa região.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{transferencia_modelos.pdf}
+\caption{Perda do F1 frente ao modelo local do destino,
+$(M_{jj}-M_{ij})/M_{jj}$ em \%, nos quatro modelos (média das cinco
+dobras). Linhas: região de treino; colunas: região de avaliação. A
+escala de cor é a mesma nos quatro painéis.}
+\label{fig:modelos}
 \end{figure}
 
 \subsection{Relevância dos fatores}
@@ -537,33 +637,171 @@ entre o ordenamento SHAP e o do V de Cramér com correção de viés
 \cite{bergsma2013} seja apenas moderada (tau de 0,41 a 0,55): a associação
 marginal não considera o que os demais atributos já informam.
 
-\section{Discussão e Conclusão}
+\subsection{Relevância nos quatro modelos}
 
-Com os atributos do boletim da PRF, o óbito é previsível apenas em
-parte: o F1 da classe óbito fica entre 0,26 e 0,35, e a maioria dos
-óbitos não é identificada. Os fatores mais relevantes são comuns ao
-país. Tipo de veículo, tipo e causa do acidente e uso do solo lideram o
-ordenamento em todas as regiões, o que sustenta medidas de alcance
-nacional, como as voltadas a pedestres e a colisões graves. O peso
-desses fatores, por outro lado, muda. Tipo de veículo, uso do solo e
-tipo de pista pesam de 1,8 a 5,8 vezes mais no Norte e no Nordeste,
-onde motocicleta, área rural e pista simples são mais letais, e modelos
-treinados no Sul e no Sudeste perdem de 12\% a 19\% do F1 nessas
-regiões. Recomendações derivadas de
-um recorte regional, como as do estudo da região Sul \cite{gabardo2025}, devem ser
-estendidas ao resto do país com cautela, principalmente onde a
-letalidade é maior. Os resultados sugerem que duplicação de pistas e
-fiscalização de motociclistas teriam retorno maior no Norte e no
-Nordeste.
+No XGBoost, a importância por permutação concorda com o SHAP, com tau
+de 0,56 no Sudeste a 0,78 no Norte. Por ser medida numa amostra de 10
+mil registros, a permutação é mais ruidosa, e a concordância entre
+regiões fica um pouco abaixo da do SHAP (tau médio de 0,61, contra
+0,69).
 
-Os resultados são associações e não permitem atribuir causa. Sem os
-identificadores de lugar, o ordenamento não pode ser comparado com o do
-estudo do Sul, cujo fator principal é o trecho da rodovia. O registro da
-PRF pode diferir entre regiões em cobertura e preenchimento, e apenas um
-modelo foi implementado. Até o relatório
-final serão acrescentados os outros três classificadores previstos,
-com o mesmo protocolo, para verificar se a estabilidade dos fatores e a
-assimetria da transferência dependem do modelo.
+Entre os modelos, a concordância depende do par
+(Tabela~\ref{tab:taumodelos}). XGBoost, SVM e MLP concordam entre si,
+com tau médio de 0,51 a 0,64, e os três põem tipo de veículo, tipo de
+acidente e causa do acidente entre os cinco atributos mais relevantes
+em todas as regiões. O tipo de acidente está entre os cinco primeiros
+em todos os modelos e regiões. O kNN se afasta dos demais (tau de 0,25
+a 0,51) porque põe a marca do veículo em primeiro lugar nas cinco
+regiões. A marca entra nos modelos como a taxa de óbito da marca, um
+número contínuo que pesa na distância entre registros, e embaralhá-la
+desfaz a vizinhança que o kNN usa para estimar a probabilidade. O
+primeiro lugar da marca no kNN vem, portanto, da forma como ele mede
+distâncias. No
+XGBoost e no SVM, a marca tem importância próxima de zero; no MLP, ela
+fica em primeiro lugar no Sudeste e em quarto no Sul, as regiões em que
+esse modelo é mais instável. Dentro de cada modelo, os ordenamentos das
+regiões se parecem: o tau médio entre pares de regiões é de 0,61 no
+XGBoost, 0,63 no SVM, 0,54 no kNN e 0,51 no MLP.
+
+\begin{table}[H]
+\centering
+\caption{Tau de Kendall entre os ordenamentos por permutação de dois
+modelos na mesma região, média das cinco dobras}
+\label{tab:taumodelos}
+\small
+\begin{tabular}{lcccccc}
+\toprule
+Par de modelos & Norte & Nordeste & Centro-Oeste & Sudeste & Sul & Média \\
+\midrule
+XGBoost e SVM & 0,69 & 0,64 & 0,64 & 0,59 & 0,63 & 0,64 \\
+XGBoost e MLP & 0,56 & 0,66 & 0,61 & 0,34 & 0,56 & 0,55 \\
+MLP e SVM     & 0,55 & 0,64 & 0,56 & 0,34 & 0,47 & 0,51 \\
+kNN e MLP     & 0,53 & 0,50 & 0,56 & 0,45 & 0,50 & 0,51 \\
+XGBoost e kNN & 0,34 & 0,36 & 0,38 & 0,26 & 0,30 & 0,33 \\
+kNN e SVM     & 0,32 & 0,34 & 0,24 & 0,13 & 0,23 & 0,25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A diferença de peso entre regiões que o SHAP do XGBoost mostrou se
+repete nos outros modelos (Tabela~\ref{tab:pesos}). Na permutação, o
+tipo de veículo vale de 1,8 a 1,9 vez mais no Norte e no Nordeste do que
+no Sul no XGBoost, de 4,1 a 4,2 vezes no MLP, de 4,8 a 5,3 vezes no SVM
+e de 7 a 8 vezes no kNN. O uso do solo vale de 1,7 a 5,2 vezes mais
+nessas duas regiões, conforme o modelo. No XGBoost, no MLP e no SVM, o
+tipo de pista tem queda de no máximo 3,9 no Sul e no Sudeste e de 9,1 a
+21,1 no Norte e no Nordeste, na escala da tabela; no kNN, esse padrão
+não aparece. Parte da
+diferença vem da AUC-PR de base, maior no Norte e no Nordeste (até 1,6
+vez a do Sul no XGBoost), mas as razões do MLP, do SVM e do kNN vão
+muito além disso. O tipo de envolvido faz o caminho inverso no XGBoost
+e no SVM e pesa mais no Sudeste e no Sul. Como ele divide com o tipo de
+veículo a identidade do pedestre, a inversão é coerente com o tipo de
+veículo pesar menos nessas regiões.
+
+\begin{table}[H]
+\centering
+\caption{Importância por permutação (queda de AUC-PR $\times 1000$) de
+três atributos, por modelo e região, média das cinco dobras}
+\label{tab:pesos}
+\small
+\begin{tabular}{llrrrrr}
+\toprule
+Atributo & Modelo & Norte & Nordeste & Centro-Oeste & Sudeste & Sul \\
+\midrule
+Tipo de veículo & XGBoost & 158,2 & 169,1 & 129,3 & 103,3 & 90,2 \\
+                & kNN     & 19,7  & 17,0  & 7,5   & 2,4   & 2,4  \\
+                & MLP     & 130,8 & 128,6 & 79,7  & 28,0  & 31,0 \\
+                & SVM     & 127,2 & 115,4 & 67,8  & 39,9  & 24,2 \\
+\midrule
+Uso do solo     & XGBoost & 64,0  & 38,3  & 28,2  & 15,9  & 21,9 \\
+                & kNN     & 20,3  & 13,3  & 10,0  & 3,0   & 4,3  \\
+                & MLP     & 51,5  & 33,9  & 22,1  & 6,7   & 12,7 \\
+                & SVM     & 50,1  & 35,5  & 18,8  & 13,1  & 9,6  \\
+\midrule
+Tipo de pista   & XGBoost & 17,4  & 21,1  & 7,8   & 3,9   & 2,2  \\
+                & kNN     & 5,8   & 9,5   & 9,4   & 8,2   & 4,3  \\
+                & MLP     & 9,5   & 17,4  & 4,0   & 3,6   & 2,5  \\
+                & SVM     & 9,1   & 15,6  & 2,0   & $-0{,}6$ & 0,1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Discussão}
+
+Com os atributos do boletim da PRF, o óbito é previsível só em parte. O
+melhor F1 da classe óbito fica entre 0,26 e 0,35, a maioria dos óbitos
+não é identificada, e nenhum dos quatro modelos muda esse quadro. Os
+fatores principais são comuns ao país: tipo de veículo e tipo e causa do
+acidente lideram nos três modelos que concordam entre si, e o tipo de
+acidente fica entre os cinco primeiros em todos. O uso do solo fica
+entre os cinco primeiros no Norte e no Nordeste nesses três modelos. O
+peso desses fatores, por outro lado, muda entre regiões, e a mudança vai na
+mesma direção em todos os modelos. Tipo de veículo, uso do solo e tipo
+de pista pesam mais no Norte e no Nordeste, onde motocicleta, área rural
+e pista simples são mais letais (Figura~\ref{fig:categorias}).
+
+A transferência entre regiões tem a mesma forma nos quatro modelos. Os
+modelos do Sul e do Sudeste perdem mais no Norte e no Nordeste do que o
+contrário. Uma explicação compatível com os dados é que, no Sul e no
+Sudeste, motocicleta, área rural e pista simples têm letalidade mais
+próxima da média, e o modelo aprende efeitos pequenos para elas. Levado
+ao Norte e ao Nordeste, onde essas categorias concentram os óbitos, ele
+subestima o risco delas. Um modelo do
+Norte já aprendeu esses efeitos com peso alto e, no Sul, eles continuam
+apontando na direção certa, embora pesem menos. Como a assimetria
+aparece em árvores, num modelo linear, numa rede neural e num método de
+vizinhança, ela deve vir das diferenças entre as regiões, e a escolha
+do algoritmo pesa pouco.
+
+O estudo da região Sul \cite{gabardo2025} encontrou localização na
+rodovia, tipo de acidente e tipo de pista no topo do ordenamento. Aqui o
+tipo de acidente também lidera, mas o tipo de pista fica em 12º lugar
+no Sul pelo SHAP, e a localização foi excluída de propósito. A comparação
+direta é limitada, porque o alvo daquele estudo é o acidente com vítima
+fatal e o deste é o óbito do envolvido, e os atributos e o
+balanceamento também diferem. Quanto à extensão a outras regiões, que o
+estudo aponta como trabalho futuro, os resultados indicam que o
+ordenamento do Sul se repete em boa parte do país, mas o peso de alguns
+fatores e o desempenho do modelo não se repetem. Um modelo treinado no
+Sul perde de 12\% a 15\% do F1 no Norte e no Nordeste com o XGBoost, e
+mais com os outros modelos.
+
+Para a política pública, os fatores comuns sustentam medidas nacionais,
+como as voltadas a pedestres e a colisões frontais. Os fatores de peso
+regional apontam para medidas de retorno maior no Norte e no Nordeste,
+como a duplicação de pistas simples e a fiscalização de motociclistas
+em áreas rurais. Para quem usa modelos preditivos com dados da PRF, a
+consequência prática é validar o modelo na região em que ele será usado
+antes de tirar dele recomendações.
+
+Os resultados são associações e não permitem atribuir causa. O boletim não traz atributos como a velocidade no impacto ou o
+tempo até o atendimento, e a forma de registro pode diferir entre
+regiões. Os treinos foram reduzidos ao tamanho do Norte, o que iguala as
+regiões mas desperdiça dados do Sul e do Sudeste. As grades de busca
+foram pequenas, e o kNN escolheu o maior $k$ testado, de modo que um $k$
+maior poderia melhorar seu desempenho. A importância por permutação
+divide o crédito entre atributos redundantes de forma diferente do SHAP,
+e por isso os ordenamentos dos modelos não são comparáveis um a um com
+o ordenamento SHAP.
+
+\section{Conclusão}
+
+Este trabalho comparou, nas cinco macrorregiões do IBGE, os fatores
+associados ao óbito de envolvidos em acidentes nas rodovias federais,
+com quatro algoritmos e dados da PRF de 2021 a 2025. O óbito é previsível
+só em parte (F1 de 0,26 a 0,35 no melhor modelo de cada região), e
+XGBoost e SVM linear têm desempenho parecido. Os fatores principais são
+os mesmos no país, mas tipo de veículo, uso do solo e tipo de pista
+pesam mais no Norte e no Nordeste em todos os modelos. Modelos treinados
+no Sul e no Sudeste perdem em média de 15\% a 32\% do F1 no Norte e no
+Nordeste, conforme o algoritmo, e a perda no sentido contrário é menor
+nos quatro modelos.
+Recomendações tiradas de uma região devem ser validadas antes de chegar
+às outras, sobretudo onde a letalidade é maior. Como trabalhos futuros,
+ficam a inclusão de dados de outras fontes, como frota e malha viária
+por região, e um modelo nacional que receba a região como atributo, para comparar
+com os modelos regionais.
 
 \bibliographystyle{sbc}
 \bibliography{referencias}
