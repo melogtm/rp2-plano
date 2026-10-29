@@ -1,4 +1,5 @@
-"""XGBoost por macrorregião: desempenho, matriz de transferência 5×5 e SHAP.
+"""XGBoost, kNN, MLP e SVM por macrorregião: desempenho, matriz de
+transferência 5×5, SHAP (XGBoost) e importância por permutação (os quatro).
 
 Cada região é dividida uma vez em 5 dobras agrupadas por acidente. Na dobra k,
 o modelo da região i treina no treino de i (subamostrado para o tamanho do
@@ -6,7 +7,7 @@ menor treino, o do Norte, preservando a proporção de classes) e é avaliado no
 teste k de cada região j. O limiar de decisão é escolhido num corte interno do
 treino e aplicado sem mudança em todas as regiões. Uma segunda rodada, só na
 diagonal, inclui os identificadores de lugar, para medir quanto do desempenho
-vem de "onde" e não de "o quê".
+vem de "onde" e não de "o quê". A rodada com lugar e o SHAP são só do XGBoost.
 
 Uso: .venv/bin/python src/modelos.py [--rapido] [--figuras]
 """
@@ -23,10 +24,17 @@ import sklearn
 import xgboost as xgb
 from scipy.stats import kendalltau
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.compose import make_column_transformer
+from sklearn.impute import SimpleImputer
 from sklearn.metrics import (average_precision_score, precision_recall_curve,
                              roc_auc_score)
 from sklearn.model_selection import (GroupKFold, GroupShuffleSplit,
                                      StratifiedGroupKFold)
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.svm import LinearSVC
 
 from dados import base_analitica
 import matplotlib
@@ -53,9 +61,15 @@ ROTULO = {**{c: ATRIBUTOS[c] for c in CATEG}, "idade_n": "Idade",
 # Rótulo do modelo -> rótulo equivalente no V de Cramér da exploratória.
 EQUIV_CRAMER = {"Idade": "Faixa etária", "Hora": "Faixa horária"}
 
-# Busca única, em acidentes separados do experimento; o escolhido (inclusive o
-# número de árvores, pela parada antecipada da busca) vale para todas as regiões.
-GRADE = [dict(max_depth=d, min_child_weight=w) for d in (4, 6, 8) for w in (1, 5)]
+# Busca única por modelo, em acidentes separados do experimento; o escolhido
+# (no XGBoost, inclusive o número de árvores, pela parada antecipada da busca)
+# vale para todas as regiões.
+GRADE = {
+    "XGBoost": [dict(max_depth=d, min_child_weight=w) for d in (4, 6, 8) for w in (1, 5)],
+    "kNN": [dict(n_neighbors=k) for k in (25, 75, 200)],
+    "MLP": [dict(hidden_layer_sizes=h, alpha=a) for h in ((32,), (64, 32)) for a in (1e-4, 1e-2)],
+    "SVM": [dict(C=c) for c in (0.01, 0.1, 1.0)],
+}
 XGB_FIXO = dict(learning_rate=0.1, tree_method="hist", enable_categorical=True, n_jobs=-1)
 
 
@@ -127,9 +141,30 @@ class GroupTargetEncoder(BaseEstimator, TransformerMixin):
 
 
 # ------------------------------------------------------------------- modelo
-MODELOS = {  # os demais classificadores entram aqui no relatório final
+def numerico(clf):
+    """Pipeline dos modelos que não aceitam categorias nem ausentes: one-hot nos
+    categóricos; nos demais (numéricos, `marca` codificada e traçado), mediana
+    com indicador de ausência e padronização."""
+    return make_pipeline(make_column_transformer(
+        (OneHotEncoder(handle_unknown="ignore", sparse_output=False), CATEG),
+        remainder=make_pipeline(SimpleImputer(strategy="median", add_indicator=True),
+                                StandardScaler())), clf)
+
+
+MODELOS = {
     "XGBoost": lambda hp, seed: xgb.XGBClassifier(**XGB_FIXO, **hp, random_state=seed),
+    "kNN": lambda hp, seed: numerico(KNeighborsClassifier(**hp, n_jobs=-1)),
+    "MLP": lambda hp, seed: numerico(MLPClassifier(**hp, early_stopping=True, random_state=seed)),
+    "SVM": lambda hp, seed: numerico(LinearSVC(**hp, random_state=seed)),
 }
+
+
+def escore(clf, A):
+    """Escore da classe óbito: probabilidade, ou a distância ao hiperplano no
+    SVM linear, que não estima probabilidade. Limiar e AUCs só usam a ordem."""
+    if hasattr(clf, "predict_proba"):
+        return clf.predict_proba(A)[:, 1]
+    return clf.decision_function(A)
 
 
 def melhor_limiar(y, p):
@@ -149,13 +184,13 @@ def ajustar(nome, X, y, cols, hp, seed):
     A_val = enc.transform(X.iloc[val][cols + ["id"]])
     clf = MODELOS[nome](hp, seed)
     clf.fit(A_fit, y.iloc[fit])
-    limiar = melhor_limiar(y.iloc[val], clf.predict_proba(A_val)[:, 1])
+    limiar = melhor_limiar(y.iloc[val], escore(clf, A_val))
     return clf, enc, limiar
 
 
 def avaliar(clf, enc, limiar, X, y, cols):
     """Métricas do modelo ajustado em (X, y), com o limiar fixado no treino."""
-    p = clf.predict_proba(enc.transform(X[cols + ["id"]]))[:, 1]
+    p = escore(clf, enc.transform(X[cols + ["id"]]))
     pred = p >= limiar
     tp = int((pred & (y == 1)).sum())
     prec = tp / max(pred.sum(), 1)
@@ -183,6 +218,30 @@ def shap_medio(clf, enc, X, cols):
     return C.abs().mean().rename(index=ROTULO)
 
 
+def importancia(clf, enc, X, y, cols, seed, n=10_000, rep=3):
+    """Queda média de AUC-PR ao embaralhar cada atributo antes da codificação,
+    numa amostra de até n linhas sorteada com `seed` (a mesma para todos os
+    modelos). Os indicadores de traçado são embaralhados juntos, como um
+    atributo só."""
+    rng = np.random.default_rng(seed)
+    if len(X) > n:
+        i = np.sort(rng.choice(len(X), n, replace=False))
+        X, y = X.iloc[i], y.iloc[i]
+    base = average_precision_score(y, escore(clf, enc.transform(X[cols + ["id"]])))
+    trac = [c for c in cols if c.startswith("tracado_")]
+    grupos = {**{c: [c] for c in cols if c not in trac}, "tracado": trac}
+    out = {}
+    for a, cs in grupos.items():
+        queda = []
+        for _ in range(rep):
+            Xp = X.copy()
+            # iloc + set_axis mantém o dtype categórico que o XGBoost exige
+            Xp[cs] = Xp[cs].iloc[rng.permutation(len(Xp))].set_axis(Xp.index)
+            queda.append(base - average_precision_score(y, escore(clf, enc.transform(Xp[cols + ["id"]]))))
+        out[ROTULO[a]] = float(np.mean(queda))
+    return pd.Series(out)
+
+
 def subamostrar(y, n, seed):
     """Índices posicionais de `y` com tamanho n e a proporção de classes de y."""
     rng = np.random.default_rng(seed)
@@ -205,33 +264,41 @@ def separar_busca(X, y, n):
 
 def buscar_hp(nome, X, y, cols, rapido):
     """Busca única em amostra nacional separada, CV agrupada de 3 dobras, AUC-PR.
-    A parada antecipada na dobra de validação da busca fixa o número de árvores."""
+    No XGBoost, a parada antecipada na dobra de validação da busca fixa o
+    número de árvores."""
     Xs, ys = X.reset_index(drop=True), y.reset_index(drop=True)
     notas = []
-    for hp in (GRADE[:1] if rapido else GRADE):
+    for hp in (GRADE[nome][:1] if rapido else GRADE[nome]):
         s, arv = [], []
         for tr, te in GroupKFold(3).split(Xs, ys, Xs["id"]):
             enc = GroupTargetEncoder(["marca"])
             A_tr = enc.fit_transform(Xs.iloc[tr][cols + ["id"]], ys.iloc[tr])
             A_te = enc.transform(Xs.iloc[te][cols + ["id"]])
-            clf = xgb.XGBClassifier(**XGB_FIXO, **hp, n_estimators=500,
-                                    early_stopping_rounds=30, eval_metric="aucpr",
-                                    random_state=SEED)
-            clf.fit(A_tr, ys.iloc[tr], eval_set=[(A_te, ys.iloc[te])], verbose=False)
-            s.append(average_precision_score(ys.iloc[te], clf.predict_proba(A_te)[:, 1]))
-            arv.append(clf.best_iteration + 1)
+            if nome == "XGBoost":
+                clf = xgb.XGBClassifier(**XGB_FIXO, **hp, n_estimators=500,
+                                        early_stopping_rounds=30, eval_metric="aucpr",
+                                        random_state=SEED)
+                clf.fit(A_tr, ys.iloc[tr], eval_set=[(A_te, ys.iloc[te])], verbose=False)
+                arv.append(clf.best_iteration + 1)
+            else:
+                clf = MODELOS[nome](hp, SEED).fit(A_tr, ys.iloc[tr])
+            s.append(average_precision_score(ys.iloc[te], escore(clf, A_te)))
         notas.append({**hp, "auc_pr": float(np.mean(s)), "dp": float(np.std(s)),
-                      "arvores": int(round(np.mean(arv)))})
-        print("  busca", notas[-1], flush=True)
+                      **({"arvores": int(round(np.mean(arv)))} if arv else {})})
+        print(f"  busca {nome}", notas[-1], flush=True)
     melhor = max(notas, key=lambda d: d["auc_pr"])
-    return {**{k: melhor[k] for k in GRADE[0]}, "n_estimators": melhor["arvores"]}, notas
+    hp = {k: melhor[k] for k in GRADE[nome][0]}
+    return ({**hp, "n_estimators": melhor["arvores"]} if nome == "XGBoost" else hp), notas
 
 
-def rodar(rapido=False, nome="XGBoost"):
-    """Experimento completo: busca de hiperparâmetros, 5 dobras x 5 regiões de
-    treino x 5 de teste e SHAP. Grava metricas.csv, shap.csv e modelos.json em
-    results/ e chama `resumir`. Com `rapido`, uma dobra e treinos de 5 mil
-    registros, para testar o código (saídas com sufixo _rapido)."""
+def rodar(rapido=False):
+    """Experimento completo, modelo a modelo: busca de hiperparâmetros, 5 dobras
+    x 5 regiões de treino x 5 de teste e importância por permutação; no
+    XGBoost, também SHAP e a rodada com lugar. Ao fim de cada modelo grava
+    metricas.csv, importancia.csv, shap.csv e modelos.json em results/, para
+    que uma falha adiante não apague o que já rodou, e no fim chama `resumir`.
+    Com `rapido`, uma dobra e treinos de 5 mil registros, para testar o código
+    (saídas com sufixo _rapido)."""
     t0 = time.time()
     df, funil = base_analitica()
     X, y, reg = montar(df)
@@ -240,8 +307,7 @@ def rodar(rapido=False, nome="XGBoost"):
     cols = {"sem_lugar": lugar_fora, "com_lugar": lugar_fora + LUGAR}
 
     i_busca, i_exp = separar_busca(X, y, 10_000 if rapido else N_BUSCA)
-    hp, notas = buscar_hp(nome, X.iloc[i_busca], y.iloc[i_busca], cols["sem_lugar"], rapido)
-    print("hiperparâmetros:", hp, flush=True)
+    Xb, yb = X.iloc[i_busca], y.iloc[i_busca]
     X, y, reg = (X.iloc[i_exp].reset_index(drop=True), y.iloc[i_exp].reset_index(drop=True),
                  reg.iloc[i_exp].reset_index(drop=True))
 
@@ -252,56 +318,67 @@ def rodar(rapido=False, nome="XGBoost"):
     n_sub = min(len(tr) for r in REGIOES for tr, _ in dobras[r])
     if rapido:
         n_sub = 5_000
-    linhas, shap = [], []
-    for k in range(1 if rapido else K):
-        teste = {r: por[r][dobras[r][k][1]] for r in REGIOES}
-        Xte = {r: X.iloc[teste[r]] for r in REGIOES}
-        yte = {r: y.iloc[teste[r]] for r in REGIOES}
-        for i in REGIOES:
-            tr = por[i][dobras[i][k][0]]
-            assert not set(X["id"].iloc[tr]) & set(X["id"].iloc[teste[i]]), "id em treino e teste"
-            tr = tr[subamostrar(y.iloc[tr], n_sub, SEED + k)]
-            Xi, yi = X.iloc[tr].reset_index(drop=True), y.iloc[tr].reset_index(drop=True)
-            for var, c in cols.items():
-                clf, enc, lim = ajustar(nome, Xi, yi, c, hp, SEED + k)
-                destinos = REGIOES if var == "sem_lugar" else [i]
-                for j in destinos:
-                    m = avaliar(clf, enc, lim, Xte[j], yte[j], c)
-                    linhas.append({"modelo": nome, "variante": var, "origem": i,
-                                   "destino": j, "dobra": k, "limiar": lim,
-                                   **m})
-                if var == "sem_lugar":
-                    s = shap_medio(clf, enc, Xte[i], c)
-                    shap += [{"modelo": nome, "regiao": i, "dobra": k, "atributo": a,
-                              "shap_abs_medio": v} for a, v in s.items()]
-            d = next(l for l in reversed(linhas)
-                     if l["variante"] == "sem_lugar" and l["destino"] == i)
-            print(f"dobra {k} {i:12s} F1 diag {d['f1']:.3f}  ({time.time() - t0:.0f}s)", flush=True)
-
     sufixo = "_rapido" if rapido else ""
-    met = pd.DataFrame(linhas)
-    met.to_csv(RES / f"metricas{sufixo}.csv", index=False)
-    pd.DataFrame(shap).to_csv(RES / f"shap{sufixo}.csv", index=False)
-    cfg = {"semente": SEED, "dobras": K, "n_subamostra_treino": int(n_sub),
-           "corte_interno": "GroupShuffleSplit por id: 80% ajuste, 20% limiar",
-           "busca_registros_reservados": int(len(i_busca)),
-           "codificacao_marca": "GroupTargetEncoder m=10, 5 dobras por id",
-           "hiperparametros": {**XGB_FIXO, **hp},
-           "busca": notas, "atributos_sem_lugar": cols["sem_lugar"], "lugar": LUGAR,
-           "versoes": {"python": platform.python_version(), "xgboost": xgb.__version__,
-                       "scikit-learn": sklearn.__version__, "pandas": pd.__version__},
-           "funil": funil, "duracao_s": round(time.time() - t0)}
-    (RES / f"modelos{sufixo}.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=1))
+    linhas, shap, imp, cfg_modelos = [], [], [], {}
+    for nome in MODELOS:
+        hp, notas = buscar_hp(nome, Xb, yb, cols["sem_lugar"], rapido)
+        print(f"{nome}: hiperparâmetros {hp}", flush=True)
+        cfg_modelos[nome] = {"hiperparametros": {**XGB_FIXO, **hp} if nome == "XGBoost" else hp,
+                             "busca": notas}
+        variantes = cols if nome == "XGBoost" else {"sem_lugar": cols["sem_lugar"]}
+        for k in range(1 if rapido else K):
+            teste = {r: por[r][dobras[r][k][1]] for r in REGIOES}
+            Xte = {r: X.iloc[teste[r]] for r in REGIOES}
+            yte = {r: y.iloc[teste[r]] for r in REGIOES}
+            for i in REGIOES:
+                tr = por[i][dobras[i][k][0]]
+                assert not set(X["id"].iloc[tr]) & set(X["id"].iloc[teste[i]]), "id em treino e teste"
+                tr = tr[subamostrar(y.iloc[tr], n_sub, SEED + k)]
+                Xi, yi = X.iloc[tr].reset_index(drop=True), y.iloc[tr].reset_index(drop=True)
+                for var, c in variantes.items():
+                    clf, enc, lim = ajustar(nome, Xi, yi, c, hp, SEED + k)
+                    destinos = REGIOES if var == "sem_lugar" else [i]
+                    for j in destinos:
+                        m = avaliar(clf, enc, lim, Xte[j], yte[j], c)
+                        linhas.append({"modelo": nome, "variante": var, "origem": i,
+                                       "destino": j, "dobra": k, "limiar": lim,
+                                       **m})
+                    if var == "sem_lugar":
+                        s = importancia(clf, enc, Xte[i], yte[i], c, SEED + k)
+                        imp += [{"modelo": nome, "regiao": i, "dobra": k, "atributo": a,
+                                 "queda_auc_pr": v} for a, v in s.items()]
+                    if var == "sem_lugar" and nome == "XGBoost":
+                        s = shap_medio(clf, enc, Xte[i], c)
+                        shap += [{"modelo": nome, "regiao": i, "dobra": k, "atributo": a,
+                                  "shap_abs_medio": v} for a, v in s.items()]
+                d = next(l for l in reversed(linhas)
+                         if l["variante"] == "sem_lugar" and l["destino"] == i)
+                print(f"{nome} dobra {k} {i:12s} F1 diag {d['f1']:.3f}  ({time.time() - t0:.0f}s)",
+                      flush=True)
+
+        pd.DataFrame(linhas).to_csv(RES / f"metricas{sufixo}.csv", index=False)
+        pd.DataFrame(imp).to_csv(RES / f"importancia{sufixo}.csv", index=False)
+        pd.DataFrame(shap).to_csv(RES / f"shap{sufixo}.csv", index=False)
+        cfg = {"semente": SEED, "dobras": K, "n_subamostra_treino": int(n_sub),
+               "corte_interno": "GroupShuffleSplit por id: 80% ajuste, 20% limiar",
+               "busca_registros_reservados": int(len(i_busca)),
+               "codificacao_marca": "GroupTargetEncoder m=10, 5 dobras por id",
+               "importancia": "queda de AUC-PR, 3 permutações, até 10 mil linhas do teste da origem",
+               "modelos": cfg_modelos, "atributos_sem_lugar": cols["sem_lugar"], "lugar": LUGAR,
+               "versoes": {"python": platform.python_version(), "xgboost": xgb.__version__,
+                           "scikit-learn": sklearn.__version__, "pandas": pd.__version__},
+               "funil": funil, "duracao_s": round(time.time() - t0)}
+        (RES / f"modelos{sufixo}.json").write_text(json.dumps(cfg, ensure_ascii=False, indent=1))
     resumir(sufixo)
 
 
 # ------------------------------------------------------------------- resumo
-def resumir(sufixo=""):
-    """Agrega metricas.csv e shap.csv (médias e desvios entre dobras) em
-    modelos_resumo.json. Lê results/exploratoria.json para comparar o SHAP
-    com o V de Cramér, então a exploratória precisa ter rodado antes."""
-    met = pd.read_csv(RES / f"metricas{sufixo}.csv")
-    shap = pd.read_csv(RES / f"shap{sufixo}.csv")
+SUL_SE, NORTE_NE = ["Sul", "Sudeste"], ["Norte", "Nordeste"]
+
+
+def _desempenho(met):
+    """Matrizes 5x5, perda de transferência e diagonal de um modelo (médias e
+    desvios entre dobras)."""
     out = {}
     sem = met[met.variante == "sem_lugar"]
     g = sem.groupby(["origem", "destino"])
@@ -319,11 +396,44 @@ def resumir(sufixo=""):
         out[f"degradacao_{nome}"] = {o: {d: [round(deg.loc[(o, d), "mean"], 3),
                                              round(deg.loc[(o, d), "std"], 3)]
                                          for d in REGIOES} for o in REGIOES}
+        # Perda média nos quatro pares Sul/Sudeste -> Norte/Nordeste e no sentido contrário.
+        m = deg["mean"]
+        out[f"assimetria_{nome}"] = {
+            "sul_sudeste_para_norte_nordeste": round(np.mean([m[o, d] for o in SUL_SE for d in NORTE_NE]), 3),
+            "norte_nordeste_para_sul_sudeste": round(np.mean([m[o, d] for o in NORTE_NE for d in SUL_SE]), 3)}
     diag_cols = ["f1", "precisao", "revocacao", "auc_pr", "auc_roc", "taxa_predita_positiva", "prevalencia"]
     for var in ["sem_lugar", "com_lugar"]:
         d = met[(met.variante == var) & (met.origem == met.destino)].groupby("origem")[diag_cols]
         out[f"diagonal_{var}"] = {r: {c: [round(d.mean().loc[r, c], 3), round(d.std().loc[r, c], 3)]
                                       for c in diag_cols} for r in REGIOES if r in d.mean().index}
+    return out
+
+
+def resumir(sufixo=""):
+    """Agrega metricas.csv, importancia.csv e shap.csv (médias e desvios entre
+    dobras) em modelos_resumo.json. Lê results/exploratoria.json para comparar
+    o SHAP com o V de Cramér, então a exploratória precisa ter rodado antes."""
+    met = pd.read_csv(RES / f"metricas{sufixo}.csv")
+    imp = pd.read_csv(RES / f"importancia{sufixo}.csv")
+    shap = pd.read_csv(RES / f"shap{sufixo}.csv")
+    modelos = [m for m in MODELOS if m in set(met.modelo)]
+    out = {"modelos": {m: _desempenho(met[met.modelo == m]) for m in modelos}}
+
+    # Importância por permutação: ordenamento por modelo e região, e tau de
+    # Kendall (médio entre dobras) entre regiões no mesmo modelo e entre
+    # modelos na mesma região.
+    ti = imp.pivot_table(index=["modelo", "regiao", "dobra"], columns="atributo", values="queda_auc_pr")
+    dobras = ti.index.get_level_values("dobra").unique()
+    media_i = ti.groupby(["modelo", "regiao"]).mean()
+    tau = lambda a, b: round(float(np.mean([kendalltau(ti.loc[a + (k,)], ti.loc[b + (k,)])[0]
+                                            for k in dobras])), 3)
+    out["importancia_media"] = {m: media_i.loc[m].T[REGIOES].round(4).to_dict() for m in modelos}
+    out["importancia_ordenamento"] = {m: {r: list(media_i.loc[(m, r)].sort_values(ascending=False).index)
+                                          for r in REGIOES} for m in modelos}
+    out["importancia_tau_regioes"] = {m: {f"{a} x {b}": tau((m, a), (m, b))
+                                          for a, b in combinations(REGIOES, 2)} for m in modelos}
+    out["importancia_tau_modelos"] = {r: {f"{a} x {b}": tau((a, r), (b, r))
+                                          for a, b in combinations(modelos, 2)} for r in REGIOES}
 
     # Ordenamentos SHAP: por região (média das dobras) e concordância par a par por dobra.
     tab = shap.pivot_table(index=["regiao", "dobra"], columns="atributo", values="shap_abs_medio")
@@ -350,10 +460,16 @@ def resumir(sufixo=""):
                 for k in tab.index.get_level_values("dobra").unique()] for r in REGIOES}
     out["shap_vs_cramer"] = {r: {"tau": [round(np.mean(v), 3), round(np.std(v, ddof=1), 3)],
                                  "n_atributos": len(comum)} for r, v in porc.items()}
+    # Checagem: no XGBoost, SHAP e permutação devem ordenar os atributos de forma parecida.
+    out["shap_vs_permutacao"] = {r: round(float(np.mean(
+        [kendalltau(tab.loc[(r, k)], ti.loc[("XGBoost", r, k)][tab.columns])[0] for k in dobras])), 3)
+        for r in REGIOES}
     (RES / f"modelos_resumo{sufixo}.json").write_text(json.dumps(out, ensure_ascii=False, indent=1))
-    print(json.dumps({k: out[k] for k in ["matriz_f1", "shap_pares", "shap_vs_cramer"]},
+    print(json.dumps({m: {"diagonal_f1": {r: v["f1"] for r, v in d["diagonal_sem_lugar"].items()},
+                          "assimetria": d["assimetria_destino"]}
+                      for m, d in out["modelos"].items()}, ensure_ascii=False, indent=1))
+    print(json.dumps({k: out[k] for k in ["importancia_tau_modelos", "shap_vs_permutacao"]},
                      ensure_ascii=False, indent=1))
-    print("ordenamentos:", json.dumps(out["shap_ordenamento"], ensure_ascii=False, indent=1))
 
 
 # ------------------------------------------------------------------ figuras
@@ -377,12 +493,14 @@ def _heatmap(ax, M, cmap, norm, fmt, escuro):
 
 
 def figuras():
-    """Gera matriz_transferencia.pdf e shap_regioes.pdf a partir de
-    modelos_resumo.json, sem treinar nada."""
+    """Gera matriz_transferencia.pdf, transferencia_modelos.pdf e
+    shap_regioes.pdf a partir de modelos_resumo.json, sem treinar nada."""
     r = json.loads((RES / "modelos_resumo.json").read_text())
-    f1 = pd.DataFrame({o: {d: r["matriz_f1"][o][d][0] for d in REGIOES} for o in REGIOES}).T.loc[REGIOES, REGIOES]
-    deg = pd.DataFrame({o: {d: r["degradacao_destino"][o][d][0] for d in REGIOES}
-                        for o in REGIOES}).T.loc[REGIOES, REGIOES] * 100
+    matriz = lambda M: pd.DataFrame({o: {d: M[o][d][0] for d in REGIOES}
+                                     for o in REGIOES}).T.loc[REGIOES, REGIOES]
+    xg = r["modelos"]["XGBoost"]
+    f1 = matriz(xg["matriz_f1"])
+    deg = matriz(xg["degradacao_destino"]) * 100
     num = lambda f: (lambda x: f.format(x).replace(".", ",").replace("-", "−"))
 
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(6.3, 2.5))
@@ -400,6 +518,24 @@ def figuras():
     a2.set_title("Perda frente ao modelo local (%)", loc="left")
     fig.tight_layout()
     fig.savefig(FIG / "matriz_transferencia.pdf")
+    plt.close(fig)
+
+    # Perda de transferência dos quatro modelos, na mesma escala de cor.
+    degs = {m: matriz(d["degradacao_destino"]) * 100 for m, d in r["modelos"].items()}
+    lim = max(np.abs(d.to_numpy()).max() for d in degs.values())
+    fig, eixos = plt.subplots(2, 2, figsize=(6.3, 4.6))
+    for (m, d), ax in zip(degs.items(), eixos.flat):
+        _heatmap(ax, d, div, matplotlib.colors.Normalize(-lim, lim), num("{:.0f}"),
+                 lambda t: abs(t - 0.5) > 0.35)
+        ax.set_title(m, loc="left")
+    for ax in eixos[0]:
+        ax.set_xlabel("")
+    for ax in eixos[:, 1]:
+        ax.set_yticklabels([])
+    for ax in eixos[:, 0]:
+        ax.set_ylabel("Região de treino")
+    fig.tight_layout()
+    fig.savefig(FIG / "transferencia_modelos.pdf")
     plt.close(fig)
 
     S = pd.DataFrame(r["shap_medio"])[REGIOES]

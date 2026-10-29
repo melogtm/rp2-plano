@@ -30,6 +30,7 @@ overleaf/
 
 # Python
 __pycache__/
+.venv/
 
 # Dados: só os CSV comprimidos (.xz) vão para o git
 data/*.csv
