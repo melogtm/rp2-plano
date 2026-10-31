@@ -16,7 +16,7 @@ O artigo é escrito em LaTeX. Cada um edita localmente e commita; o GitHub Actio
 ├── src/
 │   ├── dados.py                  # leitura, filtros e base analítica
 │   ├── exploratoria.py           # análise por macrorregião e figuras da exploratória
-│   └── modelos.py                # XGBoost por região, transferência e SHAP
+│   └── modelos.py                # XGBoost, kNN, MLP e SVM por região, transferência, SHAP e permutação
 ├── results/                      # números citados no texto (JSON e CSV)
 ├── figuras/                      # PDFs incluídos no artigo
 ├── requirements.txt
@@ -110,7 +110,7 @@ Microdados abertos da PRF, variante "agrupados por pessoa, todas as causas e tip
 
 ## Reproduzir os resultados
 
-Os resultados foram gerados com Python 3.14 (`versoes` em `results/modelos.json`). As versões das bibliotecas estão em `requirements.txt`.
+Os resultados foram gerados com Python 3.13 (`versoes` em `results/modelos.json`). As versões das bibliotecas estão em `requirements.txt`.
 
 ```bash
 python3 -m venv .venv
@@ -125,9 +125,9 @@ A ordem importa. `exploratoria.py` grava `results/exploratoria.json`, e o resumo
 | Script | Gera |
 |---|---|
 | `exploratoria.py` | `results/exploratoria.json` (funil, tabela por região, letalidade por ano e por categoria, V de Cramér); `figuras/letalidade_categorias.pdf`, `letalidade_ano.pdf`, `associacao_regioes.pdf` |
-| `modelos.py` | `results/metricas.csv` (uma linha por dobra, origem e destino), `results/shap.csv` (SHAP médio por dobra, região e atributo), `results/modelos.json` (configuração, hiperparâmetros e versões) e `results/modelos_resumo.json` (médias e desvios, matriz de transferência, ordenamentos e tau de Kendall) |
-| `modelos.py --figuras` | `figuras/matriz_transferencia.pdf` e `figuras/shap_regioes.pdf`, a partir de `modelos_resumo.json`, sem treinar de novo |
+| `modelos.py` | `results/metricas.csv` (uma linha por modelo, dobra, origem e destino), `results/importancia.csv` (queda de AUC-PR por permutação, por modelo, dobra, região e atributo), `results/shap.csv` (SHAP médio do XGBoost por dobra, região e atributo), `results/modelos.json` (configuração, busca e hiperparâmetros de cada modelo, versões) e `results/modelos_resumo.json` (médias e desvios por modelo, matrizes de transferência, ordenamentos e tau de Kendall) |
+| `modelos.py --figuras` | `figuras/matriz_transferencia.pdf`, `figuras/transferencia_modelos.pdf` e `figuras/shap_regioes.pdf`, a partir de `modelos_resumo.json`, sem treinar de novo |
 
 `.venv/bin/python src/test_encoder.py` testa se a codificação de `marca` exclui o próprio acidente, para que pessoas do mesmo acidente não passem o rótulo umas para as outras.
 
-O experimento completo levou cerca de 8 minutos na última execução (`duracao_s` em `results/modelos.json`). Para testar uma mudança no código antes disso, `src/modelos.py --rapido` roda uma dobra só, com treinos de 5 mil registros, e grava as saídas com o sufixo `_rapido`, sem sobrescrever as do artigo.
+O experimento completo levou cerca de 36 minutos na última execução, com 8 núcleos (`duracao_s` em `results/modelos.json`). O XGBoost termina em pouco mais de 2 minutos, e a maior parte do tempo vai para o kNN. Para testar uma mudança no código antes disso, `src/modelos.py --rapido` roda uma dobra só, com treinos de 5 mil registros, e grava as saídas com o sufixo `_rapido`, sem sobrescrever as do artigo. Com treinos desse tamanho o MLP fica perto do acaso, então o modo rápido serve para ver se o código roda, e os números dele não devem ser lidos.
