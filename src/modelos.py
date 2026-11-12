@@ -7,7 +7,7 @@ menor treino, o do Norte, preservando a proporção de classes) e é avaliado no
 teste k de cada região j. O limiar de decisão é escolhido num corte interno do
 treino e aplicado sem mudança em todas as regiões. Uma segunda rodada, só na
 diagonal, inclui os identificadores de lugar, para medir quanto do desempenho
-vem de "onde" e não de "o quê". A rodada com lugar e o SHAP são só do XGBoost.
+vem da localização. A rodada com lugar e o SHAP são só do XGBoost.
 
 Uso: .venv/bin/python src/modelos.py [--rapido] [--figuras]
 """
@@ -75,8 +75,10 @@ XGB_FIXO = dict(learning_rate=0.1, tree_method="hist", enable_categorical=True, 
 
 # ------------------------------------------------------------------ atributos
 def montar(df):
-    """Matriz de atributos. Mantém `id` (grupo) e `marca` em texto, que é
-    codificada por alvo dentro de cada treino."""
+    """Matriz com todos os atributos, inclusive os de lugar (`rodar` escolhe
+    as colunas de cada variante). Mantém `id` (grupo) e `marca` em texto, que
+    é codificada por alvo dentro de cada treino. Retorna X, y e a macrorregião
+    de cada linha."""
     df = preparar(df)
     X = pd.DataFrame({c: df[c].astype(str).astype("category") for c in CATEG})
     X["idade_n"] = df["idade"].where(df["idade"].between(0, 120))
@@ -104,12 +106,18 @@ class GroupTargetEncoder(BaseEstimator, TransformerMixin):
     o seu acidente (GroupKFold por `id`). Pessoas do mesmo acidente têm o
     mesmo rótulo, e sem isso uma vazaria o rótulo para as outras. No
     teste, usa-se o mapa ajustado sobre todo o treino. `id` é consumido e
-    não sai como atributo."""
+    não sai como atributo.
+
+    cols: colunas codificadas. grupo: coluna do acidente. m: peso da média
+    geral na suavização (quanto maior, mais uma categoria rara fica perto
+    dela). n_splits: dobras do ajuste fora-da-dobra."""
 
     def __init__(self, cols, grupo="id", m=10, n_splits=5):
         self.cols, self.grupo, self.m, self.n_splits = cols, grupo, m, n_splits
 
     def _mapa(self, X, y):
+        """Por coluna, (soma de y + m * prior) / (contagem + m) de cada
+        categoria; prior é a média de y."""
         prior = y.mean()
         return {c: (y.groupby(X[c]).agg(["sum", "count"]).pipe(lambda t: (t["sum"] + self.m * prior) / (t["count"] + self.m)))
                 for c in self.cols}, prior
@@ -168,7 +176,7 @@ def escore(clf, A):
 
 
 def melhor_limiar(y, p):
-    """Limiar de probabilidade que maximiza o F1 da classe positiva."""
+    """Limiar de escore que maximiza o F1 da classe positiva."""
     prec, rev, lim = precision_recall_curve(y, p)
     f1 = 2 * prec * rev / np.maximum(prec + rev, 1e-12)
     return float(lim[np.argmax(f1[:-1])])
@@ -176,7 +184,8 @@ def melhor_limiar(y, p):
 
 def ajustar(nome, X, y, cols, hp, seed):
     """Codificação de `marca` e ajuste num corte interno por acidente: 80% para
-    o ajuste e 20% só para escolher o limiar (o número de árvores vem da busca)."""
+    o ajuste e 20% só para escolher o limiar (o número de árvores vem da busca).
+    Retorna o classificador, o codificador e o limiar."""
     fit, val = next(GroupShuffleSplit(1, test_size=0.2, random_state=seed)
                     .split(X, y, X["id"]))
     enc = GroupTargetEncoder(["marca"])
@@ -561,9 +570,13 @@ def figuras():
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--rapido", action="store_true")
-    ap.add_argument("--figuras", action="store_true")
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--rapido", action="store_true",
+                    help="uma dobra e treinos de 5 mil registros, só para ver se o código "
+                         "roda; grava as saídas com o sufixo _rapido")
+    ap.add_argument("--figuras", action="store_true",
+                    help="refaz as figuras a partir de results/modelos_resumo.json, sem treinar")
     a = ap.parse_args()
     if a.figuras:
         figuras()

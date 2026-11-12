@@ -1,8 +1,8 @@
-# Plano de Trabalho — Resolução de Problemas II (ACH0042)
+# Fatores associados à gravidade de acidentes em rodovias federais brasileiras
 
-Repositório do trabalho em grupo de RP II, 2026/2 (EACH-USP).
+Repositório do trabalho em grupo de Resolução de Problemas II (ACH0042), 2026/2, EACH-USP. Aqui estão o artigo em LaTeX (`main.tex`), o código que gera os números e as figuras (`src/`) e os resultados citados no texto (`results/`). Para gerar tudo de novo, veja [Reproduzir os resultados](#reproduzir-os-resultados).
 
-O artigo é escrito em LaTeX. Cada um edita localmente e commita; o GitHub Actions compila o PDF a cada push. **Ninguém precisa instalar LaTeX pra contribuir** — dá pra escrever a sua seção e pegar o PDF pronto no CI. Mas instalar dá feedback em segundos em vez de minutos, então vale.
+O artigo é escrito em LaTeX. Cada um edita localmente e commita; o GitHub Actions compila o PDF a cada push. Ninguém precisa instalar LaTeX pra contribuir: dá pra escrever a sua seção e pegar o PDF pronto no CI. Mas instalar dá feedback em segundos em vez de minutos, então vale.
 
 ## Estrutura
 
@@ -49,7 +49,7 @@ sudo tlmgr update --self
 sudo tlmgr install latexmk babel-portuges collection-fontsrecommended
 ```
 
-Se preferir não caçar pacote faltando um a um, use o MacTeX completo (`brew install --cask mactex`) — ~5 GB, mas resolve tudo de uma vez.
+Se preferir não caçar pacote faltando um a um, use o MacTeX completo (`brew install --cask mactex`). São uns 5 GB, mas resolve tudo de uma vez.
 
 ### Verificar
 
@@ -65,7 +65,7 @@ VS Code + extensão **LaTeX Workshop** (`James-Yu.latex-workshop`).
 
 A config já está em `.vscode/settings.json`, então ao clonar você herda tudo. Na primeira compilação (`Ctrl+Alt+B` / `Cmd+Alt+B`), escolha a receita **latexmk (latexmk)**.
 
-- `Ctrl+Alt+V` — abre o preview do PDF lado a lado
+- `Ctrl+Alt+V` abre o preview do PDF lado a lado
 - Salvar o arquivo já dispara a compilação
 - Clicar no PDF pula pra linha correspondente no `.tex` (SyncTeX)
 
@@ -83,9 +83,9 @@ O CI roda em PRs justamente pra quebrar antes de entrar na `main`. Se o build fa
 
 ## Fluxo de trabalho
 
-1. `git pull` antes de começar a escrever — sempre
+1. `git pull` sempre antes de começar a escrever
 2. Trabalhe na sua seção; evite reformatar linhas de outra pessoa (vira conflito por nada)
-3. Compile local antes de commitar — não empurre `.tex` quebrado
+3. Compile local antes de commitar, para não empurrar `.tex` quebrado
 4. Commits pequenos e frequentes; mensagem dizendo a seção (`metodo: primeira versão`)
 
 Se for por branch: uma branch por seção, PR pra `main`, merge quando o CI passar.
@@ -96,7 +96,7 @@ Se for por branch: uma branch por seção, PR pra `main`, merge quando o CI pass
 |---|---|---|
 | 26/08 | Plano de trabalho (P1) | 5% |
 | 16/09 | Avanços do relatório | — |
-| 21/10 | Relatório parcial + vídeo 8–10 min (P2) | 5% |
+| 21/10 | Relatório parcial + vídeo de 8 a 10 min (P2) | 5% |
 | 18/11 | Relatório final (P3) | 90% |
 | 19/11 | Slides da apresentação | — |
 

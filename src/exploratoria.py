@@ -1,4 +1,4 @@
-"""Análise exploratória da base analítica (2021–2025) por macrorregião.
+"""Análise exploratória da base analítica (2021 a 2025) por macrorregião.
 
 Gera as figuras do relatório em figuras/ e os números citados no texto em
 results/exploratoria.json. Uso: .venv/bin/python src/exploratoria.py
@@ -22,9 +22,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 FIG = RAIZ / "figuras"
 RES = RAIZ / "results"
 REGIOES = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"]
-# Paleta categórica de referência (ordem fixa, validada para daltonismo).
+# Cores das regiões, na mesma ordem em todas as figuras.
 COR = dict(zip(REGIOES, ["#2a78d6", "#eb6834", "#1baf7a", "#4a3aa7", "#e34948"]))
-# Forma por região: identidade não depende só da cor (sem validador de CVD aqui).
+# Marcador por região, para as figuras se lerem também sem cor.
 MARCA = dict(zip(REGIOES, ["o", "s", "^", "D", "v"]))
 AZUIS = ["#f4f8fd", "#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"]
 
