@@ -49,9 +49,9 @@ o melhor desempenho, com F1 da classe óbito de 0,25 a 0,35. Pelos
 valores SHAP do XGBoost, tipo de veículo, tipo e causa do acidente e uso
 do solo são os fatores mais relevantes em todas as regiões, e a
 importância por permutação confirma tipo de veículo e tipo e causa do
-acidente no topo também no MLP e no SVM. O peso do tipo de veículo, do
-uso do solo e do tipo de pista é maior no Norte e no Nordeste em todos
-os modelos. Aplicar um modelo do Sul ou do Sudeste ao Norte e ao
+acidente no topo também no MLP e no SVM. O peso do tipo de veículo e do
+uso do solo é maior no Norte e no Nordeste nos quatro modelos, e o do
+tipo de pista, em todos menos no kNN. Aplicar um modelo do Sul ou do Sudeste ao Norte e ao
 Nordeste custa em média de 15\% a 32\% do F1, conforme o algoritmo, e a
 perda no sentido contrário é menor nos quatro modelos.
 \end{resumo}
@@ -324,7 +324,7 @@ padronização. O kNN estima a probabilidade de óbito pela fração de
 óbitos entre os $k$ vizinhos, e o MLP para de treinar quando a acurácia
 num corte interno do treino deixa de melhorar. O SVM linear não estima
 probabilidade. Como o limiar e as áreas sob as curvas dependem só da
-ordem dos escores, a distância ao hiperplano serve de escore.
+ordem dos escores, a distância ao hiperplano é usada como escore.
 
 Os hiperparâmetros de cada modelo foram escolhidos uma única vez, numa
 amostra nacional de 60 mil registros sorteados por acidente e retirados
@@ -399,14 +399,14 @@ mesma amostra para os quatro modelos, e os indicadores de traçado são
 embaralhados juntos. Os ordenamentos por permutação são comparados pelo
 tau de Kendall entre regiões, dentro de cada modelo, e entre modelos,
 dentro de cada região. No XGBoost, o tau entre o ordenamento SHAP e o
-de permutação serve de checagem das duas medidas.
+de permutação mostra se as duas medidas concordam.
 
 
 \section{Resultados e Discussão}
 
 Os números e figuras desta seção foram gerados em Python com pandas,
 scikit-learn \cite{pedregosa2011}, XGBoost e matplotlib \cite{hunter2007}. O código e os
-dados estão no repositório do trabalho.
+dados estão em \url{https://github.com/melogtm/rp2-plano}.
 
 \subsection{Composição regional}
 
@@ -630,16 +630,15 @@ concordam entre si, com tau médio entre as regiões de 0,64 (XGBoost e
 SVM), 0,55 (XGBoost e MLP) e 0,51 (MLP e SVM), e os três põem tipo de veículo, tipo de
 acidente e causa do acidente entre os cinco atributos mais relevantes
 em todas as regiões. O tipo de acidente está entre os cinco primeiros
-em todos os modelos e regiões. O kNN se afasta dos demais (tau de 0,33 com o
-XGBoost, 0,51 com o MLP e 0,25 com o SVM) porque põe a marca do veículo em primeiro lugar nas cinco
+em todos os modelos e regiões. O kNN concorda pouco com o XGBoost e com
+o SVM (tau de 0,33 e 0,25), e com o MLP tem tau de 0,51, o mesmo do par
+MLP e SVM. Ele põe a marca do veículo em primeiro lugar nas cinco
 regiões. A marca entra nos modelos como a taxa de óbito da marca, um
 número contínuo que pesa na distância entre registros, e embaralhá-la
-desfaz a vizinhança que o kNN usa para estimar a probabilidade. O
-primeiro lugar da marca no kNN vem, portanto, da forma como ele mede
-distâncias. No
-XGBoost e no SVM, a marca tem importância próxima de zero; no MLP, ela
-fica em primeiro lugar no Sudeste e em quarto no Sul, as regiões em que
-esse modelo é mais instável. Dentro de cada modelo, os ordenamentos das
+desfaz a vizinhança que o kNN usa para estimar a probabilidade. No SVM,
+a marca tem importância próxima de zero, e no XGBoost fica entre o 9º e
+o 14º lugar. No MLP, ela é a primeira no Sudeste e a quarta no Sul, as
+regiões em que esse modelo é mais instável. Dentro de cada modelo, os ordenamentos das
 regiões se parecem: o tau médio entre pares de regiões é de 0,61 no
 XGBoost, 0,63 no SVM, 0,54 no kNN e 0,51 no MLP.
 
@@ -690,10 +689,10 @@ Tipo de pista   & XGBoost & 17,4  & 21,1  & 7,8   & 3,9   & 2,2  \\
 
 Com os atributos do boletim da PRF, o óbito é previsível só em parte,
 e nenhum dos quatro modelos muda esse quadro. Os fatores principais são
-comuns ao país, mas tipo de veículo, uso do solo e tipo de pista pesam
-mais no Norte e no Nordeste em todos os modelos, e essas são as regiões
-em que motocicleta, área rural e pista simples são mais letais
-(Figura~\ref{fig:categorias}).
+comuns ao país, mas tipo de veículo e uso do solo pesam mais no Norte e
+no Nordeste nos quatro modelos, e o tipo de pista também, exceto no
+kNN. Essas são as regiões em que motocicleta, área rural e pista
+simples são mais letais (Figura~\ref{fig:categorias}).
 
 A transferência entre regiões tem a mesma forma nos quatro modelos. Os
 modelos do Sul e do Sudeste perdem mais no Norte e no Nordeste do que o
@@ -721,9 +720,9 @@ fatores e o desempenho do modelo não se repetem.
 
 Para a política pública, os fatores comuns sustentam medidas nacionais,
 como as voltadas a pedestres e a colisões frontais. Os fatores de peso
-regional apontam para medidas de retorno maior no Norte e no Nordeste,
-como a duplicação de pistas simples e a fiscalização de motociclistas
-em áreas rurais. Para quem usa modelos preditivos com dados da PRF, a
+regional indicam onde priorizar, no Norte e no Nordeste, medidas como a
+duplicação de pistas simples e a fiscalização de motociclistas em áreas
+rurais. Para quem usa modelos preditivos com dados da PRF, a
 consequência prática é validar o modelo na região em que ele será usado
 antes de tirar dele recomendações.
 
@@ -744,8 +743,9 @@ associados ao óbito de envolvidos em acidentes nas rodovias federais,
 com quatro algoritmos e dados da PRF de 2021 a 2025. O óbito é previsível
 só em parte (F1 de 0,26 a 0,35 no melhor modelo de cada região), e
 XGBoost e SVM linear têm desempenho parecido. Os fatores principais são
-os mesmos no país, mas tipo de veículo, uso do solo e tipo de pista
-pesam mais no Norte e no Nordeste em todos os modelos. Modelos treinados
+os mesmos no país, mas tipo de veículo e uso do solo pesam mais no Norte
+e no Nordeste nos quatro modelos, e o tipo de pista em todos menos no
+kNN. Modelos treinados
 no Sul e no Sudeste perdem em média de 15\% a 32\% do F1 no Norte e no
 Nordeste, conforme o algoritmo, e a perda no sentido contrário é menor
 nos quatro modelos.
