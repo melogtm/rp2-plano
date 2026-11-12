@@ -1,8 +1,8 @@
 """Carregamento e preparação dos microdados da PRF.
 
 Variante "agrupados por pessoa, todas as causas e tipos de acidente",
-arquivos anuais 2021–2025. Todas as funções recebem/retornam DataFrames
-para serem reutilizadas por exploratoria.py e modelos.py.
+arquivos anuais de 2021 a 2025. As funções retornam DataFrames do pandas
+e são usadas por exploratoria.py e modelos.py.
 """
 from pathlib import Path
 
@@ -19,7 +19,7 @@ MACRORREGIAO = {
     **dict.fromkeys(["PR", "RS", "SC"], "Sul"),
 }
 
-# Renomeações de causa_acidente dentro de 2021–2025 (grafia e redação).
+# Renomeações de causa_acidente dentro de 2021 a 2025 (grafia e redação).
 HARMONIZA_CAUSA = {
     "Transitar no Acostamento": "Transitar no acostamento",
     "Ingestão de álcool e/ou substâncias psicoativas pelo pedestre": "Pedestre: ingestão de álcool ou substâncias",
@@ -37,7 +37,8 @@ DTYPES = {
 
 
 def carregar_bruta(anos=range(2021, 2026), usar_cache=True) -> pd.DataFrame:
-    """Concatena os arquivos anuais. Mantém latitude/longitude como texto."""
+    """Concatena os arquivos anuais. Mantém latitude/longitude como texto.
+    Com `usar_cache`, lê e grava data/base_bruta.parquet."""
     xz = {ano: DATA_DIR / f"acidentes{ano}_todas_causas_tipos.csv.xz" for ano in anos}
     # Um .xz mais novo que o parquet (a PRF atualiza o ano corrente) refaz o cache.
     if usar_cache and CACHE.exists() and max(
