@@ -97,8 +97,9 @@ Se for por branch: uma branch por seção, PR pra `main`, merge quando o CI pass
 | 26/08 | Plano de trabalho (P1) | 5% |
 | 16/09 | Avanços do relatório | — |
 | 21/10 | Relatório parcial + vídeo de 8 a 10 min (P2) | 5% |
-| 18/11 | Relatório final (P3) | 90% |
-| 19/11 | Slides da apresentação | — |
+| 22/11 | Relatório final (P3) | 90% |
+| 23/11 | Slides da apresentação (presencial, 12 min e mais 3 de perguntas) | — |
+| 24/11 | Vídeo de 5 a 6 min sobre o código, sem slides | — |
 
 Só um integrante submete cada entrega. Todos apresentam no vídeo e na apresentação final.
 
