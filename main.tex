@@ -102,7 +102,7 @@ predição e permitem ordenar os fatores por relevância, como já foi feito
 na detecção de acidentes em vias expressas \cite{parsa2020}. Ao treinar
 um modelo por macrorregião e comparar os ordenamentos obtidos, é
 possível dizer quais fatores são comuns ao país e quais são específicos
-de uma região. Além disso, a mesma estrutura permite medir quanto um
+de uma região. A mesma estrutura também permite medir quanto um
 modelo treinado em uma região perde ao ser aplicado em outra.
 
 Na região Sul, por exemplo, um estudo treinou k-vizinhos mais próximos,
@@ -209,7 +209,7 @@ Em outro estudo, uma rede neural treinada com dados da rodovia M1, no
 Reino Unido, foi aplicada a outras rodovias e anos \cite{man2022}. A
 aplicação direta não funcionou, e o desempenho só foi recuperado com
 aprendizado por transferência. Nesses estudos o objetivo é reduzir a
-perda de desempenho. Aqui a perda é o que se mede, e sua magnitude entre
+perda de desempenho. Aqui a perda é medida, e sua magnitude entre
 macrorregiões indica se fatores e recomendações obtidos em uma região
 valem para as demais.
 
@@ -542,7 +542,7 @@ outra prevalência.
 
 O Centro-Oeste fica no meio: seu modelo perde de 7\% a 10\% nas demais
 regiões. O modelo do Sul perde de 12\% a 15\% do F1 no Norte e no
-Nordeste, onde mais se morre, o que limita a extensão de recomendações
+Nordeste, as regiões de maior letalidade, o que limita a extensão de recomendações
 derivadas do Sul a essas regiões.
 
 \begin{figure}[H]
@@ -653,8 +653,8 @@ tipo de pista tem queda de no máximo 3,9 no Sul e no Sudeste e de 9,1 a
 21,1 no Norte e no Nordeste, na escala da tabela; no kNN, esse padrão
 não aparece. Parte da
 diferença vem da AUC-PR de base, maior no Norte e no Nordeste (até 1,6
-vez a do Sul no XGBoost), mas as razões dos outros modelos vão muito
-além disso. O tipo de envolvido faz o caminho inverso no XGBoost
+vez a do Sul no XGBoost), mas a AUC-PR de base não explica razões de
+4 a 5 vezes no MLP e no SVM. O tipo de envolvido faz o caminho inverso no XGBoost
 e no SVM e pesa mais no Sudeste e no Sul. Como ele divide com o tipo de
 veículo a identidade do pedestre, a inversão é coerente com o tipo de
 veículo pesar menos nessas regiões.
@@ -687,8 +687,8 @@ Tipo de pista   & XGBoost & 17,4  & 21,1  & 7,8   & 3,9   & 2,2  \\
 
 \subsection{Discussão}
 
-Com os atributos do boletim da PRF, o óbito é previsível só em parte,
-e nenhum dos quatro modelos muda esse quadro. Os fatores principais são
+Com os atributos do boletim da PRF, o óbito é previsível só em parte
+nos quatro modelos. Os fatores principais são
 comuns ao país, mas tipo de veículo e uso do solo pesam mais no Norte e
 no Nordeste nos quatro modelos, e o tipo de pista também, exceto no
 kNN. Essas são as regiões em que motocicleta, área rural e pista
