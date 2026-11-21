@@ -1,4 +1,4 @@
-# Fatores associados à gravidade de acidentes em rodovias federais brasileiras
+# Fatores associados ao óbito em acidentes nas rodovias federais brasileiras
 
 Repositório do trabalho em grupo de Resolução de Problemas II (ACH0042), 2026/2, EACH-USP. Aqui estão o artigo em LaTeX (`main.tex`), o código que gera os números e as figuras (`src/`) e os resultados citados no texto (`results/`). Para gerar tudo de novo, veja [Reproduzir os resultados](#reproduzir-os-resultados).
 
